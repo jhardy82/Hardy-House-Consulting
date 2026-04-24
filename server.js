@@ -6,6 +6,7 @@ import pagesRouter   from './routes/pages.js';
 import elementRouter from './routes/api/element.js';
 import exportRouter  from './routes/api/export.js';
 import agentsRouter  from './routes/api/agents.js';
+import tasksRouter   from './routes/tasks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app  = express();
@@ -23,6 +24,7 @@ app.use(session({
 app.use('/api/element',  elementRouter);
 app.use('/api/export',   exportRouter);
 app.use('/api/agents',   agentsRouter);
+app.use('/tasks',        tasksRouter);
 app.use('/',             pagesRouter);
 
 app.listen(PORT, () => console.log(`Hardy House running on http://localhost:${PORT}`));
