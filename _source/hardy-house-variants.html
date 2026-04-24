@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy House — Brand Variant Studio</title>
+<style>
+/* Fonts loaded from Google CDN when online; fallback to system serif/mono offline */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+</style>
+<style>
+/* ================================================================
+   RESET & BASE
+================================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Lora',Georgia,serif;background:#07040F;color:#F4F0EB;min-height:100vh;overflow-x:hidden;}
+button{font-family:inherit;cursor:pointer;}
+
+/* ================================================================
+   DOCK — sticky top navigation
+================================================================ */
+.dock{
+  position:sticky;top:0;z-index:200;
+  background:rgba(7,4,15,0.96);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(196,154,31,0.14);
+  padding:0.55rem 1.4rem;
+  display:flex;align-items:center;gap:0.9rem;
+  overflow-x:auto;
+}
+.dock-brand{
+  font-family:'Cormorant',serif;font-size:0.95rem;font-weight:600;
+  color:#C49A1F;letter-spacing:0.1em;white-space:nowrap;
+  padding-right:1rem;border-right:1px solid rgba(196,154,31,0.18);flex-shrink:0;
+}
+.dock-variants{display:flex;gap:0.5rem;align-items:center;flex-shrink:0;}
+
+/* Variant thumbnail */
+.vt{
+  display:flex;flex-direction:column;align-items:center;gap:0.28rem;
+  padding:0.35rem 0.65rem;border:1px solid rgba(255,255,255,0.06);
+  border-radius:6px;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+  background:rgba(255,255,255,0.025);min-width:82px;user-select:none;
+}
+.vt:hover{border-color:rgba(196,154,31,0.3);background:rgba(196,154,31,0.05);}
+.vt.active{border-color:rgba(196,154,31,0.8);background:rgba(196,154,31,0.08);}
+.vt-dots{display:flex;gap:3px;}
+.vt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.vt-name{font-family:'JetBrains Mono',monospace;font-size:0.57rem;letter-spacing:0.07em;color:rgba(244,240,235,0.55);}
+.vt.active .vt-name{color:#C49A1F;}
+
+.dock-sep{width:1px;height:28px;background:rgba(196,154,31,0.12);flex-shrink:0;}
+.dock-actions{display:flex;gap:0.45rem;margin-left:auto;flex-shrink:0;}
+.d-btn{
+  font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.09em;
+  padding:0.35rem 0.8rem;border-radius:3px;border:none;transition:all 0.2s;
+}
+.d-btn-cmp{background:transparent;border:1px solid rgba(196,154,31,0.35);color:rgba(196,154,31,0.75);}
+.d-btn-cmp:hover,.d-btn-cmp.on{background:rgba(196,154,31,0.12);border-color:#C49A1F;color:#C49A1F;}
+
+/* ================================================================
+   LAYOUT
+================================================================ */
+.app{min-height:calc(100vh - 52px);}
+.hidden{display:none!important;}
+
+/* ================================================================
+   PREVIEW WRAPPER — per-variant context
+================================================================ */
+.pw{position:relative;}
+
+/* ---- Per-variant CSS variable sets ---- */
+.pw[data-v="base"]     {--p:#2E1760;--s:#C49A1F;--a:#1E3FAA;--g:#1B5E35;--bg:#0D0820;--sf:#150D2E;--cd:#1E1442;--tx:#F4F0EB;--tx2:#A89EC8;--bd:rgba(196,154,31,0.13);}
+.pw[data-v="metallic"] {--p:#2E1760;--s:#C49A1F;--a:#1E3FAA;--g:#8A9BB8;--bg:#080616;--sf:#110E20;--cd:#181030;--tx:#FFFFFF; --tx2:#C8C0E0;--bd:rgba(200,180,255,0.1);}
+.pw[data-v="pearl"]    {--p:#5A3A8C;--s:#CCAA44;--a:#4A6BBF;--g:#3E7A5A;--bg:#050210;--sf:#0C0720;--cd:#140A2A;--tx:#F8F4FF;--tx2:#C8C0E8;--bd:rgba(200,180,255,0.13);}
+.pw[data-v="chameleon"]{--p:#3D1A8C;--s:#C49A1F;--a:#1A4AD4;--g:#1A7840;--bg:#070412;--sf:#100826;--cd:#180C36;--tx:#F0EAFF;--tx2:#B0A8D8;--bd:rgba(150,100,255,0.15);}
+.pw[data-v="cartoon"]  {--p:#5B21B6;--s:#FBBF24;--a:#2563EB;--g:#16A34A;--bg:#0F0A2E;--sf:#181250;--cd:#221866;--tx:#FFFFFF; --tx2:#E0D8FF;--bd:rgba(0,0,0,0.5);}
+.pw[data-v="academic"] {--p:#3A1850;--s:#8C7228;--a:#192C68;--g:#1E3D1A;--bg:#09070A;--sf:#110E0C;--cd:#181410;--tx:#E8D8B0;--tx2:#A89878;--bd:rgba(140,114,40,0.2);}
+.pw[data-v="holo"]     {--p:#2E1760;--s:#C49A1F;--a:#1E3FAA;--g:#1B5E35;--bg:#030108;--sf:#08041E;--cd:#0E082A;--tx:#FFFFFF; --tx2:#D0C8FF;--bd:rgba(200,100,255,0.22);}
+
+/* ================================================================
+   HERO
+================================================================ */
+.hero{
+  position:relative;height:290px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+}
+.h-bg{position:absolute;inset:0;z-index:0;}
+.h-geo{position:absolute;inset:0;z-index:1;opacity:0.06;pointer-events:none;}
+.h-overlay{position:absolute;inset:0;z-index:2;pointer-events:none;}
+.h-content{position:relative;z-index:3;max-width:600px;padding:1.5rem;}
+
+.h-eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:0.64rem;letter-spacing:0.24em;
+  text-transform:uppercase;color:var(--s,#C49A1F);margin-bottom:0.9rem;
+  display:flex;align-items:center;justify-content:center;gap:0.75rem;
+}
+.h-eyebrow::before,.h-eyebrow::after{content:'';width:28px;height:1px;background:var(--s,#C49A1F);opacity:0.5;}
+.h-title{
+  font-family:'Cormorant',serif;font-size:clamp(2rem,4.5vw,3.5rem);
+  font-weight:300;color:#fff;line-height:1.08;
+}
+.h-title em{font-style:italic;color:var(--s,#C49A1F);}
+.h-cta{
+  display:inline-block;margin-top:1.3rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;
+  text-transform:uppercase;padding:0.58rem 1.4rem;border-radius:2px;border:none;
+  transition:all 0.2s;background:var(--s,#C49A1F);color:var(--bg,#0D0820);font-weight:700;
+}
+.h-cta:hover{transform:translateY(-1px);}
+
+/* ================================================================
+   BODY GRID
+================================================================ */
+.body-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 290px;
+  background:var(--bg,#0D0820);
+  border-top:1px solid var(--bd,rgba(196,154,31,0.13));
+}
+.body-grid.no-analysis{grid-template-columns:1fr 1fr;}
+
+.body-col{
+  padding:1.35rem;
+  border-right:1px solid var(--bd,rgba(196,154,31,0.13));
+}
+.body-col:last-child{border-right:none;}
+.col-title{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;
+  text-transform:uppercase;color:rgba(255,255,255,0.3);
+  margin-bottom:0.85rem;padding-bottom:0.4rem;
+  border-bottom:1px solid var(--bd,rgba(196,154,31,0.13));
+}
+
+/* ================================================================
+   SWATCHES
+================================================================ */
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;}
+.sw{border-radius:6px;overflow:hidden;cursor:pointer;position:relative;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);transition:transform 0.2s;}
+.sw:hover{transform:translateY(-3px);}
+.sw-c{height:76px;position:relative;}
+.sw-badge{
+  position:absolute;bottom:0.35rem;left:0.35rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.56rem;
+  background:rgba(0,0,0,0.3);color:rgba(255,255,255,0.88);
+  padding:0.1rem 0.32rem;border-radius:2px;backdrop-filter:blur(4px);
+}
+.sw-inf{
+  padding:0.48rem 0.6rem;
+  background:var(--cd,#1E1442);
+  border:1px solid var(--bd,rgba(196,154,31,0.13));border-top:none;
+}
+.sw-tok{font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:var(--s,#C49A1F);margin-bottom:0.1rem;}
+.sw-nm{font-size:0.75rem;font-weight:500;color:var(--tx,#F4F0EB);}
+
+/* ================================================================
+   COMPONENTS
+================================================================ */
+.btn-row{display:flex;flex-wrap:wrap;gap:0.45rem;margin-bottom:1rem;}
+.pv-btn{
+  font-family:'JetBrains Mono',monospace;font-size:0.63rem;letter-spacing:0.08em;
+  text-transform:uppercase;padding:0.48rem 0.95rem;border-radius:2px;
+  border:none;transition:all 0.2s;position:relative;overflow:hidden;
+}
+.pv-btn:hover{transform:translateY(-1px);}
+.badge-row{display:flex;flex-wrap:wrap;gap:0.38rem;margin-bottom:1rem;}
+.pv-badge{
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.06em;
+  padding:0.18rem 0.55rem;border-radius:2px;
+}
+.pv-card{
+  border-radius:6px;padding:1rem;position:relative;overflow:hidden;
+  background:var(--cd,#1E1442);
+  border:1px solid var(--bd,rgba(196,154,31,0.13));
+  transition:transform 0.2s;
+}
+.pv-card:hover{transform:translateY(-2px);}
+.pv-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2.5px;
+  background:var(--p,#2E1760);
+}
+.pv-card-icon{font-size:1.1rem;margin-bottom:0.45rem;}
+.pv-card h4{font-family:'Cormorant',serif;font-size:1rem;font-weight:600;color:var(--tx,#F4F0EB);margin-bottom:0.28rem;}
+.pv-card p{font-size:0.73rem;color:var(--tx2,#A89EC8);line-height:1.55;}
+
+/* ================================================================
+   ANALYSIS PANEL
+================================================================ */
+.an-panel{background:var(--cd,#1E1442);}
+.an-head{
+  font-family:'Cormorant',serif;font-size:1.05rem;font-weight:600;
+  color:var(--tx,#F4F0EB);margin-bottom:1rem;
+}
+.an-sec{margin-bottom:1.1rem;}
+.an-lbl{
+  font-family:'JetBrains Mono',monospace;font-size:0.56rem;letter-spacing:0.16em;
+  text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:0.45rem;
+}
+/* Contrast */
+.cr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.38rem;}
+.cr-lbl{font-size:0.68rem;color:var(--tx2,#A89EC8);}
+.cr-right{display:flex;align-items:center;gap:0.38rem;}
+.cr-val{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#fff;}
+.wcag-pill{font-family:'JetBrains Mono',monospace;font-size:0.55rem;padding:0.12rem 0.38rem;border-radius:2px;font-weight:700;}
+/* Scores */
+.score-row{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.38rem;}
+.score-lbl{font-size:0.66rem;color:var(--tx2,#A89EC8);width:88px;flex-shrink:0;}
+.score-bar{flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.score-fill{height:100%;border-radius:3px;transition:width 0.7s ease;}
+.score-n{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#fff;width:30px;text-align:right;}
+/* Tags */
+.tag-wrap{display:flex;flex-wrap:wrap;gap:0.32rem;}
+.tone-tag{
+  font-family:'JetBrains Mono',monospace;font-size:0.56rem;letter-spacing:0.05em;
+  padding:0.16rem 0.5rem;border-radius:2px;
+  background:rgba(196,154,31,0.1);color:rgba(196,154,31,0.85);
+  border:1px solid rgba(196,154,31,0.2);
+}
+.ctx-tag{
+  font-size:0.58rem;font-family:'JetBrains Mono',monospace;
+  padding:0.16rem 0.5rem;border-radius:2px;
+  background:rgba(30,63,170,0.14);color:rgba(122,154,224,0.9);
+  border:1px solid rgba(30,63,170,0.25);
+}
+.an-note{font-size:0.7rem;color:var(--tx2,#A89EC8);line-height:1.55;}
+.an-ok{color:#86EFAC;} .an-warn{color:#FCD34D;}
+
+/* ================================================================
+   COMPARE MODE
+================================================================ */
+.cmp-wrap{display:grid;grid-template-columns:1fr 1fr;}
+.cmp-col{border-right:2px solid rgba(196,154,31,0.18);}
+.cmp-col:last-child{border-right:none;}
+.cmp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.65rem 1.2rem;
+  background:rgba(255,255,255,0.025);
+  border-bottom:1px solid rgba(196,154,31,0.12);
+}
+.cmp-label{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(196,154,31,0.65);}
+.cmp-select{
+  font-family:'JetBrains Mono',monospace;font-size:0.66rem;
+  background:#0D0820;color:#F4F0EB;
+  border:1px solid rgba(196,154,31,0.3);border-radius:3px;
+  padding:0.28rem 0.55rem;cursor:pointer;outline:none;
+}
+/* Mini hero in compare mode */
+.cmp-col .hero{height:220px;}
+.cmp-col .body-grid{grid-template-columns:1fr 1fr;}
+/* Mini analysis strip below compare body */
+.cmp-analysis{
+  padding:0.85rem 1.2rem;
+  background:rgba(255,255,255,0.02);
+  border-top:1px solid rgba(196,154,31,0.1);
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;
+}
+.cmp-an-block{}
+.cmp-an-title{font-family:'JetBrains Mono',monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:0.35rem;}
+
+/* ================================================================
+   TEXTURE: BASE — clean flat
+================================================================ */
+.pw[data-v="base"] .h-bg{
+  background:linear-gradient(148deg,#0D0820 0%,#1A0D3D 26%,#2E1760 60%,#220F52 100%);
+}
+
+/* ================================================================
+   TEXTURE: METALLIC — multi-stop specular + animated sheen
+================================================================ */
+.pw[data-v="metallic"] .h-bg{
+  background:linear-gradient(145deg,
+    #04020E 0%,#150A30 14%,#2E1760 26%,
+    #5A3A9C 36%,#9B7BE0 44%,#CBBCF4 50%,
+    #9B7BE0 56%,#5A3A9C 64%,
+    #2E1760 74%,#150A30 86%,#04020E 100%
+  );
+}
+.pw[data-v="metallic"] .h-overlay{
+  background:linear-gradient(88deg,
+    transparent 0%,transparent 32%,
+    rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0.07) 48%,rgba(255,255,255,0.14) 50%,
+    rgba(255,255,255,0.07) 52%,rgba(255,255,255,0) 60%,
+    transparent 68%,transparent 100%
+  );
+  animation:metal-sheen 4.5s ease-in-out infinite;
+}
+@keyframes metal-sheen{0%{transform:translateX(-220%)}100%{transform:translateX(320%)} }
+
+/* metallic swatch gradients */
+.pw[data-v="metallic"] .sw-p .sw-c{background:linear-gradient(135deg,#04020E 0%,#2E1760 28%,#9B7BE0 50%,#2E1760 72%,#04020E 100%)!important;}
+.pw[data-v="metallic"] .sw-s .sw-c{background:linear-gradient(135deg,#3A2606 0%,#C49A1F 28%,#F5E07A 50%,#C49A1F 72%,#3A2606 100%)!important;}
+.pw[data-v="metallic"] .sw-a .sw-c{background:linear-gradient(135deg,#080E38 0%,#1E3FAA 28%,#8AAAD8 50%,#1E3FAA 72%,#080E38 100%)!important;}
+.pw[data-v="metallic"] .sw-g .sw-c{background:linear-gradient(135deg,#080C14 0%,#8A9BB8 28%,#C8D8EC 50%,#8A9BB8 72%,#080C14 100%)!important;}
+.pw[data-v="metallic"] .sw-nl .sw-c{background:linear-gradient(135deg,#28203A 0%,#9890B4 28%,#E0D8F0 50%,#9890B4 72%,#28203A 100%)!important;}
+.pw[data-v="metallic"] .sw-nd .sw-c{background:linear-gradient(135deg,#04020E 0%,#180E2E 28%,#3A2858 50%,#180E2E 72%,#04020E 100%)!important;}
+
+/* metallic btn + card */
+.pw[data-v="metallic"] .pv-btn.btn-p{
+  background:linear-gradient(135deg,#3A2606,#C49A1F,#F5E07A,#C49A1F,#3A2606);
+  color:#04020E;position:relative;overflow:hidden;
+}
+.pw[data-v="metallic"] .pv-btn.btn-p::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+  animation:btn-sheen 2.8s ease-in-out infinite;
+}
+@keyframes btn-sheen{0%{transform:translateX(-200%)}100%{transform:translateX(300%)} }
+.pw[data-v="metallic"] .pv-btn.btn-a{background:linear-gradient(135deg,#080E38,#1E3FAA,#8AAAD8,#1E3FAA,#080E38);color:#fff;}
+.pw[data-v="metallic"] .pv-btn.btn-g{background:linear-gradient(135deg,#080C14,#8A9BB8,#C8D8EC,#8A9BB8,#080C14);color:#04020E;}
+.pw[data-v="metallic"] .pv-card::before{background:linear-gradient(90deg,#3A2606,#C49A1F,#F5E07A,#C49A1F,#3A2606);}
+.pw[data-v="metallic"] .pv-card{box-shadow:0 0 24px rgba(155,123,224,0.07);}
+
+/* ================================================================
+   TEXTURE: PEARLESCENT — radial depth + slow hue-shift overlay
+================================================================ */
+.pw[data-v="pearl"] .h-bg{
+  background:
+    radial-gradient(ellipse 65% 60% at 22% 28%,rgba(155,123,224,0.48) 0%,transparent 100%),
+    radial-gradient(ellipse 55% 45% at 78% 72%,rgba(196,154,31,0.22) 0%,transparent 100%),
+    radial-gradient(ellipse 45% 65% at 62% 18%,rgba(74,107,191,0.32) 0%,transparent 100%),
+    #050210;
+}
+.pw[data-v="pearl"] .h-overlay{
+  background:linear-gradient(135deg,
+    rgba(255,255,255,0.02) 0%,rgba(210,190,255,0.07) 20%,
+    rgba(255,255,255,0.10) 42%,rgba(190,210,255,0.06) 62%,
+    rgba(210,230,255,0.08) 80%,rgba(255,255,255,0.02) 100%
+  );
+  animation:pearl 6s ease-in-out infinite alternate;
+}
+@keyframes pearl{
+  0%{opacity:0.45;filter:hue-rotate(0deg) brightness(0.95);}
+  100%{opacity:1;filter:hue-rotate(42deg) brightness(1.05);}
+}
+/* pearl button glow */
+.pw[data-v="pearl"] .pv-btn.btn-p{
+  background:radial-gradient(ellipse at 50% 50%,#8A6AB8 0%,#5A3A8C 100%);
+  color:#F8F4FF;box-shadow:0 4px 18px rgba(155,123,224,0.3),inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.pw[data-v="pearl"] .pv-card{box-shadow:0 4px 24px rgba(90,58,140,0.15),inset 0 1px 0 rgba(255,255,255,0.04);}
+.pw[data-v="pearl"] .h-cta{background:var(--s);color:#050210;box-shadow:0 4px 16px rgba(204,170,68,0.28);}
+
+/* ================================================================
+   TEXTURE: CHAMELEON — continuous hue-rotate on key elements
+================================================================ */
+.pw[data-v="chameleon"] .h-bg{
+  background:linear-gradient(148deg,#070412 0%,#150926 26%,#3D1A8C 60%,#2A1272 100%);
+  animation:cham-bg 12s linear infinite;
+}
+.pw[data-v="chameleon"] .h-overlay{
+  background:conic-gradient(from 180deg,
+    rgba(255,0,180,0.06),rgba(0,200,255,0.07),
+    rgba(100,255,50,0.05),rgba(255,180,0,0.06),rgba(255,0,180,0.06)
+  );
+  animation:cham-cone 8s linear infinite;
+  transform-origin:50% 50%;
+}
+@keyframes cham-bg{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)} }
+@keyframes cham-cone{from{transform:rotate(0deg) scale(2.5)}to{transform:rotate(360deg) scale(2.5)} }
+
+.pw[data-v="chameleon"] .sw{animation:cham-bg 10s linear infinite;}
+.pw[data-v="chameleon"] .sw-s{animation:cham-bg 25s linear infinite;} /* gold is anchor — slow */
+.pw[data-v="chameleon"] .pv-btn{animation:cham-bg 8s linear infinite;}
+.pw[data-v="chameleon"] .pv-btn.btn-p{background:var(--s);color:#07040E;}
+.pw[data-v="chameleon"] .pv-card{animation:cham-bg 15s linear infinite;}
+
+/* ================================================================
+   TEXTURE: CARTOON — flat, black outlines, offset drop shadows
+================================================================ */
+.pw[data-v="cartoon"] .h-bg{background:#1A1248;}
+.pw[data-v="cartoon"] .hero{border-bottom:4px solid rgba(0,0,0,0.88);}
+.pw[data-v="cartoon"] .h-title{
+  text-shadow:3px 3px 0 rgba(0,0,0,0.85);
+  -webkit-text-stroke:0.8px rgba(0,0,0,0.3);
+}
+.pw[data-v="cartoon"] .h-title em{color:#FBBF24;}
+.pw[data-v="cartoon"] .h-eyebrow{color:#FBBF24;}
+.pw[data-v="cartoon"] .h-eyebrow::before,.pw[data-v="cartoon"] .h-eyebrow::after{background:#FBBF24;}
+.pw[data-v="cartoon"] .h-cta{
+  background:#FBBF24;color:#0F0A2E;font-weight:800;letter-spacing:0.14em;
+  border:2.5px solid rgba(0,0,0,0.85);
+  box-shadow:4px 4px 0 rgba(0,0,0,0.8);
+}
+.pw[data-v="cartoon"] .h-cta:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(0,0,0,0.8);}
+.pw[data-v="cartoon"] .sw{border:2.5px solid rgba(0,0,0,0.75);box-shadow:3px 3px 0 rgba(0,0,0,0.6);}
+.pw[data-v="cartoon"] .pv-btn{
+  border:2px solid rgba(0,0,0,0.75)!important;
+  box-shadow:3px 3px 0 rgba(0,0,0,0.6);
+}
+.pw[data-v="cartoon"] .pv-btn:hover{transform:translate(-1px,-1px)!important;box-shadow:4px 4px 0 rgba(0,0,0,0.6)!important;}
+.pw[data-v="cartoon"] .pv-card{
+  border:2.5px solid rgba(0,0,0,0.75);
+  box-shadow:5px 5px 0 rgba(0,0,0,0.65);border-radius:6px;
+}
+.pw[data-v="cartoon"] .pv-card::before{height:4px;background:#FBBF24;}
+.pw[data-v="cartoon"] .body-grid{border-top:3px solid rgba(0,0,0,0.7);}
+
+/* ================================================================
+   TEXTURE: DARK ACADEMIC — grain overlay + warm palette
+================================================================ */
+.pw[data-v="academic"] .h-bg{background:#09070A;}
+/* Paper grain via SVG data URL */
+.pw[data-v="academic"] .h-overlay{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)' opacity='0.18'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+  mix-blend-mode:overlay;opacity:0.55;
+}
+.pw[data-v="academic"] .body-grid{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)' opacity='0.07'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+}
+.pw[data-v="academic"] .h-title em{color:#8C7228;}
+.pw[data-v="academic"] .h-eyebrow{color:#8C7228;}
+.pw[data-v="academic"] .h-eyebrow::before,.pw[data-v="academic"] .h-eyebrow::after{background:#8C7228;}
+.pw[data-v="academic"] .h-cta{background:#8C7228;color:#E8D8B0;letter-spacing:0.18em;}
+.pw[data-v="academic"] .pv-btn.btn-p{background:#8C7228;color:#E8D8B0;}
+.pw[data-v="academic"] .pv-card::before{background:linear-gradient(90deg,#3A1850,#8C7228);}
+.pw[data-v="academic"] .sw-inf{background:#18140E;}
+
+/* ================================================================
+   TEXTURE: HOLOGRAPHIC — rotating conic gradient + rainbow text
+================================================================ */
+.pw[data-v="holo"] .h-bg{background:#030108;}
+.pw[data-v="holo"] .h-bg::after{
+  content:'';position:absolute;inset:-50%;
+  background:conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255,0,128,0.12) 0deg,rgba(255,100,0,0.09) 51deg,
+    rgba(255,220,0,0.07) 102deg,rgba(0,255,120,0.10) 154deg,
+    rgba(0,120,255,0.12) 205deg,rgba(120,0,255,0.14) 256deg,
+    rgba(255,0,200,0.11) 308deg,rgba(255,0,128,0.12) 360deg
+  );
+  animation:holo-spin 8s linear infinite;
+  mix-blend-mode:screen;
+}
+@keyframes holo-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
+.pw[data-v="holo"] .h-overlay{
+  background:conic-gradient(
+    from 90deg at 30% 70%,
+    rgba(0,200,255,0.07),rgba(200,0,255,0.09),rgba(255,100,0,0.05),rgba(0,255,180,0.07)
+  );
+  animation:holo-spin 13s linear infinite reverse;
+  transform-origin:30% 70%;
+}
+.pw[data-v="holo"] .h-title em{
+  background:linear-gradient(90deg,#ff80b0,#ffb040,#80ffb0,#40b0ff,#b080ff,#ff80b0);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200%;animation:holo-txt 2.5s linear infinite;
+}
+@keyframes holo-txt{0%{background-position:0%}100%{background-position:200%} }
+.pw[data-v="holo"] .h-cta{
+  background:linear-gradient(90deg,#2E1760,#1E3FAA,#1B5E35,#C49A1F,#2E1760);
+  background-size:300%;color:#fff;
+  animation:holo-txt 3s linear infinite;
+  border:1px solid rgba(255,255,255,0.18);
+}
+.pw[data-v="holo"] .sw{position:relative;}
+.pw[data-v="holo"] .sw::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:conic-gradient(from 0deg,rgba(255,0,128,0.1),rgba(0,200,255,0.1),rgba(100,255,0,0.07),rgba(255,0,128,0.1));
+  animation:holo-spin 5s linear infinite;
+  mix-blend-mode:screen;pointer-events:none;
+}
+.pw[data-v="holo"] .pv-card{position:relative;}
+.pw[data-v="holo"] .pv-card::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:conic-gradient(from 0deg,rgba(255,0,128,0.08),rgba(0,200,255,0.08),rgba(100,255,0,0.05),rgba(255,0,128,0.08));
+  animation:holo-spin 7s linear infinite;
+  mix-blend-mode:screen;pointer-events:none;
+}
+.pw[data-v="holo"] .pv-btn.btn-p{
+  background:linear-gradient(90deg,#2E1760,#1E3FAA,#1B5E35,#C49A1F,#2E1760);
+  background-size:300%;color:#fff;animation:holo-txt 3s linear infinite;
+  border:1px solid rgba(255,255,255,0.15);
+}
+
+/* ================================================================
+   TOAST & FOOTER
+================================================================ */
+.toast{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);
+  background:#2E1760;color:#F4F0EB;padding:0.48rem 1.15rem;border-radius:100px;
+  font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.07em;
+  border:1px solid rgba(196,154,31,0.45);z-index:500;
+  opacity:0;transition:transform 0.28s,opacity 0.28s;pointer-events:none;white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+footer{
+  text-align:center;padding:1.3rem;
+  border-top:1px solid rgba(196,154,31,0.1);
+  background:rgba(0,0,0,0.3);
+}
+.ft-brand{font-family:'Cormorant',serif;font-size:1rem;font-weight:600;color:#C49A1F;letter-spacing:0.1em;}
+.ft-meta{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.22);margin-top:0.25rem;}
+
+@media(max-width:800px){
+  .body-grid,.body-grid.no-analysis{grid-template-columns:1fr!important;}
+  .cmp-wrap{grid-template-columns:1fr;}
+  .cmp-analysis{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     DOCK
+============================================================ -->
+<nav style="position:sticky;top:0;z-index:300;background:rgba(7,4,15,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(196,154,31,.14);display:flex;align-items:center;justify-content:space-between;padding:.6rem 2rem;">
+  <div class="nav-brand" style="font-family:'Cormorant',serif;font-size:.95rem;font-weight:600;color:#C49A1F;letter-spacing:.1em;">Hardy House · Variant Studio</div>
+  <div style="display:flex;gap:.4rem;">
+    <a class="sl" href="hardy-house-geometry.html" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.26rem .65rem;border:1px solid rgba(196,154,31,.2);border-radius:3px;color:rgba(196,154,31,.52);text-decoration:none;">Geometry</a>
+    <a class="sl on" href="hardy-house-variants.html" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.26rem .65rem;border:1px solid #C49A1F;border-radius:3px;color:#C49A1F;text-decoration:none;background:rgba(196,154,31,.06);">Variants</a>
+    <a class="sl" href="hardy-house-decomposition.html" style="font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.26rem .65rem;border:1px solid rgba(196,154,31,.2);border-radius:3px;color:rgba(196,154,31,.52);text-decoration:none;">Decomposition</a>
+  </div>
+</nav>
+<header class="dock">
+  <div class="dock-brand">HH · Studio</div>
+  <div class="dock-variants" id="dockVariants"></div>
+  <div class="dock-sep"></div>
+  <div class="dock-actions">
+    <button class="d-btn d-btn-cmp" id="btnCmp">⊟ Compare</button>
+  </div>
+</header>
+
+<!-- ============================================================
+     APP
+============================================================ -->
+<div class="app">
+  <div id="singleMode"></div>
+  <div id="compareMode" class="hidden">
+    <div class="cmp-wrap">
+      <div class="cmp-col">
+        <div class="cmp-header">
+          <span class="cmp-label">Variant A</span>
+          <select class="cmp-select" id="selA"></select>
+        </div>
+        <div id="pvA"></div>
+        <div id="anA" class="cmp-analysis"></div>
+      </div>
+      <div class="cmp-col">
+        <div class="cmp-header">
+          <span class="cmp-label">Variant B</span>
+          <select class="cmp-select" id="selB"></select>
+        </div>
+        <div id="pvB"></div>
+        <div id="anB" class="cmp-analysis"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-brand">Hardy House Consulting</div>
+  <div class="ft-meta">Brand Variant Studio · 2026 · Click swatches to copy hex</div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+/* ============================================================
+   VARIANT DEFINITIONS
+============================================================ */
+const V = [
+  {
+    id:'base', name:'Regal Standard', tag:'Flat clean authority — the recommended default',
+    icon:'⬛', thumbDots:['#2E1760','#C49A1F','#1E3FAA','#1B5E35'],
+    colors:{ p:'#2E1760', s:'#C49A1F', a:'#1E3FAA', g:'#1B5E35', bg:'#0D0820', tx:'#F4F0EB', tx2:'#A89EC8' },
+    swatches:[
+      {cls:'sw-p', hex:'#2E1760', tok:'brand.primary',    nm:'Deep Royal Purple'},
+      {cls:'sw-s', hex:'#C49A1F', tok:'brand.secondary',  nm:'Burnished Gold'},
+      {cls:'sw-a', hex:'#1E3FAA', tok:'brand.accent',     nm:'Royal Blue'},
+      {cls:'sw-g', hex:'#1B5E35', tok:'brand.supporting', nm:'Forest Green'},
+      {cls:'sw-nl',hex:'#F4F0EB', tok:'brand.neutral.lt', nm:'Warm Parchment', dark:true},
+      {cls:'sw-nd',hex:'#1F2937', tok:'brand.neutral.dk', nm:'Slate Charcoal'},
+    ],
+    btnP:{bg:'#C49A1F',col:'#0D0820'}, btnA:{bg:'#1E3FAA',col:'#fff'}, btnG:{bg:'#1B5E35',col:'#fff'},
+    cardTopBg:'#2E1760',
+    adapt:'No adaptation. All six colours rendered at true hex values. Maximum predictability and cross-platform consistency.',
+    analysis:{ tone:['Authority','Precision','Depth','Trust'], screen:10, print:9, access:10, fidelity:10,
+      ctxs:['Web UI','Presentations','Documents','Print brand'], ok:'Maximum legibility. WCAG AAA on all key pairs.', warn:'No tactile or finish dimension.' }
+  },
+  {
+    id:'metallic', name:'Burnished Metal', tag:'Multi-stop gradients simulate specular highlights on polished metal',
+    icon:'✦', thumbDots:['#9B7BE0','#F5E07A','#8AAAD8','#8A9BB8'],
+    colors:{ p:'#2E1760', s:'#C49A1F', a:'#1E3FAA', g:'#8A9BB8', bg:'#080616', tx:'#FFFFFF', tx2:'#C8C0E0' },
+    swatches:[
+      {cls:'sw-p', hex:'gradient', gradTxt:'Purple Steel',  tok:'brand.primary',    nm:'Purple Steel'},
+      {cls:'sw-s', hex:'gradient', gradTxt:'Gold Foil',     tok:'brand.secondary',  nm:'Gold Foil'},
+      {cls:'sw-a', hex:'gradient', gradTxt:'Chrome Blue',   tok:'brand.accent',     nm:'Chrome Blue'},
+      {cls:'sw-g', hex:'gradient', gradTxt:'Brushed Silver',tok:'brand.supporting', nm:'Brushed Silver'},
+      {cls:'sw-nl',hex:'gradient', gradTxt:'Platinum',      tok:'brand.neutral.lt', nm:'Platinum'},
+      {cls:'sw-nd',hex:'gradient', gradTxt:'Dark Steel',    tok:'brand.neutral.dk', nm:'Dark Steel'},
+    ],
+    btnP:{bg:'#C49A1F',col:'#04020E',cls:'btn-p'}, btnA:{bg:'#1E3FAA',col:'#fff',cls:'btn-a'}, btnG:{bg:'#8A9BB8',col:'#04020E',cls:'btn-g'},
+    cardTopBg:'#C49A1F',
+    adapt:'Forest Green swapped for Brushed Silver — green absorbs metallic sheen and loses definition. All surfaces use 5-stop gradients (dark→mid→highlight→mid→dark) mimicking specular reflection on polished metal. Animated CSS sheen sweep at 4.5s loop.',
+    analysis:{ tone:['Power','Luxury','Permanence','Prestige'], screen:8, print:6, access:8, fidelity:8,
+      ctxs:['Premium digital','Event collateral','Certificates','Physical merchandise'], ok:'Distinctive finish. Signals high-value, precision consultancy.', warn:'Print fidelity requires metallic ink stock. Screen is approximation only.' }
+  },
+  {
+    id:'pearl', name:'Lunar Glow', tag:'Radial luminosity and slow hue-rotating iridescence on deep grounds',
+    icon:'◎', thumbDots:['#5A3A8C','#CCAA44','#4A6BBF','#3E7A5A'],
+    colors:{ p:'#5A3A8C', s:'#CCAA44', a:'#4A6BBF', g:'#3E7A5A', bg:'#050210', tx:'#F8F4FF', tx2:'#C8C0E8' },
+    swatches:[
+      {cls:'sw-p', hex:'#5A3A8C', tok:'brand.primary',    nm:'Lavender Pearl'},
+      {cls:'sw-s', hex:'#CCAA44', tok:'brand.secondary',  nm:'Cream Gold'},
+      {cls:'sw-a', hex:'#4A6BBF', tok:'brand.accent',     nm:'Periwinkle'},
+      {cls:'sw-g', hex:'#3E7A5A', tok:'brand.supporting', nm:'Sage Pearl'},
+      {cls:'sw-nl',hex:'#F8F4FF', tok:'brand.neutral.lt', nm:'Pearl White', dark:true},
+      {cls:'sw-nd',hex:'#050210', tok:'brand.neutral.dk', nm:'Void Black'},
+    ],
+    btnP:{bg:'#5A3A8C',col:'#F8F4FF'}, btnA:{bg:'#4A6BBF',col:'#fff'}, btnG:{bg:'#3E7A5A',col:'#fff'},
+    cardTopBg:'#5A3A8C',
+    adapt:'All hues lightened 25–40%: purple #2E1760 → #5A3A8C, gold #C49A1F → #CCAA44. Research from Golden Artist Colors: pearlescent pigments require lighter bases against very dark grounds to carry luminosity. Hue-rotating CSS animation (0→42°) simulates angle-dependent colour shift of genuine pearl.',
+    analysis:{ tone:['Elegance','Luminosity','Mystery','Refinement'], screen:9, print:4, access:7, fidelity:9,
+      ctxs:['Luxury brand','Premium invitations','High-end digital','Beauty/wellness'], ok:'Uniquely luminous. Cannot be replicated with flat colour.', warn:'Lighter purples reduce contrast vs deep purple. Small text may fall below WCAG AA at some hue phases.' }
+  },
+  {
+    id:'chameleon', name:'Prismatic Shift', tag:'CSS hue-rotate cycles every element continuously through the spectrum',
+    icon:'◈', thumbDots:['#3D1A8C','#C49A1F','#1A4AD4','#1A7840'],
+    colors:{ p:'#3D1A8C', s:'#C49A1F', a:'#1A4AD4', g:'#1A7840', bg:'#070412', tx:'#F0EAFF', tx2:'#B0A8D8' },
+    swatches:[
+      {cls:'sw-p', hex:'#3D1A8C', tok:'brand.primary',    nm:'Shifting Purple'},
+      {cls:'sw-s', hex:'#C49A1F', tok:'brand.secondary',  nm:'Gold Anchor'},
+      {cls:'sw-a', hex:'#1A4AD4', tok:'brand.accent',     nm:'Vivid Blue'},
+      {cls:'sw-g', hex:'#1A7840', tok:'brand.supporting', nm:'Vivid Green'},
+      {cls:'sw-nl',hex:'#F0EAFF', tok:'brand.neutral.lt', nm:'Lavender Mist', dark:true},
+      {cls:'sw-nd',hex:'#070412', tok:'brand.neutral.dk', nm:'Void Purple'},
+    ],
+    btnP:{bg:'#C49A1F',col:'#07040E'}, btnA:{bg:'#1A4AD4',col:'#fff'}, btnG:{bg:'#1A7840',col:'#fff'},
+    cardTopBg:'#3D1A8C',
+    adapt:'Saturation increased across all hues to survive the full hue-rotation cycle looking strong. Gold is intentionally the slowest-rotating anchor (25s loop vs 8s for others), acting as a constant reference point. Purple, blue, and green chosen to form a coherent arc as they shift: purple→indigo→blue→teal.',
+    analysis:{ tone:['Dynamic','Adaptive','Prismatic','Energetic'], screen:9, print:3, access:6, fidelity:10,
+      ctxs:['Motion design','Generative art','Interactive web','Digital animation'], ok:'Completely native digital texture. No physical equivalent. Maximum visual novelty.', warn:'Accessibility fails during certain hue phases. Unsuitable for static print, documents, or formal contexts.' }
+  },
+  {
+    id:'cartoon', name:'Bold Ink', tag:'Maximum saturation, flat fills, offset comic shadows, and 2.5px outlines',
+    icon:'◼', thumbDots:['#5B21B6','#FBBF24','#2563EB','#16A34A'],
+    colors:{ p:'#5B21B6', s:'#FBBF24', a:'#2563EB', g:'#16A34A', bg:'#0F0A2E', tx:'#FFFFFF', tx2:'#E0D8FF' },
+    swatches:[
+      {cls:'sw-p', hex:'#5B21B6', tok:'brand.primary',    nm:'Vivid Purple'},
+      {cls:'sw-s', hex:'#FBBF24', tok:'brand.secondary',  nm:'Amber Gold'},
+      {cls:'sw-a', hex:'#2563EB', tok:'brand.accent',     nm:'Vivid Blue'},
+      {cls:'sw-g', hex:'#16A34A', tok:'brand.supporting', nm:'Vivid Green'},
+      {cls:'sw-nl',hex:'#FFFFFF', tok:'brand.neutral.lt', nm:'Pure White', dark:true},
+      {cls:'sw-nd',hex:'#0F0A2E', tok:'brand.neutral.dk', nm:'Ink Dark'},
+    ],
+    btnP:{bg:'#FBBF24',col:'#0F0A2E'}, btnA:{bg:'#2563EB',col:'#fff'}, btnG:{bg:'#16A34A',col:'#fff'},
+    cardTopBg:'#FBBF24',
+    adapt:'All four hues pushed to maximum saturation — the highest chroma version of each colour. Gold shifts #C49A1F → #FBBF24 (amber-yellow) becoming the primary CTA signal. No gradients used anywhere. Black outlines and offset drop shadows follow comic/graphic novel conventions.',
+    analysis:{ tone:['Playful','Bold','Approachable','High Energy'], screen:10, print:9, access:10, fidelity:10,
+      ctxs:['Consumer apps','Education','Community events','Social media'], ok:'Maximum accessibility and legibility. Highly reproducible across all print processes.', warn:'Loses the regal and authoritative brand signal. Not suitable for enterprise-formal or premium contexts.' }
+  },
+  {
+    id:'academic', name:'Aged Parchment', tag:'SVG grain texture, warm darks, desaturated hues, and aged-gold accents',
+    icon:'◧', thumbDots:['#3A1850','#8C7228','#192C68','#1E3D1A'],
+    colors:{ p:'#3A1850', s:'#8C7228', a:'#192C68', g:'#1E3D1A', bg:'#09070A', tx:'#E8D8B0', tx2:'#A89878' },
+    swatches:[
+      {cls:'sw-p', hex:'#3A1850', tok:'brand.primary',    nm:'Wine Purple'},
+      {cls:'sw-s', hex:'#8C7228', tok:'brand.secondary',  nm:'Aged Gold'},
+      {cls:'sw-a', hex:'#192C68', tok:'brand.accent',     nm:'Library Navy'},
+      {cls:'sw-g', hex:'#1E3D1A', tok:'brand.supporting', nm:'Moss Green'},
+      {cls:'sw-nl',hex:'#E8D8B0', tok:'brand.neutral.lt', nm:'Old Parchment', dark:true},
+      {cls:'sw-nd',hex:'#09070A', tok:'brand.neutral.dk', nm:'Warm Black'},
+    ],
+    btnP:{bg:'#8C7228',col:'#E8D8B0'}, btnA:{bg:'#192C68',col:'#E8D8B0'}, btnG:{bg:'#1E3D1A',col:'#E8D8B0'},
+    cardTopBg:'#8C7228',
+    adapt:'All hues shifted warm and desaturated. Purple moves toward wine/burgundy. Gold darkens to aged amber. Text warmed to old parchment (#E8D8B0) instead of cool white. SVG feTurbulence fractalNoise filter applied as grain overlay via data URL — simulates aged paper/canvas texture.',
+    analysis:{ tone:['Scholarly','Gravitas','Timeless','Trusted'], screen:8, print:9, access:9, fidelity:8,
+      ctxs:['Premium print','Legal/academic','Thought leadership','Long-form documents'], ok:'High contrast parchment-on-dark reads excellently in print. Grain texture adds physical quality cue.', warn:'Less impactful on screen without grain rendering support. Muted tones reduce brand vibrancy.' }
+  },
+  {
+    id:'holo', name:'Holographic', tag:'Rotating conic gradient overlays at screen:blend-mode — pure digital texture',
+    icon:'◉', thumbDots:['#2E1760','#C49A1F','#1E3FAA','#1B5E35'],
+    colors:{ p:'#2E1760', s:'#C49A1F', a:'#1E3FAA', g:'#1B5E35', bg:'#030108', tx:'#FFFFFF', tx2:'#D0C8FF' },
+    swatches:[
+      {cls:'sw-p', hex:'#2E1760', tok:'brand.primary',    nm:'Holo Purple'},
+      {cls:'sw-s', hex:'#C49A1F', tok:'brand.secondary',  nm:'Holo Gold'},
+      {cls:'sw-a', hex:'#1E3FAA', tok:'brand.accent',     nm:'Holo Blue'},
+      {cls:'sw-g', hex:'#1B5E35', tok:'brand.supporting', nm:'Holo Green'},
+      {cls:'sw-nl',hex:'#FFFFFF', tok:'brand.neutral.lt', nm:'Pure White', dark:true},
+      {cls:'sw-nd',hex:'#030108', tok:'brand.neutral.dk', nm:'Void'},
+    ],
+    btnP:{bg:'#C49A1F',col:'#030108'}, btnA:{bg:'#1E3FAA',col:'#fff'}, btnG:{bg:'#1B5E35',col:'#fff'},
+    cardTopBg:'#2E1760',
+    adapt:'Base brand colours held at true hex — the holographic effect is entirely additive via conic-gradient overlays at screen blend mode. Two conic gradients rotate at different speeds (8s, 13s) in opposite directions, creating the organic iridescent interference pattern of holographic foil.',
+    analysis:{ tone:['Futuristic','Spectral','Cutting-Edge','Dynamic'], screen:8, print:2, access:6, fidelity:9,
+      ctxs:['Digital-only','NFT/Web3','Motion graphics','Interactive installations'], ok:'Completely unmistakable. Maximum visual interest at any size.', warn:'Cannot be reproduced in print without metallic holographic foil laminate. Colour accessibility compromised by shifting interference patterns.' }
+  },
+];
+
+/* ============================================================
+   WCAG CONTRAST MATH
+============================================================ */
+function lin(c){ return c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4); }
+function lum(hex){
+  if(!hex||!hex.startsWith('#'))return 0.2;
+  const m=hex.replace('#','').match(/.{2}/g);
+  if(!m)return 0.2;
+  const[r,g,b]=m.map(x=>lin(parseInt(x,16)/255));
+  return 0.2126*r+0.7152*g+0.0722*b;
+}
+function cr(h1,h2){ const l1=lum(h1),l2=lum(h2); const[a,b]=l1>l2?[l1,l2]:[l2,l1]; return (a+0.05)/(b+0.05); }
+function wcag(r){
+  if(r>=7)  return {lv:'AAA',bg:'#14532D',col:'#4ADE80'};
+  if(r>=4.5)return {lv:'AA', bg:'#14532D',col:'#86EFAC'};
+  if(r>=3)  return {lv:'A',  bg:'#78350F',col:'#FCD34D'};
+  return          {lv:'Fail',bg:'#7F1D1D',col:'#F87171'};
+}
+
+/* ============================================================
+   BUILD SWATCH HTML
+============================================================ */
+function sw(s){
+  const isGrad = s.hex==='gradient';
+  const bgStyle = isGrad ? '' : `background:${s.hex}`;
+  const badge   = isGrad ? `<span class="sw-badge">${s.gradTxt||s.nm}</span>`
+                         : `<span class="sw-badge">${s.hex}</span>`;
+  const darkNm  = s.dark ? 'color:#1F2937;' : '';
+  return `
+    <div class="sw ${s.cls}" onclick="cp('${isGrad?(s.nm):(s.hex)}','${s.nm}')">
+      <div class="sw-c" style="${bgStyle}">${badge}</div>
+      <div class="sw-inf">
+        <div class="sw-tok">${s.tok}</div>
+        <div class="sw-nm" style="${darkNm}">${s.nm}</div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   SCORE BAR
+============================================================ */
+function scoreBar(lbl,score){
+  const pct=(score/10)*100;
+  const col=score>=8?'#4ADE80':score>=5?'#FCD34D':'#F87171';
+  return `<div class="score-row">
+    <span class="score-lbl">${lbl}</span>
+    <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${col}"></div></div>
+    <span class="score-n">${score}/10</span>
+  </div>`;
+}
+
+/* ============================================================
+   BUILD ANALYSIS HTML
+============================================================ */
+function buildAnalysis(v){
+  const r1=cr(v.colors.tx, v.colors.bg), w1=wcag(r1);
+  const r2=cr(v.colors.s,  v.colors.bg), w2=wcag(r2);
+  const r3=cr(v.colors.p,  v.colors.bg), w3=wcag(r3);
+  const an=v.analysis;
+  return `
+    <div class="an-panel body-col">
+      <div class="an-head">${v.name}</div>
+
+      <div class="an-sec">
+        <div class="an-lbl">Contrast Ratios</div>
+        <div class="cr-row">
+          <span class="cr-lbl">Text on page</span>
+          <span class="cr-right"><span class="cr-val">${r1.toFixed(1)}:1</span>
+          <span class="wcag-pill" style="background:${w1.bg};color:${w1.col}">${w1.lv}</span></span>
+        </div>
+        <div class="cr-row">
+          <span class="cr-lbl">Gold on page</span>
+          <span class="cr-right"><span class="cr-val">${r2.toFixed(1)}:1</span>
+          <span class="wcag-pill" style="background:${w2.bg};color:${w2.col}">${w2.lv}</span></span>
+        </div>
+        <div class="cr-row">
+          <span class="cr-lbl">Purple on page</span>
+          <span class="cr-right"><span class="cr-val">${r3.toFixed(1)}:1</span>
+          <span class="wcag-pill" style="background:${w3.bg};color:${w3.col}">${w3.lv}</span></span>
+        </div>
+      </div>
+
+      <div class="an-sec">
+        <div class="an-lbl">Performance</div>
+        ${scoreBar('Screen',an.screen)}
+        ${scoreBar('Print',an.print)}
+        ${scoreBar('Accessibility',an.access)}
+        ${scoreBar('Digital Fidelity',an.fidelity)}
+      </div>
+
+      <div class="an-sec">
+        <div class="an-lbl">Emotional Tone</div>
+        <div class="tag-wrap">${an.tone.map(t=>`<span class="tone-tag">${t}</span>`).join('')}</div>
+      </div>
+
+      <div class="an-sec">
+        <div class="an-lbl">Best Contexts</div>
+        <div class="tag-wrap">${an.ctxs.map(c=>`<span class="ctx-tag">${c}</span>`).join('')}</div>
+      </div>
+
+      <div class="an-sec">
+        <div class="an-lbl">Colour Adaptation</div>
+        <div class="an-note">${v.adapt}</div>
+      </div>
+
+      <div class="an-sec">
+        <div class="an-lbl">Strength</div>
+        <div class="an-note an-ok">✓ ${an.ok}</div>
+      </div>
+      <div class="an-sec">
+        <div class="an-lbl">Limitation</div>
+        <div class="an-note an-warn">⚠ ${an.warn}</div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   BUILD PREVIEW HTML
+============================================================ */
+function buildPreview(v, mini=false){
+  const btnP = v.btnP||{bg:v.colors.s,col:v.colors.bg};
+  const btnA = v.btnA||{bg:v.colors.a,col:'#fff'};
+  const btnG = v.btnG||{bg:v.colors.g,col:'#fff'};
+
+  const bodyGridCls = mini ? 'body-grid no-analysis' : 'body-grid';
+  const analysisHTML = mini ? '' : buildAnalysis(v);
+
+  return `
+  <div class="pw" data-v="${v.id}">
+    <!-- HERO -->
+    <div class="hero">
+      <canvas class="vgeo-canvas" data-vid="${v.id}" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0.16;mix-blend-mode:screen;"></canvas>
+      <div class="h-bg"></div>
+      <svg class="h-geo" viewBox="0 0 800 380" preserveAspectRatio="xMidYMid slice">
+        <circle cx="400" cy="190" r="185" stroke="white" stroke-width="0.8" fill="none"/>
+        <circle cx="400" cy="190" r="125" stroke="white" stroke-width="0.6" fill="none"/>
+        <circle cx="400" cy="190" r="72"  stroke="white" stroke-width="0.4" fill="none"/>
+        <polygon points="400,18 695,365 105,365" stroke="white" stroke-width="0.75" fill="none"/>
+        <polygon points="400,360 105,15 695,15" stroke="white" stroke-width="0.4"  fill="none"/>
+        <line x1="115" y1="190" x2="685" y2="190" stroke="white" stroke-width="0.28"/>
+        <line x1="400" y1="15"  x2="400" y2="365" stroke="white" stroke-width="0.28"/>
+      </svg>
+      <div class="h-overlay"></div>
+      <div class="h-content">
+        <div class="h-eyebrow">${v.name}</div>
+        <div class="h-title">Enterprise Depth. <em>Human Scale.</em></div>
+        <button class="h-cta">&nbsp;Engage a Consultant&nbsp;</button>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="${bodyGridCls}">
+      <!-- SWATCHES -->
+      <div class="body-col">
+        <div class="col-title">Colour Palette</div>
+        <div class="sw-grid">${v.swatches.map(sw).join('')}</div>
+      </div>
+
+      <!-- COMPONENTS -->
+      <div class="body-col">
+        <div class="col-title">Buttons</div>
+        <div class="btn-row">
+          <button class="pv-btn btn-p ${v.btnP?.cls||''}" style="background:${btnP.bg};color:${btnP.col}">Primary</button>
+          <button class="pv-btn btn-a ${v.btnA?.cls||''}" style="background:${btnA.bg};color:${btnA.col}">Accent</button>
+          <button class="pv-btn btn-g ${v.btnG?.cls||''}" style="background:${btnG.bg};color:${btnG.col}">Supporting</button>
+          <button class="pv-btn" style="background:transparent;color:${v.colors.tx};border:1px solid ${v.colors.s}50">Outline</button>
+        </div>
+        <div class="col-title">Status</div>
+        <div class="badge-row">
+          <span class="pv-badge" style="background:${v.colors.p}28;color:${v.colors.tx2};border:1px solid ${v.colors.p}44">Active</span>
+          <span class="pv-badge" style="background:${v.colors.s}20;color:${v.colors.s};border:1px solid ${v.colors.s}40">In Flight</span>
+          <span class="pv-badge" style="background:${v.colors.g}22;color:${v.colors.g==='#8A9BB8'?'#C8D4E8':v.colors.g};border:1px solid ${v.colors.g}38">Complete</span>
+        </div>
+        <div class="col-title">Service Card</div>
+        <div class="pv-card" style="--p:${v.id==='cartoon'?'#FBBF24':v.colors.p};--cd:${v.colors.bg};--bd:rgba(255,255,255,0.06);--tx:${v.colors.tx};--tx2:${v.colors.tx2}">
+          <div class="pv-card-icon">⚙️</div>
+          <h4>Systems Engineering</h4>
+          <p>Device management, compliance policy, and provisioning automation at enterprise scale.</p>
+        </div>
+      </div>
+
+      ${analysisHTML}
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   COMPARE — mini analysis strip
+============================================================ */
+function buildMiniAnalysis(v, el){
+  const r1=cr(v.colors.tx,v.colors.bg), w1=wcag(r1);
+  const an=v.analysis;
+  el.innerHTML = `
+    <div class="cmp-an-block">
+      <div class="cmp-an-title">Text Contrast</div>
+      <div class="cr-row" style="flex-direction:column;align-items:flex-start;gap:0.2rem">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#fff">${r1.toFixed(1)}:1</span>
+        <span class="wcag-pill" style="background:${w1.bg};color:${w1.col}">${w1.lv}</span>
+      </div>
+    </div>
+    <div class="cmp-an-block">
+      <div class="cmp-an-title">Scores</div>
+      ${scoreBar('Screen',an.screen)}
+      ${scoreBar('Print',an.print)}
+    </div>
+    <div class="cmp-an-block">
+      <div class="cmp-an-title">Tone</div>
+      <div class="tag-wrap">${an.tone.slice(0,3).map(t=>`<span class="tone-tag">${t}</span>`).join('')}</div>
+    </div>`;
+}
+
+/* ============================================================
+   STATE & ACTIONS
+============================================================ */
+let active='base', cmpMode=false, cmpA='base', cmpB='metallic';
+
+function setActive(id){
+  active=id;
+  document.querySelectorAll('.vt').forEach(el=>el.classList.toggle('active',el.dataset.id===id));
+  document.getElementById('singleMode').innerHTML = buildPreview(V.find(v=>v.id===id));
+}
+
+function buildDock(){
+  const wrap=document.getElementById('dockVariants');
+  V.forEach(v=>{
+    const el=document.createElement('div');
+    el.className='vt'+(v.id===active?' active':'');
+    el.dataset.id=v.id;
+    el.innerHTML=`<div class="vt-dots">${v.thumbDots.map(c=>`<div class="vt-dot" style="background:${c}"></div>`).join('')}</div><div class="vt-name">${v.name}</div>`;
+    el.addEventListener('click',()=>{ if(!cmpMode) setActive(v.id); });
+    wrap.appendChild(el);
+  });
+}
+
+function buildSelects(){
+  ['selA','selB'].forEach((sid,i)=>{
+    const sel=document.getElementById(sid);
+    sel.innerHTML=V.map(v=>`<option value="${v.id}" ${v.id===(i===0?cmpA:cmpB)?'selected':''}>${v.name}</option>`).join('');
+    sel.addEventListener('change',()=>{
+      if(sid==='selA') cmpA=sel.value;
+      else cmpB=sel.value;
+      renderCompare();
+    });
+  });
+}
+
+function renderCompare(){
+  const va=V.find(v=>v.id===cmpA), vb=V.find(v=>v.id===cmpB);
+  document.getElementById('pvA').innerHTML=buildPreview(va,true);
+  document.getElementById('pvB').innerHTML=buildPreview(vb,true);
+  buildMiniAnalysis(va,document.getElementById('anA'));
+  buildMiniAnalysis(vb,document.getElementById('anB'));
+}
+
+function toggleCompare(){
+  cmpMode=!cmpMode;
+  document.getElementById('singleMode').classList.toggle('hidden',cmpMode);
+  document.getElementById('compareMode').classList.toggle('hidden',!cmpMode);
+  document.getElementById('btnCmp').classList.toggle('on',cmpMode);
+  document.getElementById('btnCmp').textContent=cmpMode?'✕ Close Compare':'⊟ Compare';
+  if(cmpMode){ buildSelects(); renderCompare(); }
+}
+
+/* ============================================================
+   COPY TOAST
+============================================================ */
+function cp(val,name){
+  try{navigator.clipboard.writeText(val);}catch(e){}
+  const t=document.getElementById('toast');
+  t.textContent=`${val} — ${name} · Copied`;
+  t.classList.add('show');
+  clearTimeout(t._x);
+  t._x=setTimeout(()=>t.classList.remove('show'),2100);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+document.getElementById('btnCmp').addEventListener('click',toggleCompare);
+buildDock();
+setActive(active);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE)document.write('<scr'+'ipt src="three.r128.min.js"><\/scr'+'ipt>')</script>
+<script>
+'use strict';
+const VGEO={
+  base:     {geo:()=>new THREE.DodecahedronGeometry(1.8,0),    col:0x9B7BE0,rot:[.003,.005,.001]},
+  metallic: {geo:()=>new THREE.BoxGeometry(2.4,2.4,2.4),       col:0xC8D8EC,rot:[.003,.004,.001]},
+  pearl:    {geo:()=>new THREE.SphereGeometry(1.8,20,20),      col:0xC8C0E8,rot:[.002,.004,.001],wf:1},
+  chameleon:{geo:()=>new THREE.TorusKnotGeometry(1.2,.3,80,12),col:0xB0A8D8,rot:[.004,.007,.002],wf:1},
+  cartoon:  {geo:()=>new THREE.TetrahedronGeometry(1.9,0),     col:0xFFDF60,rot:[.005,.008,.002]},
+  academic: {geo:()=>new THREE.OctahedronGeometry(1.8,0),      col:0xA89878,rot:[.003,.006,.002]},
+  holo:     {geo:()=>new THREE.IcosahedronGeometry(1.8,0),     col:0xD0C8FF,rot:[.004,.007,.002]}
+};
+const vInst={};
+class VariantGeo {
+  constructor(canvas,vid){
+    this.ok=true;
+    const cfg=VGEO[vid]||VGEO.base;
+    const W=canvas.parentElement.clientWidth||300, H=canvas.parentElement.clientHeight||290;
+    this.scene=new THREE.Scene();
+    this.cam=new THREE.PerspectiveCamera(42,W/H,.1,100); this.cam.position.z=5.5;
+    this.ren=new THREE.WebGLRenderer({preserveDrawingBuffer:true,canvas,antialias:true,alpha:true});
+    this.ren.setPixelRatio(Math.min(devicePixelRatio,2)); this.ren.setSize(W,H); this.ren.setClearColor(0,0);
+    this.scene.add(new THREE.AmbientLight(0x1A0D3D,.4));
+    const pl=new THREE.PointLight(cfg.col,.65,15); pl.position.set(3,3,4); this.scene.add(pl);
+    this.grp=new THREE.Group();
+    const geo=cfg.geo(), EG=cfg.wf?THREE.WireframeGeometry:THREE.EdgesGeometry;
+    [[1,.58],[1.04,.13]].forEach(([s,op])=>{
+      const ls=new THREE.LineSegments(new EG(geo),new THREE.LineBasicMaterial({color:cfg.col,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false}));
+      ls.scale.setScalar(s); this.grp.add(ls);
+    });
+    this.scene.add(this.grp); this.cfg=cfg; this._tick();
+  }
+  _tick(){ if(!this.ok)return; requestAnimationFrame(()=>this._tick()); this.grp.rotation.x+=this.cfg.rot[0]; this.grp.rotation.y+=this.cfg.rot[1]; this.grp.rotation.z+=this.cfg.rot[2]; this.ren.render(this.scene,this.cam); }
+  die(){ this.ok=false; this.ren.dispose(); }
+}
+function startVGeo(vid){
+  if(vInst[vid]){ vInst[vid].die(); delete vInst[vid]; }
+  const c=document.querySelector(`.vgeo-canvas[data-vid="${vid}"]`);
+  if(c){ try{ vInst[vid]=new VariantGeo(c,vid); } catch(e){ console.warn('[variants] geo init',vid,e.message); } }
+}
+new MutationObserver(()=>{
+  document.querySelectorAll('.vgeo-canvas').forEach(c=>{ const v=c.dataset.vid; if(v&&!vInst[v]) startVGeo(v); });
+}).observe(document.body,{childList:true,subtree:true});
+setTimeout(()=>{ const c=document.querySelector('.vgeo-canvas'); if(c) startVGeo(c.dataset.vid); },250);
+</script>
+</body>
+</html>

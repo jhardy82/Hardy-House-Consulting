@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy House App — Architecture Evaluation</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300&family=JetBrains+Mono:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --void:#07040F; --purple:#2E1760; --gold:#C49A1F; --royal:#1E3FAA;
+  --forest:#1B5E35; --aether:#9B7BE0; --water:#20A8C8;
+  --fg:#F4F0EB; --fg2:rgba(244,240,235,.6); --fg3:rgba(244,240,235,.3);
+  --border:rgba(196,154,31,.14); --border-hi:rgba(196,154,31,.4);
+  --card:rgba(255,255,255,.025);
+}
+html{background:var(--void);color:var(--fg);scroll-behavior:smooth;}
+body{font-family:'Lora',Georgia,serif;line-height:1.65;}
+h1,h2,h3,h4{font-family:'Cormorant',serif;font-weight:600;line-height:1.1;}
+code,kbd,.mono{font-family:'JetBrains Mono',monospace;}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:50;background:rgba(7,4,15,.96);
+  border-bottom:1px solid var(--border);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 2.4rem;}
+.nav-brand{font-family:'Cormorant',serif;font-size:1rem;font-weight:700;
+  color:var(--gold);letter-spacing:.1em;text-transform:uppercase;}
+.nav-links{display:flex;gap:.3rem;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:.56rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);
+  text-decoration:none;padding:.2rem .55rem;border-radius:2px;
+  border:1px solid transparent;transition:all .2s;}
+.nav-links a:hover{color:var(--gold);border-color:var(--border-hi);}
+
+.hero{padding:5rem 2.4rem 4rem;text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,#1A0D3D,transparent);}
+.hero-eye{font-family:'JetBrains Mono',monospace;font-size:.62rem;
+  letter-spacing:.25em;text-transform:uppercase;color:rgba(196,154,31,.6);
+  margin-bottom:1.2rem;}
+.hero h1{font-size:clamp(2.4rem,5vw,4.4rem);font-weight:300;color:#fff;margin-bottom:1rem;}
+.hero h1 em{font-style:italic;color:var(--gold);}
+.hero p{font-size:1rem;color:var(--fg2);max-width:620px;margin:0 auto 2rem;}
+
+.section{max-width:1200px;margin:0 auto;padding:3.5rem 2.4rem;}
+.section-head{margin-bottom:2.2rem;}
+.section-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.section h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;
+  color:var(--fg);margin-bottom:.5rem;}
+.section h2 strong{font-weight:700;}
+.section-sub{font-size:.88rem;color:var(--fg2);max-width:680px;line-height:1.72;}
+
+/* ── Grid layouts ───────────────────────────────────────────── */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.1rem;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+@media(max-width:960px){.grid-3{grid-template-columns:repeat(2,1fr);}
+  .grid-4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.grid-3,.grid-2,.grid-4{grid-template-columns:1fr;}}
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid rgba(255,255,255,.05);
+  border-radius:10px;padding:1.25rem 1.4rem;}
+.card.gold{border-color:rgba(196,154,31,.2);}
+.card.purple{border-color:rgba(155,123,224,.2);}
+.card.blue{border-color:rgba(59,95,200,.18);}
+.card.green{border-color:rgba(27,94,53,.25);}
+.card-icon{font-size:1.6rem;margin-bottom:.7rem;display:block;}
+.card h3{font-size:1.1rem;font-weight:600;color:var(--fg);margin-bottom:.4rem;}
+.card h4{font-family:'JetBrains Mono',monospace;font-size:.62rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+.card p{font-size:.79rem;color:var(--fg2);line-height:1.62;}
+.card ul{list-style:none;margin-top:.55rem;}
+.card ul li{font-size:.77rem;color:var(--fg2);line-height:1.7;
+  display:flex;align-items:baseline;gap:.4rem;}
+.card ul li::before{content:'◈';font-size:.6em;color:var(--gold);flex-shrink:0;}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.52rem;
+  letter-spacing:.08em;text-transform:uppercase;padding:.14rem .42rem;
+  border-radius:2px;border:1px solid rgba(196,154,31,.22);color:rgba(196,154,31,.6);
+  margin:.15rem;}
+.tag.new{border-color:rgba(155,123,224,.4);color:var(--aether);}
+.tag.exists{border-color:rgba(32,168,200,.3);color:var(--water);}
+
+/* ── Architecture diagram ───────────────────────────────────── */
+.arch-tree{background:rgba(255,255,255,.015);border:1px solid var(--border);
+  border-radius:10px;padding:1.8rem 2rem;font-family:'JetBrains Mono',monospace;
+  font-size:.67rem;line-height:2.0;color:var(--fg2);}
+.arch-tree .root{color:var(--gold);font-weight:600;font-size:.78rem;}
+.arch-tree .l1{color:rgba(244,240,235,.75);padding-left:1.4rem;}
+.arch-tree .l2{color:var(--fg3);padding-left:2.8rem;}
+.arch-tree .l2.new{color:var(--aether);}
+.arch-tree .l2.exists{color:var(--water);}
+.arch-tree .comment{color:rgba(196,154,31,.4);font-style:italic;}
+
+/* ── Journey path ───────────────────────────────────────────── */
+.journey{display:flex;gap:0;overflow-x:auto;padding:.5rem 0;}
+.j-step{flex:0 0 auto;width:160px;padding:1rem 1.1rem;
+  border:1px solid rgba(255,255,255,.05);border-right:none;
+  background:rgba(255,255,255,.02);position:relative;}
+.j-step:first-child{border-radius:8px 0 0 8px;}
+.j-step:last-child{border-radius:0 8px 8px 0;border-right:1px solid rgba(255,255,255,.05);}
+.j-step::after{content:'→';position:absolute;right:-10px;top:50%;transform:translateY(-50%);
+  font-size:.9rem;color:rgba(196,154,31,.3);z-index:2;}
+.j-step:last-child::after{display:none;}
+.j-num{font-family:'JetBrains Mono',monospace;font-size:.52rem;
+  letter-spacing:.12em;color:rgba(196,154,31,.5);margin-bottom:.4rem;}
+.j-name{font-family:'Cormorant',serif;font-size:1rem;font-weight:600;color:var(--fg);}
+.j-sub{font-size:.68rem;color:var(--fg3);margin-top:.2rem;line-height:1.5;}
+.j-shape{font-size:1.3rem;margin-bottom:.3rem;}
+
+/* ── Table ──────────────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+thead th{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(196,154,31,.65);
+  border-bottom:1px solid var(--border);padding:.6rem .8rem;text-align:left;}
+tbody td{border-bottom:1px solid rgba(255,255,255,.04);padding:.65rem .8rem;
+  color:var(--fg2);vertical-align:top;}
+tbody tr:hover td{background:rgba(255,255,255,.02);}
+.td-name{color:var(--fg);font-weight:500;}
+
+/* ── Priority badges ─────────────────────────────────────────── */
+.pri{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:.13rem .42rem;border-radius:2px;white-space:nowrap;}
+.pri-1{background:rgba(196,154,31,.15);color:var(--gold);}
+.pri-2{background:rgba(32,168,200,.12);color:var(--water);}
+.pri-3{background:rgba(155,123,224,.1);color:var(--aether);}
+.pri-x{background:rgba(244,240,235,.05);color:var(--fg3);}
+
+/* ── Pull quote ─────────────────────────────────────────────── */
+.pull{font-family:'Cormorant',serif;font-size:clamp(1.3rem,2.5vw,2rem);
+  font-weight:300;font-style:italic;color:rgba(244,240,235,.75);
+  border-left:3px solid rgba(196,154,31,.4);padding-left:1.4rem;
+  margin:2rem 0;max-width:700px;line-height:1.35;}
+
+/* ── Divider ────────────────────────────────────────────────── */
+.div{max-width:1200px;margin:0 auto;padding:0 2.4rem;}
+.div-line{height:1px;background:linear-gradient(90deg,transparent,rgba(196,154,31,.18),transparent);}
+
+footer{text-align:center;padding:2rem 2.4rem 2.5rem;
+  font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.1em;
+  color:var(--fg3);border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Hardy House · App Architecture</div>
+  <div class="nav-links">
+    <a href="#ia">Structure</a>
+    <a href="#journey">Journey</a>
+    <a href="#entertainment">Entertainment</a>
+    <a href="#tree">Sacred Tree</a>
+    <a href="#buildplan">Build Plan</a>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-eye">Hardy House Consulting · App Architecture Evaluation</div>
+  <h1>From seven files to<br>one <em>coherent experience</em></h1>
+  <p>An architecture evaluation covering information structure, user journey design, sacred geometry entertainment mechanics, sacred tree workflow patterns, and a prioritised build plan.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+   1. CURRENT STATE
+════════════════════════════════════════════════════════════ -->
+<div class="section" id="current">
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <h2>Current state: <strong>seven isolated files</strong></h2>
+    <p class="section-sub">Every file is self-contained. Each works. None knows about the others except through the hub launcher. There is no shared navigation state, no persistent user journey, no progression between discovery and deep-dive, and no "story" that builds across files.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <span class="card-icon">◈</span>
+      <h4>What exists</h4>
+      <ul>
+        <li>Demo hub (static launcher)</li>
+        <li>10-slide client presentation</li>
+        <li>Geometry explorer (11 shapes)</li>
+        <li>FOL → Metatron decomposition</li>
+        <li>Brand variant studio (7 variants)</li>
+        <li>Phone geometry explorer</li>
+        <li>Interactive business card</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="card-icon">△</span>
+      <h4>What's missing</h4>
+      <ul>
+        <li>Unified navigation shell</li>
+        <li>Onboarding / guided journey</li>
+        <li>Element oracle / quiz</li>
+        <li>Sacred Tree of Life workflow</li>
+        <li>Sri Yantra interactive</li>
+        <li>Fractal / L-system builder</li>
+        <li>ContextForge agent graph</li>
+        <li>Persistent user state</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="card-icon">⬡</span>
+      <h4>The core problem</h4>
+      <p>A first-time visitor has no path. They land on the hub, see 7 cards, and must decide where to go with no context. There is no answer to <em>"why does sacred geometry matter to a consulting firm?"</em> before they are asked to explore it.</p>
+    </div>
+  </div>
+</div>
+
+<div class="div"><div class="div-line"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+   2. INFORMATION ARCHITECTURE
+════════════════════════════════════════════════════════════ -->
+<div class="section" id="ia">
+  <div class="section-head">
+    <div class="section-num">02</div>
+    <h2>Proposed information <strong>architecture</strong></h2>
+    <p class="section-sub">A single HTML shell with hash-based routing. Every existing file becomes a loadable module within the shell. The shell owns navigation, persistent state, and the onboarding path. No file:// origin issues. No server required.</p>
+  </div>
+
+  <div class="arch-tree">
+<div class="root">hardy-house-app.html  ← single entry point, owns the shell</div>
+<div class="l1">│</div>
+<div class="l1">├── #home  ·  Landing + animated hero <span class="comment">← new</span></div>
+<div class="l1">│     └── Element Oracle entry point  <span class="comment">← new</span></div>
+<div class="l1">│</div>
+<div class="l1">├── #journey  ·  Guided discovery path  <span class="comment">← new</span></div>
+<div class="l2 new">      ├── Step 1: The Circle (origin of all form)</div>
+<div class="l2 new">      ├── Step 2: Vesica Piscis (first relationship)</div>
+<div class="l2 new">      ├── Step 3: Seed of Life  ← from decomposition.html</div>
+<div class="l2 new">      ├── Step 4: Flower of Life ← from decomposition.html</div>
+<div class="l2 new">      ├── Step 5: Metatron's Cube ← from decomposition.html</div>
+<div class="l2 new">      └── Step 6: The Five Elements → unlocks Geometry Explorer</div>
+<div class="l1">│</div>
+<div class="l1">├── #geometry  ·  Sacred Geometry Explorer  <span class="comment">← geometry.html</span></div>
+<div class="l2 exists">      ├── Platonic Solids (5)</div>
+<div class="l2 exists">      ├── Extended Forms (6)</div>
+<div class="l2 new">      ├── Sri Yantra  ← new</div>
+<div class="l2 new">      └── Golden Ratio / Phyllotaxis  ← new</div>
+<div class="l1">│</div>
+<div class="l1">├── #tree  ·  Sacred Tree Workflows  <span class="comment">← new</span></div>
+<div class="l2 new">      ├── Tree of Life (Sephiroth) — visual</div>
+<div class="l2 new">      ├── Fractal Tree (L-system) — interactive builder</div>
+<div class="l2 new">      ├── ContextForge Agent Graph — workflow visualiser</div>
+<div class="l2 new">      └── PAOAL Cycle on Torus — animated</div>
+<div class="l1">│</div>
+<div class="l1">├── #decompose  ·  FOL Decomposition  <span class="comment">← decomposition.html</span></div>
+<div class="l1">│</div>
+<div class="l1">├── #brand  ·  Brand Variant Studio  <span class="comment">← variants.html</span></div>
+<div class="l1">│</div>
+<div class="l1">├── #present  ·  Client Presentation  <span class="comment">← presentation.html</span></div>
+<div class="l1">│</div>
+<div class="l1">└── #contact  ·  Business Card  <span class="comment">← phone-card.html</span></div>
+  </div>
+
+  <div class="pull">"The structure of the app should mirror the structure of the geometry itself — one circle at the centre, everything else radiating outward."</div>
+
+  <div class="grid-2" style="margin-top:1.5rem;">
+    <div class="card gold">
+      <h4>Navigation model</h4>
+      <p>Single sticky nav bar. Hash routing (no server). Clicking a nav item loads that section's canvas(es), fires a CSS transition, and updates the URL. Back button works. Bookmark-able. The shell remembers which section you were in via <code>localStorage</code>.</p>
+    </div>
+    <div class="card gold">
+      <h4>State model</h4>
+      <p>Three persistent pieces: <strong>current section</strong>, <strong>element affinity</strong> (set by the Oracle quiz), and <strong>journey progress</strong> (which steps completed). Element affinity changes the accent colour and default shape throughout the entire app. If your element is Water, the Icosahedron is pre-selected everywhere.</p>
+    </div>
+  </div>
+</div>
+
+<div class="div"><div class="div-line"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+   3. USER JOURNEY
+════════════════════════════════════════════════════════════ -->
+<div class="section" id="journey">
+  <div class="section-head">
+    <div class="section-num">03</div>
+    <h2>The guided <strong>journey path</strong></h2>
+    <p class="section-sub">First-time visitors follow a narrative arc that earns the right to explore the deeper tools. Repeat visitors skip straight to their section. Progress is saved.</p>
+  </div>
+
+  <div class="journey">
+    <div class="j-step">
+      <div class="j-shape">●</div>
+      <div class="j-num">Step 1</div>
+      <div class="j-name">The Circle</div>
+      <div class="j-sub">Tap to create it. No instructions. The circle expands from your cursor point.</div>
+    </div>
+    <div class="j-step">
+      <div class="j-shape">◎</div>
+      <div class="j-num">Step 2</div>
+      <div class="j-name">Vesica Piscis</div>
+      <div class="j-sub">Two circles. Their intersection is the first meaningful relationship.</div>
+    </div>
+    <div class="j-step">
+      <div class="j-shape">✦</div>
+      <div class="j-num">Step 3</div>
+      <div class="j-name">Seed of Life</div>
+      <div class="j-sub">Seven circles. The minimum complete unit. One apex + six ring.</div>
+    </div>
+    <div class="j-step">
+      <div class="j-shape">⬡</div>
+      <div class="j-num">Step 4</div>
+      <div class="j-name">Flower of Life</div>
+      <div class="j-sub">19 circles. The pattern that encodes everything that follows.</div>
+    </div>
+    <div class="j-step">
+      <div class="j-shape">◈</div>
+      <div class="j-num">Step 5</div>
+      <div class="j-name">Metatron's Cube</div>
+      <div class="j-sub">78 lines. All five Platonic solids hidden inside this one pattern.</div>
+    </div>
+    <div class="j-step">
+      <div class="j-shape">▲</div>
+      <div class="j-num">Step 6</div>
+      <div class="j-name">Element Oracle</div>
+      <div class="j-sub">Five questions. Your element is revealed. Your shape is unlocked.</div>
+    </div>
+    <div class="j-step" style="border-right:1px solid rgba(255,255,255,.05);border-radius:0 8px 8px 0;">
+      <div class="j-shape">🜁</div>
+      <div class="j-num">Unlocked</div>
+      <div class="j-name">Full Explorer</div>
+      <div class="j-sub">All sections accessible. Element affinity colours the entire app.</div>
+    </div>
+  </div>
+</div>
+
+<div class="div"><div class="div-line"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+   4. ENTERTAINMENT MECHANICS
+════════════════════════════════════════════════════════════ -->
+<div class="section" id="entertainment">
+  <div class="section-head">
+    <div class="section-num">04</div>
+    <h2>Entertaining <strong>introduction mechanics</strong></h2>
+    <p class="section-sub">Sacred geometry is not explained — it is experienced. Each mechanic is designed so the visitor discovers a truth by doing something, not by reading about it. The insight lands before the label does.</p>
+  </div>
+
+  <div class="grid-3">
+
+    <div class="card purple">
+      <h4>Mechanic A — The Breathing Circle</h4>
+      <h3>Land on nothing</h3>
+      <p>The page opens to pure void. A single point pulses at the cursor. The visitor clicks. A circle expands, perfectly smooth, gold on black. Text appears: <em>"This is all geometry needs to begin."</em> Then a second circle appears. They overlap. The vesica piscis glows. No instructions. Just discovery.</p>
+      <div style="margin-top:.65rem;">
+        <span class="tag new">Interaction: click to expand</span>
+        <span class="tag new">Duration: 45 seconds</span>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h4>Mechanic B — Element Oracle</h4>
+      <h3>Five questions, one solid</h3>
+      <p>Five binary questions about how you work: <em>"Do you initiate or complete?"</em> / <em>"Do you need structure or do you create it?"</em> / <em>"Does your best work happen in motion or in stillness?"</em> Each answer spins a roulette of shapes. The fifth answer locks one solid as your element. It then rotates on screen, and all subsequent UI accents shift to its colour.</p>
+      <div style="margin-top:.65rem;">
+        <span class="tag new">Interaction: choice-based</span>
+        <span class="tag new">Output: personalised element</span>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h4>Mechanic C — The Phi Hunt</h4>
+      <h3>Find φ in the wild</h3>
+      <p>A gallery of six images — a nautilus, a sunflower, a galaxy arm, a hurricane, a pine cone, a human face — overlaid with golden ratio guides that the visitor reveals by hovering. The ratio counter ticks up each time they find one. At six: the golden spiral unfurls in 3D and the connection to <em>r(θ) = base · φ^(2θ/π)</em> is shown.</p>
+      <div style="margin-top:.65rem;">
+        <span class="tag new">Interaction: hover reveal</span>
+        <span class="tag new">Count: 6 discoveries</span>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h4>Mechanic D — Build the Solid</h4>
+      <h3>Construct from scratch</h3>
+      <p>Visitor is given a set of triangular face tiles and asked to assemble a tetrahedron by dragging them into position. The faces snap and lock when placed correctly. When the fourth face closes, the solid spins up in 3D and the element label appears. Five progressively harder builds: Tetra → Cube → Octa → Icosa → Dodeca.</p>
+      <div style="margin-top:.65rem;">
+        <span class="tag new">Interaction: drag-and-drop</span>
+        <span class="tag new">Complexity: progressive</span>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h4>Mechanic E — The Edge Reveal</h4>
+      <h3>Hidden inside Metatron</h3>
+      <p>Full Metatron's Cube shown dim. Visitor clicks a solid name from a list. The exact subset of the 78 edges that form that solid highlights progressively — each edge drawing itself in ~35ms intervals, just like the decomposition demo. When complete, the 3D solid materialises beside the flat pattern. The connection is visceral: you see the solid emerge from the lines.</p>
+      <div style="margin-top:.65rem;">
+        <span class="tag exists">Uses: decomposition.html logic</span>
+        <span class="tag new">Narration: per-edge</span>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h4>Mechanic F — Fibonacci Counter</h4>
+      <h3>Grow the sequence live</h3>
+      <p>An interactive phyllotaxis spiral. A slider controls N (number of seeds). At N=3 it's a triangle. N=5 a pentagon. N=8 a cube ring. N=13 an icosahedron. N=21 a dodecahedron. The seeds spin and reorganise in real time. At each Fibonacci number, a petal sound plays and the corresponding team shape lights up — live proof that Fibonacci sizing is geometric.</p>
+      <div style="margin-top:.65rem;">
+        <span class="tag new">Interaction: slider</span>
+        <span class="tag new">Maps to: GCMT team sizes</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="div"><div class="div-line"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+   5. SACRED TREE WORKFLOWS
+════════════════════════════════════════════════════════════ -->
+<div class="section" id="tree">
+  <div class="section-head">
+    <div class="section-num">05</div>
+    <h2>Sacred tree <strong>workflow patterns</strong></h2>
+    <p class="section-sub">The Tree of Life (Kabbalah, 10 Sephiroth, 22 paths, 3 pillars) maps exactly to ContextForge's dimensional framework. It is the oldest known model of emergent hierarchical process — and it predicts multi-agent coordination topology with remarkable precision.</p>
+  </div>
+
+  <div class="pull">"Every workflow is a tree. Every tree has geometry. Sacred geometry reveals the structure of the tree before you build it."</div>
+
+  <div class="grid-2" style="margin-bottom:1.4rem;">
+    <div class="card gold">
+      <h4>Tree 1 — Tree of Life (Kabbalistic)</h4>
+      <h3>10 nodes, 22 paths, 3 pillars</h3>
+      <ul>
+        <li><strong>Kether</strong> (Crown) → Apex Agent / Strategic vision</li>
+        <li><strong>Chokmah + Binah</strong> → Left/Right orchestration pair</li>
+        <li><strong>Chesed + Geburah</strong> → Expansion vs Constraint agents</li>
+        <li><strong>Tiphareth</strong> (Heart) → Integration / synthesis agent</li>
+        <li><strong>Netzach + Hod</strong> → Creative and analytical arms</li>
+        <li><strong>Yesod</strong> → Memory / context store (UCL)</li>
+        <li><strong>Malkuth</strong> (Kingdom) → Execution / delivery layer</li>
+      </ul>
+      <p style="margin-top:.7rem;font-size:.75rem;color:var(--fg3);">3 pillars map directly: Pillar of Severity (left) = Constraint agents. Pillar of Mercy (right) = Expansion agents. Middle Pillar = The coordinating chain from vision to delivery.</p>
+    </div>
+
+    <div class="card gold">
+      <h4>Tree 2 — Fractal Workflow Tree</h4>
+      <h3>Self-similar at every scale</h3>
+      <p>Every task contains a micro-PAOAL. Every sprint contains a PAOAL. Every engagement contains a PAOAL. The workflow tree is fractal — the same pattern at every zoom level.</p>
+      <ul>
+        <li><strong>Trunk</strong> → Strategic engagement objective</li>
+        <li><strong>Primary branches</strong> → Epics / work streams</li>
+        <li><strong>Secondary branches</strong> → Sprints / cycles</li>
+        <li><strong>Leaves</strong> → Individual tasks</li>
+        <li><strong>Root system</strong> → Context and constraints (COF)</li>
+      </ul>
+      <p style="margin-top:.7rem;font-size:.75rem;color:var(--fg3);">The L-system builder lets you set branching angle, trunk length, recursion depth, and Golden Ratio mode. In GR mode, every branch is φ times the length of the one that spawned it.</p>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card blue">
+      <h4>Tree 3 — ContextForge Agent Graph</h4>
+      <h3>The Pentagon as tree root</h3>
+      <p>Visualise a live ContextForge workflow: Pentagon agents as nodes in a force-directed graph. Edges are baton handoffs. Thickness encodes handoff frequency. Colour encodes agent element. The graph responds to simulated workflow events in real time.</p>
+      <ul>
+        <li>Nodes: apex + 5 Pentagon agents</li>
+        <li>Edges: 22 handoff types (mirroring Sephiroth paths)</li>
+        <li>Animate: baton pulse along active edge</li>
+        <li>Tooltip: UCL context snapshot per node</li>
+      </ul>
+    </div>
+
+    <div class="card blue">
+      <h4>Tree 4 — PAOAL on Torus</h4>
+      <h3>The cycle as geometry</h3>
+      <p>The PAOAL cycle (Plan → Act → Observe → Assess → Learn) mapped onto a torus surface. A particle traces the surface, completing one cycle per revolution. Inner loop = fast iteration. Outer loop = strategic arc. The hole in the centre is the Void — pure potential.</p>
+      <ul>
+        <li>Interactive: drag to slow/speed</li>
+        <li>Annotate: each phase lights a zone</li>
+        <li>Counter: cycle count displayed</li>
+        <li>Overlay: current phase label</li>
+      </ul>
+    </div>
+
+    <div class="card blue">
+      <h4>Tree 5 — Sri Yantra workflow</h4>
+      <h3>9 triangles, 43 sub-triangles</h3>
+      <p>The Sri Yantra encodes 9 interlocking triangles (4 pointing up = Shiva/masculine, 5 pointing down = Shakti/feminine) producing 43 sub-triangles and 4 outer rings. Map this to: 9 = three PAOAL-phase clusters. 4 outer rings = 4 project phases. 43 sub-triangles = decision points in a complex engagement.</p>
+      <ul>
+        <li>Click a triangle → reveals sub-workflow</li>
+        <li>Animate construction from inside out</li>
+        <li>ContextForge mapping overlay toggle</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sacred Tree interaction patterns -->
+  <div style="margin-top:1.6rem;">
+    <div class="card">
+      <h4>Sacred Tree interaction patterns — all four trees</h4>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Tree</th><th>Primary interaction</th><th>What it reveals</th><th>ContextForge mapping</th><th>Wow factor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Tree of Life</td>
+              <td>Click a Sephira → expands its agent role and connects to adjacent nodes</td>
+              <td>The org chart hidden inside 4,000-year-old mysticism</td>
+              <td>COF-13D pillars, apex/Pentagon structure</td>
+              <td>The Middle Pillar IS the ContextForge coordination chain</td>
+            </tr>
+            <tr>
+              <td class="td-name">Fractal Tree</td>
+              <td>Slider: branching angle + depth + φ-mode toggle</td>
+              <td>Golden-ratio branching produces natural-looking trees at any scale</td>
+              <td>Task → sprint → epic → program hierarchy</td>
+              <td>Set angle to 137.5° (golden angle) → instant sunflower phyllotaxis</td>
+            </tr>
+            <tr>
+              <td class="td-name">Agent Graph</td>
+              <td>Trigger simulated workflow events; watch the graph respond</td>
+              <td>Agent coordination is a living geometry, not a org chart</td>
+              <td>Pentagon agents, baton handoffs, UCL</td>
+              <td>Force-directed layout self-organises into the Dodecahedron projection</td>
+            </tr>
+            <tr>
+              <td class="td-name">PAOAL Torus</td>
+              <td>Drag to scrub; click phase labels to expand</td>
+              <td>Continuous cycles have no start or end — only current position</td>
+              <td>PAOAL, AAR, iteration cadence</td>
+              <td>Two nested loops on same torus = sprint inside engagement</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div"><div class="div-line"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+   6. BUILD PLAN
+════════════════════════════════════════════════════════════ -->
+<div class="section" id="buildplan">
+  <div class="section-head">
+    <div class="section-num">06</div>
+    <h2>Prioritised <strong>build plan</strong></h2>
+    <p class="section-sub">Organised by impact and dependency. Phase 1 shells everything that exists into a unified app. Phase 2 adds the journey and oracle. Phase 3 delivers the sacred tree workflows. Phase 4 is the full entertainment layer.</p>
+  </div>
+
+  <div class="card" style="overflow-x:auto;margin-bottom:1.4rem;">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Deliverable</th><th>Phase</th><th>Priority</th><th>Uses existing</th><th>Net new</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="td-name">App shell — single HTML, hash routing, nav, element state</td><td>1</td><td><span class="pri pri-1">P1 — Core</span></td><td>All 7 files as iframe/section panels</td><td>Shell, router, state store</td></tr>
+        <tr><td>2</td><td class="td-name">Unified navigation bar with section icons and element accent</td><td>1</td><td><span class="pri pri-1">P1 — Core</span></td><td>Brand palette, JetBrains Mono, Cormorant</td><td>Nav component</td></tr>
+        <tr><td>3</td><td class="td-name">Element Oracle — 5 questions → element assignment → colour shift</td><td>2</td><td><span class="pri pri-1">P1 — Core</span></td><td>Platonic geometry data</td><td>Quiz logic, CSS var switching</td></tr>
+        <tr><td>4</td><td class="td-name">Guided journey — 6-step onboarding path</td><td>2</td><td><span class="pri pri-1">P1 — Core</span></td><td>decomposition.html scenes</td><td>Step controller, progress store</td></tr>
+        <tr><td>5</td><td class="td-name">Tree of Life — interactive Sephiroth diagram with ContextForge mapping</td><td>3</td><td><span class="pri pri-2">P2 — High</span></td><td>Three.js, geometry palette</td><td>10 node positions, 22 paths, pillar labels</td></tr>
+        <tr><td>6</td><td class="td-name">PAOAL Torus — animated cycle particle on torus surface</td><td>3</td><td><span class="pri pri-2">P2 — High</span></td><td>Torus geometry (phone-geometry.html)</td><td>Particle path, phase zone colouring</td></tr>
+        <tr><td>7</td><td class="td-name">ContextForge Agent Graph — force-directed, live workflow simulation</td><td>3</td><td><span class="pri pri-2">P2 — High</span></td><td>Three.js, ContextForge data</td><td>d3-force or custom spring solver</td></tr>
+        <tr><td>8</td><td class="td-name">Breathing Circle onboarding — click-to-expand mechanic</td><td>2</td><td><span class="pri pri-2">P2 — High</span></td><td>FOL 2D scene code</td><td>Event-driven circle expansion</td></tr>
+        <tr><td>9</td><td class="td-name">Fibonacci / Phyllotaxis slider — live seed count → shape recognition</td><td>3</td><td><span class="pri pri-2">P2 — High</span></td><td>Golden spiral math</td><td>Canvas 2D phyllotaxis renderer</td></tr>
+        <tr><td>10</td><td class="td-name">Fractal tree L-system — angle, depth, φ mode</td><td>3</td><td><span class="pri pri-3">P3 — Medium</span></td><td>Canvas 2D</td><td>L-system parser, recursion renderer</td></tr>
+        <tr><td>11</td><td class="td-name">Phi Hunt — hover reveal over 6 natural images</td><td>4</td><td><span class="pri pri-3">P3 — Medium</span></td><td>Golden ratio overlay math</td><td>Image + SVG overlay compositor</td></tr>
+        <tr><td>12</td><td class="td-name">Build the Solid — drag face tiles to assemble Platonic solids</td><td>4</td><td><span class="pri pri-3">P3 — Medium</span></td><td>Three.js geometry</td><td>Drag physics, snap detection</td></tr>
+        <tr><td>13</td><td class="td-name">Sri Yantra — interactive construction + ContextForge mapping</td><td>4</td><td><span class="pri pri-x">P4 — Later</span></td><td>Canvas 2D / Three.js</td><td>Sri Yantra geometry math (complex)</td></tr>
+        <tr><td>14</td><td class="td-name">Mobile PWA manifest — install to home screen</td><td>1</td><td><span class="pri pri-2">P2 — High</span></td><td>phone-* files</td><td>manifest.json, service worker</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-3">
+    <div class="card green">
+      <h4>Phase 1 — Shell (1 session)</h4>
+      <h3>Unify what exists</h3>
+      <p>Single app HTML. Hash router. All 7 existing files load as sections. Shared nav. Element Oracle. PWA manifest. Shared Three.js and GSAP loaded once.</p>
+      <p style="margin-top:.5rem;font-size:.75rem;color:var(--fg3);">Output: <code>hardy-house-app.html</code> + <code>manifest.json</code></p>
+    </div>
+    <div class="card green">
+      <h4>Phase 2 — Journey (1–2 sessions)</h4>
+      <h3>Onboarding + engagement</h3>
+      <p>Breathing Circle → Vesica → Seed → FOL → Metatron → Oracle 6-step path. Fibonacci slider. Element state persists. First-visit detection.</p>
+      <p style="margin-top:.5rem;font-size:.75rem;color:var(--fg3);">Output: journey sections inside <code>hardy-house-app.html</code></p>
+    </div>
+    <div class="card green">
+      <h4>Phase 3 — Sacred Tree (2 sessions)</h4>
+      <h3>The new content</h3>
+      <p>Tree of Life interactive. PAOAL Torus. ContextForge Agent Graph. Fractal L-system builder. These are the demos that don't exist anywhere else.</p>
+      <p style="margin-top:.5rem;font-size:.75rem;color:var(--fg3);">Output: <code>#tree</code> section with 4 sub-demos</p>
+    </div>
+  </div>
+</div>
+
+<div class="div"><div class="div-line"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+   7. KEY DESIGN DECISIONS
+════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <div class="section-num">07</div>
+    <h2>Key <strong>design decisions</strong></h2>
+  </div>
+  <div class="grid-4">
+    <div class="card">
+      <h4>Single file vs SPA</h4>
+      <p>Single self-contained HTML with hash routing. No build step. No Node server. Open from file system or any static host. The existing pattern that already works.</p>
+    </div>
+    <div class="card">
+      <h4>Element as identity</h4>
+      <p>The Oracle assigns one of 5 elements. This sets a CSS accent colour, a default shape, and a persistent label. It makes the tool feel personal across every section without requiring a login.</p>
+    </div>
+    <div class="card">
+      <h4>Journey is optional</h4>
+      <p>New visitors get the 6-step path. Returning visitors (detected via localStorage) land directly on their last section. The nav is always visible — no lock-in to the journey.</p>
+    </div>
+    <div class="card">
+      <h4>One Three.js load</h4>
+      <p>Currently each file loads Three.js independently. In the unified app, it loads once. All sections share the same renderer pool. Performance improves dramatically at scale.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Hardy House Consulting · App Architecture Evaluation · Generated April 2026<br>
+  <span style="color:rgba(196,154,31,.35);">Sacred Geometry · ContextForge · COF-13D · GCMT · PAOAL</span>
+</footer>
+
+</body>
+</html>

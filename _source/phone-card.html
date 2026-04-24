@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07040F">
+<title>James Hardy · Hardy House Consulting</title>
+<style>
+/* Fonts loaded from Google CDN when online; fallback to system serif/mono offline */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:#07040F;color:#F4F0EB;}
+body{font-family:'Cormorant',Georgia,serif;touch-action:none;user-select:none;}
+
+canvas{position:fixed;inset:0;width:100%!important;height:100%!important;display:block;opacity:.75;}
+
+/* ── overlay layout ────────────────────────────────────────── */
+#overlay{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  padding:max(env(safe-area-inset-top),28px) 0 max(env(safe-area-inset-bottom),20px);
+  z-index:10;
+}
+
+/* ── logo / wordmark area ───────────────────────────────────── */
+#logoArea{
+  text-align:center;
+  padding:0 24px;
+  flex:0 0 auto;
+}
+#logoSymbol{
+  font-size:1.5rem;letter-spacing:.3em;color:rgba(196,154,31,.45);
+  margin-bottom:.3rem;
+  animation:symbolPulse 4s ease-in-out infinite;
+}
+@keyframes symbolPulse{0%,100%{opacity:.45;}50%{opacity:.75;}}
+#logoWord{
+  font-family:'Cormorant',serif;font-size:1.0rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;color:rgba(196,154,31,.55);
+}
+#logoDivider{
+  width:36px;height:1px;background:rgba(196,154,31,.22);
+  margin:.7rem auto;
+}
+
+/* ── centre — name + role ───────────────────────────────────── */
+#centre{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:0 24px;
+}
+#name{
+  font-size:clamp(2.6rem,10vw,4.2rem);font-weight:300;letter-spacing:-.01em;
+  color:#fff;line-height:1;text-align:center;margin-bottom:.6rem;
+  text-shadow:0 0 60px rgba(155,123,224,.28);
+}
+#nameFirst{display:block;font-weight:600;}
+#nameLast{display:block;font-weight:300;font-style:italic;color:rgba(244,240,235,.72);}
+#role{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(196,154,31,.68);text-align:center;
+  line-height:1.8;
+}
+#roleStack{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem .6rem;
+  margin-top:.9rem;
+}
+.tag{
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:.18rem .5rem;
+  border-radius:2px;border:1px solid rgba(196,154,31,.18);
+  color:rgba(196,154,31,.5);
+}
+
+/* ── panel — the switchable info section ───────────────────── */
+#panel{
+  flex:0 0 auto;
+  margin:0 20px;
+  background:rgba(14,8,32,.85);
+  border:1px solid rgba(196,154,31,.14);
+  border-radius:12px;
+  padding:16px 20px 20px;
+  backdrop-filter:blur(12px);
+  min-height:90px;
+  transition:opacity .25s;
+}
+#panel.fade{opacity:0;}
+#panelTitle{
+  font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(196,154,31,.55);margin-bottom:.55rem;
+}
+#panelBody{
+  font-size:.82rem;color:rgba(244,240,235,.7);line-height:1.65;
+}
+
+/* ── action buttons ─────────────────────────────────────────── */
+#actions{
+  flex:0 0 auto;
+  display:flex;gap:.6rem;padding:14px 20px 0;
+  pointer-events:all;
+}
+.act-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;
+  padding:.7rem .4rem;border-radius:10px;cursor:pointer;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  color:rgba(244,240,235,.45);
+  transition:all .2s;-webkit-tap-highlight-color:transparent;
+}
+.act-btn:active,.act-btn.on{
+  background:rgba(196,154,31,.08);
+  border-color:rgba(196,154,31,.35);
+  color:#C49A1F;
+}
+.act-icon{font-size:1.2rem;line-height:1;}
+.act-label{
+  font-family:'JetBrains Mono',monospace;font-size:.48rem;letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+/* ── gyro enable button (iOS) ──────────────────────────────── */
+#gyroBtn{
+  position:fixed;bottom:max(env(safe-area-inset-bottom),16px);
+  right:16px;z-index:30;
+  font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.08em;
+  text-transform:uppercase;padding:.28rem .6rem;
+  border-radius:3px;border:1px solid rgba(196,154,31,.22);
+  color:rgba(196,154,31,.42);background:transparent;cursor:pointer;
+  transition:all .2s;display:none;
+}
+#gyroBtn.show{display:block;}
+#gyroBtn:active{border-color:#C49A1F;color:#C49A1F;}
+
+/* ── copy toast ─────────────────────────────────────────────── */
+#toast{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
+  background:rgba(14,8,32,.96);border:1px solid rgba(196,154,31,.3);
+  border-radius:8px;padding:.6rem 1.2rem;
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.1em;
+  color:#C49A1F;opacity:0;transition:all .25s;pointer-events:none;z-index:100;
+}
+#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="overlay">
+  <!-- Logo -->
+  <div id="logoArea">
+    <div id="logoSymbol">◇ ◈ ◇</div>
+    <div id="logoWord">Hardy House Consulting</div>
+    <div id="logoDivider"></div>
+  </div>
+
+  <!-- Name + role -->
+  <div id="centre">
+    <div id="name">
+      <span id="nameFirst">James</span>
+      <span id="nameLast">Hardy</span>
+    </div>
+    <div id="role">Modern Workplace · Endpoint Engineering</div>
+    <div id="roleStack">
+      <span class="tag">Intune</span>
+      <span class="tag">SCCM</span>
+      <span class="tag">Azure</span>
+      <span class="tag">M365 Copilot</span>
+      <span class="tag">Graph API</span>
+      <span class="tag">ContextForge</span>
+    </div>
+  </div>
+
+  <!-- Switchable info panel -->
+  <div id="panel" style="pointer-events:all;">
+    <div id="panelTitle">What I do</div>
+    <div id="panelBody">Enterprise endpoint management at scale — Windows 11 deployments, Intune Autopilot, Azure Virtual Desktop, and Microsoft 365 architecture. Consultant at Avanade.</div>
+  </div>
+
+  <!-- Action buttons -->
+  <div id="actions">
+    <button class="act-btn on" id="btnWork" onclick="switchPanel('work')">
+      <span class="act-icon">⬡</span>
+      <span class="act-label">Work</span>
+    </button>
+    <button class="act-btn" id="btnCF" onclick="switchPanel('cf')">
+      <span class="act-icon">◈</span>
+      <span class="act-label">ContextForge</span>
+    </button>
+    <button class="act-btn" id="btnGeo" onclick="switchPanel('geo')">
+      <span class="act-icon">△</span>
+      <span class="act-label">Geometry</span>
+    </button>
+    <button class="act-btn" id="btnContact" onclick="switchPanel('contact')">
+      <span class="act-icon">✉</span>
+      <span class="act-label">Contact</span>
+    </button>
+  </div>
+</div>
+
+<button id="gyroBtn" onclick="requestGyro()">Enable Motion</button>
+<div id="toast">Copied</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE)document.write('<scr'+'ipt src="three.r128.min.js"><\/scr'+'ipt>')</script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════
+   PANEL CONTENT
+══════════════════════════════════════════════════════════════ */
+const PANELS = {
+  work: {
+    title: 'What I build',
+    body: 'Enterprise endpoint management at scale — Windows 11 deployments, Intune Autopilot, Azure Virtual Desktop, and Microsoft 365 architecture. Consultant at Avanade delivering Modern Workplace transformations.',
+    shape: 'cube', shapeColor: 0x2D8050,
+  },
+  cf: {
+    title: 'ContextForge',
+    body: 'ContextForge is an AI agent orchestration framework built on Sacred Geometry. Five Pentagon agents in a COF-13D dimensional structure. Automates task management, AAR loops, and multi-agent workflows. GitHub: SCCMScripts.',
+    shape: 'dodeca', shapeColor: 0x9B7BE0,
+  },
+  geo: {
+    title: 'Sacred Geometry as Practice',
+    body: 'The 5 Platonic solids map to the 5 elements and 5 types of agent role. Team sizes follow Fibonacci. Architecture follows the Golden Ratio. Geometry is not metaphor — it is the actual structural logic of the system.',
+    shape: 'icosa', shapeColor: 0x20A8C8,
+  },
+  contact: {
+    title: 'Get in touch',
+    body: '📍 Denver, CO  ·  Avanade (Microsoft/Accenture JV)\n\n💼 LinkedIn: linkedin.com/in/jameshardy\n✉ Tap to copy email',
+    shape: 'torus', shapeColor: 0xC49A1F,
+    action: true,
+  },
+};
+
+const SHAPE_GEOS = {
+  cube:   () => new THREE.BoxGeometry(2,2,2),
+  dodeca: () => new THREE.DodecahedronGeometry(1.6,0),
+  icosa:  () => new THREE.IcosahedronGeometry(1.65,0),
+  tetra:  () => new THREE.TetrahedronGeometry(1.75,0),
+  torus:  () => new THREE.TorusGeometry(1.3,0.44,12,52),
+  octa:   () => new THREE.OctahedronGeometry(1.7,0),
+};
+
+let activePanel = 'work';
+
+function switchPanel(key) {
+  if (activePanel === key) return;
+  activePanel = key;
+  document.querySelectorAll('.act-btn').forEach(b => b.classList.toggle('on', b.id === 'btn' + key.charAt(0).toUpperCase() + key.slice(1)));
+  const panel = document.getElementById('panel');
+  panel.classList.add('fade');
+  setTimeout(() => {
+    const p = PANELS[key];
+    document.getElementById('panelTitle').textContent = p.title;
+    document.getElementById('panelBody').textContent = p.body;
+    panel.classList.remove('fade');
+    transitionShape(key);
+  }, 200);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THREE.JS SCENE
+══════════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({preserveDrawingBuffer:true,
+  canvas, antialias:true, alpha:false, powerPreference:'high-performance'
+});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x07040F, 1);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x07040F, 0.048);
+
+const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 50);
+camera.position.set(0, 0, 5.8);
+camera.lookAt(0, 0, 0);
+
+scene.add(new THREE.AmbientLight(0x1A0D3D, 0.65));
+const pl1 = new THREE.PointLight(0xC49A1F, 1.1, 16); pl1.position.set(2.5, 2.5, 4); scene.add(pl1);
+const pl2 = new THREE.PointLight(0x2E1760, 0.45, 12); pl2.position.set(-2, -1.5, 2); scene.add(pl2);
+const pl3 = new THREE.PointLight(0x1E3FAA, 0.28, 10); pl3.position.set(0, -3, -1); scene.add(pl3);
+
+// Particles
+const ptN = 240, ptPos = new Float32Array(ptN*3);
+for (let i = 0; i < ptN; i++) {
+  const θ = Math.random()*Math.PI*2, φ = Math.acos(2*Math.random()-1);
+  const r = 5 + Math.random()*5.5;
+  ptPos[i*3] = r*Math.sin(φ)*Math.cos(θ); ptPos[i*3+1] = r*Math.sin(φ)*Math.sin(θ); ptPos[i*3+2] = r*Math.cos(φ);
+}
+const ptGeo = new THREE.BufferGeometry();
+ptGeo.setAttribute('position', new THREE.Float32BufferAttribute(ptPos, 3));
+const ptMat = new THREE.PointsMaterial({ color:0xC49A1F, size:0.04, transparent:true, opacity:0.28, blending:THREE.AdditiveBlending });
+scene.add(new THREE.Points(ptGeo, ptMat));
+
+// Distant decorative rings
+[2.8, 3.6, 4.4].forEach((radius, i) => {
+  const rGeo = new THREE.TorusGeometry(radius, 0.008, 4, 80);
+  const rMat = new THREE.MeshBasicMaterial({ color:0xC49A1F, transparent:true, opacity:0.04 + i*0.01, blending:THREE.AdditiveBlending });
+  const ring = new THREE.Mesh(rGeo, rMat);
+  ring.rotation.x = Math.PI/3 + i*0.4;
+  ring.rotation.y = i * 0.7;
+  scene.add(ring);
+});
+
+// Shape group
+const shapeGroup = new THREE.Group();
+scene.add(shapeGroup);
+
+function buildEdges(geo, hex, ops=[[1,.85],[1.03,.16]]) {
+  const col = typeof hex==='number' ? hex : parseInt(hex.replace('#',''),16);
+  const g = new THREE.Group();
+  ops.forEach(([s,op]) => {
+    const l = new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({ color:col, transparent:true, opacity:op, blending:THREE.AdditiveBlending, depthWrite:false }));
+    l.scale.setScalar(s); g.add(l);
+  });
+  return g;
+}
+
+function buildMesh(geo, col, opacity=0.08) {
+  return new THREE.Mesh(geo, new THREE.MeshPhongMaterial({
+    color:col, emissive:col, emissiveIntensity:0.1,
+    transparent:true, opacity, side:THREE.DoubleSide
+  }));
+}
+
+let currentShape = null;
+let targetTh = 0, currentTh = 0, currentPh = Math.PI/2;
+let autoTh = 0;
+
+function buildShapeGroup(key) {
+  const col = PANELS[key].shapeColor;
+  const g = new THREE.Group();
+
+  if (key === 'cf') {
+    // Star Tetrahedron (Merkaba) for ContextForge
+    const tGeo = new THREE.TetrahedronGeometry(1.7, 0);
+    const t1 = new THREE.Group();
+    t1.add(buildEdges(tGeo, 0xC49A1F));
+    t1.add(buildMesh(tGeo, 0xC49A1F, 0.07));
+    const t2 = new THREE.Group();
+    t2.add(buildEdges(tGeo, 0x9B7BE0));
+    t2.add(buildMesh(tGeo, 0x9B7BE0, 0.07));
+    t2.rotation.x = Math.PI;
+    g.add(t1, t2);
+    g._t2 = t2;
+  } else {
+    const geo = SHAPE_GEOS[PANELS[key].shape]?.() || SHAPE_GEOS.dodeca();
+    g.add(buildEdges(geo, col));
+    g.add(buildMesh(geo, col));
+  }
+
+  pl1.color.setHex(col);
+  return g;
+}
+
+function transitionShape(key) {
+  if (currentShape) {
+    const old = currentShape;
+    const t0 = performance.now();
+    (function fadeOut(now) {
+      const p = Math.min((now-t0)/260, 1);
+      old.scale.setScalar(Math.max(0, 1-p));
+      if (p<1) requestAnimationFrame(fadeOut);
+      else scene.remove(old);
+    })(t0);
+  }
+  const g = buildShapeGroup(key);
+  g.scale.setScalar(0.01);
+  scene.add(g);
+  currentShape = g;
+  const t0 = performance.now();
+  (function scaleIn(now) {
+    const p = Math.min((now-t0)/400, 1);
+    const e = 1 - Math.pow(1-p, 3);
+    g.scale.setScalar(0.01 + e * 0.99);
+    if (p<1) requestAnimationFrame(scaleIn);
+  })(t0);
+}
+
+// Init shape
+transitionShape('work');
+
+/* ══════════════════════════════════════════════════════════════
+   GYROSCOPE / DEVICE ORIENTATION
+══════════════════════════════════════════════════════════════ */
+let gyroEnabled = false;
+let gyroAlpha = 0, gyroBeta = 0, gyroGamma = 0;
+
+function handleOrientation(e) {
+  gyroAlpha = e.alpha || 0;
+  gyroBeta  = e.beta  || 0;
+  gyroGamma = e.gamma || 0;
+}
+
+function enableGyro() {
+  window.addEventListener('deviceorientation', handleOrientation);
+  gyroEnabled = true;
+  document.getElementById('gyroBtn').style.display = 'none';
+}
+
+function requestGyro() {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS 13+
+    DeviceOrientationEvent.requestPermission()
+      .then(perm => { if (perm === 'granted') enableGyro(); })
+      .catch(console.warn);
+  } else {
+    enableGyro();
+  }
+}
+
+// Show the Enable Motion button on iOS (detect via requestPermission existence)
+if (typeof DeviceOrientationEvent !== 'undefined' &&
+    typeof DeviceOrientationEvent.requestPermission === 'function') {
+  document.getElementById('gyroBtn').classList.add('show');
+} else {
+  // Android / non-iOS: just start directly
+  enableGyro();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOUCH INPUT (fallback when gyro unavailable / as override)
+══════════════════════════════════════════════════════════════ */
+let touchPrev = null;
+let manualTh = 0, manualPh = Math.PI * 0.45;
+
+canvas.addEventListener('touchstart', e => {
+  touchPrev = { x:e.touches[0].clientX, y:e.touches[0].clientY };
+}, { passive:true });
+
+canvas.addEventListener('touchmove', e => {
+  if (!touchPrev) return;
+  const dx = e.touches[0].clientX - touchPrev.x;
+  const dy = e.touches[0].clientY - touchPrev.y;
+  manualTh -= dx * 0.007;
+  manualPh = Math.max(0.12, Math.min(Math.PI-0.12, manualPh - dy * 0.007));
+  touchPrev = { x:e.touches[0].clientX, y:e.touches[0].clientY };
+}, { passive:true });
+
+canvas.addEventListener('touchend', () => { touchPrev = null; });
+
+/* ══════════════════════════════════════════════════════════════
+   CONTACT ACTION
+══════════════════════════════════════════════════════════════ */
+document.getElementById('panelBody').addEventListener('click', e => {
+  if (activePanel === 'contact') {
+    const email = 'james@hardyhouseconsulting.com';
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(email).catch(() => {});
+    }
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Email copied';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER LOOP
+══════════════════════════════════════════════════════════════ */
+function resize() {
+  const W = window.innerWidth, H = window.innerHeight;
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+let t0 = performance.now();
+
+function tick(now) {
+  requestAnimationFrame(tick);
+  const elapsed = (now - t0) / 1000;
+
+  let th, ph;
+
+  if (gyroEnabled) {
+    // Use device orientation for camera parallax
+    // gamma: -90 to 90 (left-right tilt)
+    // beta: -180 to 180 (forward-back tilt)
+    const targetGammaNorm = (gyroGamma / 90) * Math.PI * 0.35;
+    const targetBetaNorm  = ((gyroBeta - 45) / 90) * Math.PI * 0.25 + Math.PI * 0.45;
+    manualTh += (targetGammaNorm - manualTh) * 0.06;
+    manualPh += (Math.max(0.2, Math.min(Math.PI-0.2, targetBetaNorm)) - manualPh) * 0.06;
+    th = manualTh + elapsed * 0.003;  // very slow auto drift
+    ph = manualPh;
+  } else {
+    // Touch or auto
+    th = manualTh + elapsed * 0.006;
+    ph = manualPh;
+  }
+
+  const sp = Math.sin(ph), cp = Math.cos(ph);
+  const st = Math.sin(th), ct = Math.cos(th);
+  const r = 5.8;
+  camera.position.set(r*sp*ct, r*cp, r*sp*st);
+  camera.lookAt(0, 0, 0);
+
+  if (currentShape) {
+    currentShape.rotation.y += 0.005;
+    currentShape.rotation.x += 0.001;
+    // Extra rotation for Merkaba's second tetrahedron
+    if (currentShape._t2) currentShape._t2.rotation.y += 0.011;
+  }
+
+  // Ambient pulse
+  pl1.intensity = 1.0 + Math.sin(now * 0.0008) * 0.18;
+  ptMat.opacity  = 0.22 + Math.sin(now * 0.0005) * 0.08;
+
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

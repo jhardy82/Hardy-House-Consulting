@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy House — Sacred Geometry</title>
+<style>
+/* Fonts loaded from Google CDN when online; fallback to system serif/mono offline */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Lora',Georgia,serif;background:#07040F;color:#F4F0EB;overflow-x:hidden;}
+
+/* ─── NAV ─────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:200;background:rgba(7,4,15,.96);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(196,154,31,.14);display:flex;align-items:center;
+  justify-content:space-between;padding:.65rem 2rem;gap:1rem;}
+.nav-brand{font-family:'Cormorant',serif;font-size:.95rem;font-weight:600;color:#C49A1F;letter-spacing:.1em;white-space:nowrap;}
+.nav-links{display:flex;gap:1.6rem;list-style:none;flex-wrap:wrap;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:rgba(244,240,235,.45);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:#C49A1F;}
+.nav-suite{display:flex;gap:.45rem;}
+.suite-link{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.28rem .7rem;border:1px solid rgba(196,154,31,.2);border-radius:3px;color:rgba(196,154,31,.55);
+  text-decoration:none;transition:all .2s;white-space:nowrap;}
+.suite-link:hover{border-color:#C49A1F;color:#C49A1F;}
+.suite-link.active{background:rgba(196,154,31,.1);border-color:rgba(196,154,31,.55);color:#C49A1F;}
+
+/* ─── HERO ────────────────────────────────────────────────── */
+.hero{position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 110% 85% at 50% 38%,#1A0D3D 0%,#07040F 68%);}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero-content{position:relative;z-index:2;text-align:center;max-width:720px;padding:2rem;}
+.h-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(196,154,31,.72);margin-bottom:1.4rem;display:flex;align-items:center;justify-content:center;gap:.9rem;}
+.h-eyebrow::before,.h-eyebrow::after{content:'';width:40px;height:1px;background:#C49A1F;opacity:.35;}
+.h-title{font-family:'Cormorant',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:300;color:#fff;line-height:1.05;}
+.h-title em{font-style:italic;color:#C49A1F;}
+.h-sub{font-size:1.05rem;color:rgba(244,240,235,.58);line-height:1.75;max-width:540px;margin:1.2rem auto 0;}
+.h-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;letter-spacing:.2em;color:rgba(196,154,31,.4);text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:sp 2.5s ease-in-out infinite;}
+.h-scroll::after{content:'';width:1px;height:28px;background:linear-gradient(to bottom,rgba(196,154,31,.38),transparent);}
+@keyframes sp{0%,100%{opacity:.32}50%{opacity:.85}}
+
+/* ─── PLATONIC MAP ────────────────────────────────────────── */
+.plat-map{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;
+  max-width:1200px;margin:0 auto;padding:1.5rem 2rem;
+  background:rgba(255,255,255,.018);border:1px solid rgba(196,154,31,.1);border-radius:10px;}
+.pm{text-align:center;padding:.6rem .3rem;}
+.pm-el{font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.28rem;}
+.pm-sh{font-family:'Cormorant',serif;font-size:1rem;font-weight:600;color:#F4F0EB;margin-bottom:.18rem;}
+.pm-n{font-family:'JetBrains Mono',monospace;font-size:.57rem;color:rgba(244,240,235,.28);}
+.pm-div{width:1px;background:rgba(196,154,31,.12);}
+
+/* ─── SECTIONS ────────────────────────────────────────────── */
+section{padding:5rem 2rem;max-width:1200px;margin:0 auto;}
+.s-lbl{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:#C49A1F;margin-bottom:.7rem;}
+.s-title{font-family:'Cormorant',serif;font-size:clamp(2rem,4vw,3rem);font-weight:600;color:#F4F0EB;margin-bottom:.7rem;}
+.s-div{width:56px;height:2px;background:linear-gradient(90deg,#C49A1F,#1E3FAA);margin-bottom:1.5rem;}
+.s-desc{color:rgba(244,240,235,.56);max-width:560px;line-height:1.75;margin-bottom:3rem;font-size:.94rem;}
+
+/* ─── MODE PILLS ──────────────────────────────────────────── */
+.mode-pills{display:flex;gap:.4rem;margin-bottom:2rem;}
+.mpill{font-family:'JetBrains Mono',monospace;font-size:.61rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.3rem .75rem;border-radius:100px;cursor:pointer;border:none;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(244,240,235,.46);transition:all .2s;}
+.mpill:hover{border-color:rgba(196,154,31,.3);color:rgba(196,154,31,.8);}
+.mpill.on{background:rgba(196,154,31,.1);border-color:rgba(196,154,31,.52);color:#C49A1F;}
+
+/* ─── SHAPE GRID ──────────────────────────────────────────── */
+.shape-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.3rem;}
+.shape-card{background:rgba(255,255,255,.024);border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;overflow:hidden;transition:border-color .25s,box-shadow .25s,transform .25s;
+  opacity:0;transform:translateY(40px);}/* initial state for GSAP */
+.shape-card.visible{opacity:1;transform:translateY(0);}
+.shape-card:hover{border-color:rgba(196,154,31,.32);box-shadow:0 10px 40px rgba(46,23,96,.32);transform:translateY(-4px);}
+
+.sc-wrap{position:relative;width:100%;aspect-ratio:1;background:#050210;overflow:hidden;
+  cursor:grab;user-select:none;-webkit-user-select:none;}
+.sc-wrap:active{cursor:grabbing;}
+.sc-wrap canvas{display:block;width:100%;height:100%;}
+
+.sc-hint{position:absolute;bottom:50%;left:50%;transform:translate(-50%,50%);
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(196,154,31,.5);opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap;
+  background:rgba(5,2,16,.65);padding:.2rem .6rem;border-radius:3px;backdrop-filter:blur(6px);}
+.sc-wrap:hover .sc-hint{opacity:1;}
+
+.sc-btns{position:absolute;top:.5rem;right:.5rem;z-index:2;display:flex;gap:.3rem;}
+.sc-btn{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.06em;
+  background:rgba(5,2,16,.75);border:1px solid rgba(196,154,31,.28);color:rgba(196,154,31,.72);
+  border-radius:3px;padding:.2rem .45rem;backdrop-filter:blur(6px);cursor:pointer;transition:all .2s;line-height:1.2;}
+.sc-btn:hover{border-color:#C49A1F;color:#C49A1F;}
+
+.sc-info{padding:.92rem 1rem 1.05rem;}
+.sc-el{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;margin-bottom:.35rem;}
+.sc-name{font-family:'Cormorant',serif;font-size:1.26rem;font-weight:600;color:#F4F0EB;margin-bottom:.18rem;}
+.sc-facts{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:rgba(244,240,235,.3);letter-spacing:.05em;margin-bottom:.52rem;}
+.sc-meaning{font-size:.75rem;color:rgba(244,240,235,.5);line-height:1.6;}
+
+/* ─── 2D SACRED FORMS ─────────────────────────────────────── */
+.s2d-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+.s2d-card{background:rgba(255,255,255,.024);border:1px solid rgba(196,154,31,.1);border-radius:10px;overflow:hidden;
+  opacity:0;transform:translateY(30px);}
+.s2d-card.visible{opacity:1;transform:translateY(0);}
+.s2d-wrap{position:relative;width:100%;aspect-ratio:1;background:#050210;overflow:hidden;}
+.s2d-wrap canvas{display:block;width:100%;height:100%;}
+
+/* ─── PHILOSOPHY ──────────────────────────────────────────── */
+.phil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.phil-card{background:rgba(255,255,255,.02);border:1px solid rgba(196,154,31,.1);border-radius:8px;padding:1.5rem;}
+.phil-icon{font-size:1.3rem;margin-bottom:.75rem;}
+.phil-title{font-family:'Cormorant',serif;font-size:1.12rem;font-weight:600;color:#F4F0EB;margin-bottom:.5rem;}
+.phil-text{font-size:.77rem;color:rgba(244,240,235,.5);line-height:1.65;}
+
+/* ─── FULLSCREEN OVERLAY ──────────────────────────────────── */
+#fsOverlay{position:fixed;inset:0;background:rgba(4,2,10,.97);z-index:500;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;
+  backdrop-filter:blur(8px);}
+#fsOverlay.open{display:flex;}
+#fsClose{position:absolute;top:1.5rem;right:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:.12em;background:transparent;border:1px solid rgba(196,154,31,.32);color:rgba(196,154,31,.72);
+  border-radius:3px;padding:.38rem .8rem;cursor:pointer;transition:all .2s;}
+#fsClose:hover{border-color:#C49A1F;color:#C49A1F;}
+#fsModeBar{display:flex;gap:.35rem;}
+.fs-mpill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.25rem .65rem;border-radius:100px;cursor:pointer;border:none;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(244,240,235,.45);transition:all .2s;}
+.fs-mpill.on{background:rgba(196,154,31,.1);border-color:rgba(196,154,31,.52);color:#C49A1F;}
+#fsInfo{text-align:center;}
+#fsName{font-family:'Cormorant',serif;font-size:1.75rem;color:#F4F0EB;margin-bottom:.22rem;}
+#fsMeta{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:rgba(196,154,31,.68);letter-spacing:.1em;}
+#fsCanvas{border-radius:8px;display:block;cursor:grab;}
+#fsCanvas:active{cursor:grabbing;}
+#fsHint{font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,240,235,.22);}
+
+footer{text-align:center;padding:2rem;border-top:1px solid rgba(196,154,31,.1);}
+.ft-brand{font-family:'Cormorant',serif;font-size:.98rem;font-weight:600;color:#C49A1F;letter-spacing:.1em;}
+.ft-meta{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:rgba(244,240,235,.18);margin-top:.28rem;}
+
+@media(max-width:900px){.s2d-grid,.phil-grid{grid-template-columns:1fr;}}
+@media(max-width:768px){nav .nav-links{display:none;}.nav-suite{display:none;}.plat-map{grid-template-columns:repeat(3,1fr);}.pm-div{display:none;}}
+@media(max-width:480px){.plat-map{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">Hardy House · Sacred Geometry</div>
+  <ul class="nav-links">
+    <li><a href="#platonic">Platonic</a></li>
+    <li><a href="#extended">Extended</a></li>
+    <li><a href="#sacred2d">2D Forms</a></li>
+    <li><a href="#philosophy">Philosophy</a></li>
+  </ul>
+  <div class="nav-suite">
+    <a class="suite-link active" href="hardy-house-geometry.html">Geometry</a>
+    <a class="suite-link" href="hardy-house-variants.html">Variants</a>
+    <a class="suite-link" href="hardy-house-decomposition.html">Decomposition</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────── -->
+<div class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-content">
+    <div class="h-eyebrow">Hardy House Consulting · Brand Foundation</div>
+    <h1 class="h-title">Sacred <em>Geometry</em><br/>of the Brand</h1>
+    <p class="h-sub">The five Platonic solids and their extended forms define the structural grammar of Hardy House Consulting — from team topology to multi-agent architecture and the ContextForge COF-13D framework.</p>
+  </div>
+  <div class="h-scroll">Scroll · Drag to Orbit</div>
+</div>
+
+<!-- ─── PLATONIC MAP ──────────────────────────────────────── -->
+<div class="plat-map">
+  <div class="pm"><div class="pm-el" style="color:#C49A1F">Fire</div><div class="pm-sh">Tetrahedron</div><div class="pm-n">4 · 4 · 6</div></div>
+  <div class="pm-div"></div>
+  <div class="pm"><div class="pm-el" style="color:#2D8050">Earth</div><div class="pm-sh">Hexahedron</div><div class="pm-n">6 · 8 · 12</div></div>
+  <div class="pm-div"></div>
+  <div class="pm"><div class="pm-el" style="color:#3B5FC8">Air</div><div class="pm-sh">Octahedron</div><div class="pm-n">8 · 6 · 12</div></div>
+  <div class="pm-div"></div>
+  <div class="pm"><div class="pm-el" style="color:#20A8C8">Water</div><div class="pm-sh">Icosahedron</div><div class="pm-n">20 · 12 · 30</div></div>
+  <div class="pm-div"></div>
+  <div class="pm"><div class="pm-el" style="color:#9B7BE0">Aether</div><div class="pm-sh">Dodecahedron</div><div class="pm-n">12 · 20 · 30</div></div>
+</div>
+
+<!-- ─── PLATONIC SOLIDS ───────────────────────────────────── -->
+<section id="platonic">
+  <div class="s-lbl">01 — Platonic Solids</div>
+  <h2 class="s-title">The Five Perfect Forms</h2>
+  <div class="s-div"></div>
+  <p class="s-desc">Plato identified five and only five regular convex polyhedra. Each maps to an element, an agent role, and a phase in the PAOAL cycle. Drag to orbit · Click ⛶ for fullscreen · ↓ to export PNG.</p>
+  <div class="mode-pills">
+    <button class="mpill on" onclick="setMode('both',this)">Edges + Faces</button>
+    <button class="mpill" onclick="setMode('edges',this)">Edges Only</button>
+    <button class="mpill" onclick="setMode('faces',this)">Faces Only</button>
+  </div>
+  <div class="shape-grid" id="platonicGrid"></div>
+</section>
+
+<!-- ─── EXTENDED ──────────────────────────────────────────── -->
+<section id="extended" style="padding-top:1.5rem;">
+  <div class="s-lbl">02 — Extended Sacred Geometry</div>
+  <h2 class="s-title">Beyond the Platonic</h2>
+  <div class="s-div"></div>
+  <p class="s-desc">Torus, Merkaba, Torus Knot, Cuboctahedron, Sphere, and the Golden Ratio Spiral — the extended vocabulary of the Hardy House brand system.</p>
+  <div class="shape-grid" id="extendedGrid"></div>
+</section>
+
+<!-- ─── 2D FORMS ──────────────────────────────────────────── -->
+<section id="sacred2d" style="padding-top:1.5rem;">
+  <div class="s-lbl">03 — Two-Dimensional Sacred Forms</div>
+  <h2 class="s-title">Pattern &amp; Structure</h2>
+  <div class="s-div"></div>
+  <p class="s-desc">The Flower of Life and Metatron's Cube are foundational 2D sacred geometry forms. The Flower generates all five Platonic solids within its structure. Metatron's Cube is drawn progressively — 78 lines connecting 13 circle centres.</p>
+  <div class="s2d-grid">
+    <div class="s2d-card" id="folCard">
+      <div class="s2d-wrap"><canvas id="folCanvas"></canvas></div>
+      <div class="sc-info">
+        <div class="sc-el" style="color:#C49A1F">Pattern</div>
+        <div class="sc-name">Flower of Life</div>
+        <div class="sc-facts">19 circles · Hexagonal grid · R-spaced centres</div>
+        <div class="sc-meaning">The fundamental pattern of existence. All geometric forms emerge from this arrangement — the cycle of creation, growth, and decay at every scale. The centre contains the Seed of Life.</div>
+      </div>
+    </div>
+    <div class="s2d-card" id="metCard">
+      <div class="s2d-wrap"><canvas id="metCanvas"></canvas></div>
+      <div class="sc-info">
+        <div class="sc-el" style="color:#9B7BE0">Structure</div>
+        <div class="sc-name">Metatron's Cube</div>
+        <div class="sc-facts">13 circles · 78 connecting lines · All 5 Platonic solids encoded within</div>
+        <div class="sc-meaning">All five Platonic solids can be found within Metatron's Cube. In ContextForge it represents the unified field from which all agent architectures and team topologies derive. Lines are drawn progressively on entry.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PHILOSOPHY ────────────────────────────────────────── -->
+<section id="philosophy" style="padding-top:1.5rem;">
+  <div class="s-lbl">04 — Application</div>
+  <h2 class="s-title">Geometry as Strategy</h2>
+  <div class="s-div"></div>
+  <div class="phil-grid">
+    <div class="phil-card"><div class="phil-icon">△</div><div class="phil-title">Team Architecture</div><div class="phil-text">Multi-agent team sizing follows Platonic geometry via GCMT. A Triangle team (3) is a Tetrahedron. A Pentagon (5) encodes the Dodecahedron's pentagonal faces. The geometric shape predicts communication topology and information flow.</div></div>
+    <div class="phil-card"><div class="phil-icon">○</div><div class="phil-title">Identity as Torus</div><div class="phil-text">Torus Theory models identity and community as a toroidal field — continuous, self-referential, and fundamentally connected to its environment. The hole is not absence; it is the axis of transformation and the locus of deepest truth.</div></div>
+    <div class="phil-card"><div class="phil-icon">φ</div><div class="phil-title">The Golden Ratio</div><div class="phil-text">φ = 1.6180... appears throughout the Platonic solids, defines Hardy House brand spacing, and is the only growth rate that is self-similar at every scale. The dodecahedron and icosahedron are both saturated with φ in their internal geometry.</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-brand">Hardy House Consulting</div>
+  <div class="ft-meta">Sacred Geometry Foundation · 2026 · Drag to orbit · ⛶ for fullscreen · ↓ to export PNG</div>
+</footer>
+
+<!-- ─── FULLSCREEN OVERLAY ────────────────────────────────── -->
+<div id="fsOverlay">
+  <button id="fsClose" onclick="closeFS()">✕ &nbsp;ESC</button>
+  <div id="fsModeBar">
+    <button class="fs-mpill on" onclick="fsSetMode('both',this)">Edges + Faces</button>
+    <button class="fs-mpill" onclick="fsSetMode('edges',this)">Edges Only</button>
+    <button class="fs-mpill" onclick="fsSetMode('faces',this)">Faces Only</button>
+  </div>
+  <div id="fsInfo"><div id="fsName"></div><div id="fsMeta"></div></div>
+  <canvas id="fsCanvas"></canvas>
+  <div id="fsHint">Drag to orbit · Release for inertia</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE)document.write('<scr'+'ipt src="three.r128.min.js"><\/scr'+'ipt>')</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>if(!window.gsap)document.write('<scr'+'ipt src="gsap.3.12.2.min.js"><\/scr'+'ipt>')</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script>if(!window.ScrollTrigger)document.write('<scr'+'ipt src="ScrollTrigger.3.12.2.min.js"><\/scr'+'ipt>')</script>
+<script>
+'use strict';
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+const allShapes = new Set();
+let globalT   = 0;
+let scrollVel = 0;
+let lastSY    = 0;
+let globalMode = 'both';
+let fsShape    = null;
+
+window.addEventListener('scroll', () => {
+  scrollVel = Math.min(Math.abs(window.scrollY - lastSY) * 0.026, 2.2);
+  lastSY = window.scrollY;
+});
+
+(function tick(){
+  requestAnimationFrame(tick);
+  globalT  += 0.005;
+  scrollVel *= 0.90;
+  const b = 1 + scrollVel;
+  allShapes.forEach(s => s.tick(globalT, b));
+})();
+
+/* ============================================================
+   ORBIT CONTROL — spherical camera orbit with inertia
+============================================================ */
+class OrbitControl {
+  constructor(cam, r = 4.4) {
+    this.cam = cam; this.r = r;
+    this.th = 0; this.ph = Math.PI / 2;
+    this.vTh = 0; this.vPh = 0;
+    this.dn = false; this.lx = 0; this.ly = 0;
+    this.damp = 0.87;
+  }
+  press(x,y){ this.dn=true; this.lx=x; this.ly=y; }
+  move(x,y) { if(!this.dn)return; this.vTh-=(x-this.lx)*.0085; this.vPh-=(y-this.ly)*.0085; this.lx=x; this.ly=y; }
+  release()  { this.dn=false; }
+  update(autoOrbit=true){
+    if(!this.dn&&autoOrbit) this.th+=0.003;
+    this.th  += this.vTh;
+    this.ph   = Math.max(.06, Math.min(Math.PI-.06, this.ph+this.vPh));
+    this.vTh *= this.damp; this.vPh *= this.damp;
+    const sp=Math.sin(this.ph),cp=Math.cos(this.ph),st=Math.sin(this.th),ct=Math.cos(this.th);
+    this.cam.position.set(this.r*sp*ct, this.r*cp, this.r*sp*st);
+    this.cam.lookAt(0,0,0);
+  }
+  bind(canvas){
+    canvas.addEventListener('mousedown', e=>{ e.preventDefault(); this.press(e.clientX,e.clientY); });
+    canvas.addEventListener('mousemove', e=>this.move(e.clientX,e.clientY));
+    canvas.addEventListener('mouseup',   ()=>this.release());
+    canvas.addEventListener('mouseleave',()=>this.release());
+    canvas.addEventListener('touchstart',e=>{ e.preventDefault(); const t=e.touches[0]; this.press(t.clientX,t.clientY); },{passive:false});
+    canvas.addEventListener('touchmove', e=>{ e.preventDefault(); const t=e.touches[0]; this.move(t.clientX,t.clientY); },{passive:false});
+    canvas.addEventListener('touchend',  ()=>this.release());
+  }
+}
+
+/* ============================================================
+   GLOW EDGE HELPER — 4-layer fake bloom
+============================================================ */
+function buildGlowEdge(geo, hexStr, useWF){
+  const col=parseInt(hexStr.replace('#',''),16);
+  const EGC=useWF?THREE.WireframeGeometry:THREE.EdgesGeometry;
+  const g=new THREE.Group();
+  [[1.000,.91],[1.022,.27],[1.058,.10],[1.105,.04]].forEach(([s,op])=>{
+    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false});
+    const ls=new THREE.LineSegments(new EGC(geo),mat); ls.scale.setScalar(s); g.add(ls);
+  });
+  return g;
+}
+
+/* ============================================================
+   SACRED SHAPE CLASS
+============================================================ */
+class SacredShape {
+  constructor(canvas, cfg, dims){
+    this.cfg=cfg; this.hovered=false; this.breatheScl=1.0;
+    this.phase=Math.random()*Math.PI*2; this.pulseSpd=.75+Math.random()*.45;
+    this.faceMeshes=[]; this.glowMats=[]; this.baseOps=[]; this.running=true;
+
+    const W=dims?dims[0]:(canvas.parentElement?.clientWidth||220);
+    const H=dims?dims[1]:(canvas.parentElement?.clientHeight||220);
+
+    this.scene  =new THREE.Scene();
+    this.camera =new THREE.PerspectiveCamera(42,W/H,.1,100);
+    this.orbit  =new OrbitControl(this.camera, 4.4);
+    this.orbit.update(false); // set initial position
+
+    this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    this.renderer.setSize(W,H);
+    this.renderer.setClearColor(0x000000,0);
+
+    const al=new THREE.AmbientLight(0x1A0D3D,.65);
+    const pl1=new THREE.PointLight(0xC49A1F,1.45,14); pl1.position.set(2.5,2,3.5);
+    const pl2=new THREE.PointLight(0x1E3FAA,.50,10);  pl2.position.set(-2,-1,2);
+    this.scene.add(al,pl1,pl2);
+
+    this.group=new THREE.Group(); this.scene.add(this.group);
+
+    if     (cfg.special==='merkaba')       this.buildMerkaba();
+    else if(cfg.special==='cuboctahedron') this.buildCuboctahedron();
+    else if(cfg.special==='golden')        this.buildGoldenSpiral();
+    else                                   this.buildStandard();
+
+    this.addParticles();
+    this.orbit.bind(canvas);
+    canvas.addEventListener('mouseenter',()=>{ this.hovered=true; });
+    canvas.addEventListener('mouseleave',()=>{ this.hovered=false; });
+    if(!dims) new ResizeObserver(()=>{
+      const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;
+      if(w&&h){this.renderer.setSize(w,h);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();}
+    }).observe(canvas.parentElement);
+    allShapes.add(this);
+  }
+
+  buildStandard(){
+    const geo=this.cfg.geo();
+    const fc=parseInt(this.cfg.faceHex.replace('#',''),16);
+    const fm=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:fc,emissive:fc,emissiveIntensity:.14,transparent:true,opacity:this.cfg.faceOpacity,side:THREE.DoubleSide}));
+    this.group.add(fm); this.faceMeshes.push(fm);
+    const gg=buildGlowEdge(geo,this.cfg.edgeHex,this.cfg.useWireframe);
+    this.group.add(gg);
+    gg.children.forEach(c=>{this.glowMats.push(c.material);this.baseOps.push(c.material.opacity);});
+  }
+
+  buildMerkaba(){
+    const geo=new THREE.TetrahedronGeometry(1.52,0);
+    const mk=(fHex,eHex)=>{
+      const fc=parseInt(fHex.replace('#',''),16);
+      const g=new THREE.Group();
+      const fm=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:fc,emissive:fc,emissiveIntensity:.12,transparent:true,opacity:.12,side:THREE.DoubleSide}));
+      const gg=buildGlowEdge(geo,eHex,false);
+      g.add(fm,gg); this.faceMeshes.push(fm);
+      gg.children.forEach(c=>{this.glowMats.push(c.material);this.baseOps.push(c.material.opacity);});
+      return g;
+    };
+    this.tet1=mk(this.cfg.faceHex,this.cfg.edgeHex);
+    this.tet2=mk(this.cfg.faceHex2,this.cfg.edgeHex2);
+    this.tet2.rotation.x=Math.PI; this.tet2.rotation.y=Math.PI/3;
+    this.group.add(this.tet1,this.tet2);
+  }
+
+  buildCuboctahedron(){
+    const s=1.1;
+    const v=new Float32Array([s,s,0,-s,s,0,s,-s,0,-s,-s,0,s,0,s,-s,0,s,s,0,-s,-s,0,-s,0,s,s,0,-s,s,0,s,-s,0,-s,-s]);
+    const f=[0,4,8,0,6,10,2,4,9,2,6,11,1,5,8,1,7,10,3,5,9,3,7,11,0,4,2,0,2,6,1,5,3,1,3,7,0,8,1,0,1,10,2,9,3,2,3,11,4,8,5,4,5,9,6,10,7,6,7,11];
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(v,3)); geo.setIndex(f); geo.computeVertexNormals();
+    const fc=parseInt(this.cfg.faceHex.replace('#',''),16);
+    const fm=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:fc,emissive:fc,emissiveIntensity:.12,transparent:true,opacity:this.cfg.faceOpacity,side:THREE.DoubleSide}));
+    this.group.add(fm); this.faceMeshes.push(fm);
+    const gg=buildGlowEdge(geo,this.cfg.edgeHex,false);
+    this.group.add(gg);
+    gg.children.forEach(c=>{this.glowMats.push(c.material);this.baseOps.push(c.material.opacity);});
+  }
+
+  buildGoldenSpiral(){
+    const PHI=(1+Math.sqrt(5))/2;
+    const N=380, turns=4.8;
+    const pts=[];
+    for(let i=0;i<N;i++){
+      const t=i/(N-1), theta=t*turns*Math.PI*2;
+      const r=0.072*Math.pow(PHI,2*theta/Math.PI);
+      pts.push(new THREE.Vector3(r*Math.cos(theta), r*Math.sin(theta), r*.22*Math.sin(theta*.44)));
+    }
+    const col=parseInt(this.cfg.edgeHex.replace('#',''),16);
+    // 4-layer glow lines
+    [[1.000,.90],[1.010,.28],[1.028,.11],[1.058,.04]].forEach(([sc,op])=>{
+      const spts=pts.map(p=>new THREE.Vector3(p.x*sc,p.y*sc,p.z*sc));
+      const geo=new THREE.BufferGeometry().setFromPoints(spts);
+      const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false});
+      this.group.add(new THREE.Line(geo,mat));
+      this.glowMats.push(mat); this.baseOps.push(op);
+    });
+    // Origin point
+    const sGeo=new THREE.SphereGeometry(.055,8,8);
+    const sMat=new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.9});
+    const sm=new THREE.Mesh(sGeo,sMat);
+    this.group.add(sm); this.faceMeshes.push(sm);
+    // φ ratio arc guides (nested rectangles, subtle)
+    let a=.072,b=.072;
+    const rMat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.14,blending:THREE.AdditiveBlending,depthWrite:false});
+    const dirs=[[1,0],[0,1],[-1,0],[0,-1]];
+    let ox=0,oy=0;
+    for(let i=0;i<5;i++){
+      const side=a+b; const d=dirs[i%4];
+      const cx=ox,cy=oy,c=b;
+      const p=[new THREE.Vector3(cx,cy,0),new THREE.Vector3(cx+c*d[0],cy+c*d[1],0)];
+      // square outline (simplified: just the two new edges)
+      const perp=[-d[1],d[0]];
+      p.push(new THREE.Vector3(p[1].x+c*perp[0],p[1].y+c*perp[1],0));
+      p.push(new THREE.Vector3(p[0].x+c*perp[0],p[0].y+c*perp[1],0));
+      p.push(p[0].clone());
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p),rMat));
+      if(d[0]===1){ox+=c;}else if(d[1]===1){oy+=c;}else if(d[0]===-1){ox-=side;}else{oy-=side;}
+      [a,b]=[b,a+b];
+    }
+  }
+
+  addParticles(){
+    const n=36; const pos=new Float32Array(n*3);
+    for(let i=0;i<n;i++){pos[i*3]=(Math.random()-.5)*7.5;pos[i*3+1]=(Math.random()-.5)*7.5;pos[i*3+2]=(Math.random()-.5)*7.5;}
+    const pg=new THREE.BufferGeometry(); pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    this.scene.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0xC49A1F,size:.022,transparent:true,opacity:.40,blending:THREE.AdditiveBlending})));
+  }
+
+  setDisplayMode(mode){
+    this.faceMeshes.forEach(m=>{m.visible=mode!=='edges';});
+    this.group.traverse(o=>{if(o.isLineSegments||o.isLine)o.visible=mode!=='faces';});
+  }
+
+  tick(t, boost=1){
+    if(!this.running)return;
+    // Camera orbit (auto-drifts when not dragging)
+    this.orbit.update(!this.orbit.dn);
+    // Group auto-rotation
+    this.group.rotation.x+=this.cfg.rotX*boost;
+    this.group.rotation.y+=this.cfg.rotY*boost;
+    this.group.rotation.z+=(this.cfg.rotZ||0)*boost;
+    if(this.cfg.special==='merkaba'&&this.tet2) this.tet2.rotation.y+=.013;
+    // Glow pulse
+    const pulse=.84+.16*Math.sin(t*this.pulseSpd+this.phase);
+    this.glowMats.forEach((m,i)=>m.opacity=this.baseOps[i]*pulse);
+    // Breathe scale (only when not dragging)
+    const ts=(this.hovered&&!this.orbit.dn)?1.06:1.0;
+    this.breatheScl+=(ts-this.breatheScl)*.06;
+    this.group.scale.setScalar(this.breatheScl);
+    this.renderer.render(this.scene,this.camera);
+  }
+  dispose(){ this.running=false; allShapes.delete(this); this.renderer.dispose(); }
+}
+
+/* ============================================================
+   FLOWER OF LIFE SCENE
+============================================================ */
+class FOLScene {
+  constructor(canvas){
+    this.running=true;
+    const W=canvas.clientWidth||400,H=canvas.clientHeight||400,half=3.2,asp=W/H;
+    this.scene=new THREE.Scene();
+    this.camera=new THREE.OrthographicCamera(-half*asp,half*asp,half,-half,.1,50);
+    this.camera.position.z=10;
+    this.renderer=new THREE.WebGLRenderer({preserveDrawingBuffer:true,canvas,antialias:true,alpha:true});
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    this.renderer.setSize(W,H); this.renderer.setClearColor(0x000000,0);
+    this.scene.add(new THREE.AmbientLight(0x1A0D3D,1));
+    this.group=new THREE.Group(); this.circleMats=[];
+    const ax=[[0,0],[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1],[2,0],[1,1],[0,2],[-1,2],[-2,2],[-2,1],[-2,0],[-1,-1],[0,-2],[1,-2],[2,-2],[2,-1]];
+    const ro=([q,r])=>Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r));
+    const rop=[.88,.64,.40];
+    ax.forEach(coord=>{
+      const cx=coord[0]+coord[1]*.5, cy=coord[1]*Math.sqrt(3)*.5;
+      const bop=rop[Math.min(ro(coord),2)];
+      const pts=[]; for(let i=0;i<=72;i++){const a=i/72*Math.PI*2;pts.push(new THREE.Vector3(cx+Math.cos(a),cy+Math.sin(a),0));}
+      const mat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:bop,blending:THREE.AdditiveBlending});
+      mat.userData={bop,ph:Math.random()*Math.PI*2}; this.circleMats.push(mat);
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat));
+      const mat2=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.05,blending:THREE.AdditiveBlending,depthWrite:false});
+      const pts2=pts.map(p=>new THREE.Vector3(p.x*1.04,p.y*1.04,0));
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),mat2));
+    });
+    this.scene.add(this.group);
+    const n=60;const pp=new Float32Array(n*3);for(let i=0;i<n;i++){pp[i*3]=(Math.random()-.5)*8;pp[i*3+1]=(Math.random()-.5)*8;pp[i*3+2]=(Math.random()-.5)*4;}
+    const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+    this.scene.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0xC49A1F,size:.036,transparent:true,opacity:.26,blending:THREE.AdditiveBlending})));
+    new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(w&&h){this.camera.left=-half*(w/h);this.camera.right=half*(w/h);this.camera.updateProjectionMatrix();this.renderer.setSize(w,h);}}).observe(canvas);
+    allShapes.add(this);
+  }
+  tick(t,b=1){
+    if(!this.running)return;
+    this.group.rotation.z+=.0022*b;
+    this.circleMats.forEach(m=>{m.opacity=m.userData.bop*(.78+.22*Math.sin(t*.85+m.userData.ph));});
+    this.renderer.render(this.scene,this.camera);
+  }
+  dispose(){this.running=false;allShapes.delete(this);this.renderer.dispose();}
+}
+
+/* ============================================================
+   METATRON'S CUBE SCENE
+============================================================ */
+class MetatronScene {
+  constructor(canvas){
+    this.running=true;this.drawn=0;this.totalV=0;this.lGeo=null;this.gGeo=null;this.lMat=null;
+    const W=canvas.clientWidth||400,H=canvas.clientHeight||400,half=3.2,asp=W/H;
+    this.scene=new THREE.Scene();
+    this.camera=new THREE.OrthographicCamera(-half*asp,half*asp,half,-half,.1,50);
+    this.camera.position.z=10;
+    this.renderer=new THREE.WebGLRenderer({preserveDrawingBuffer:true,canvas,antialias:true,alpha:true});
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    this.renderer.setSize(W,H);this.renderer.setClearColor(0x000000,0);
+    this.scene.add(new THREE.AmbientLight(0x1A0D3D,1));
+    this.group=new THREE.Group();
+    const R=1.0;
+    const cs=[[0,0],[R,0],[R*.5,R*.866],[-R*.5,R*.866],[-R,0],[-R*.5,-R*.866],[R*.5,-R*.866],[2*R,0],[R,R*1.732],[-R,R*1.732],[-2*R,0],[-R,-R*1.732],[R,-R*1.732]];
+    const verts=[];
+    for(let i=0;i<13;i++) for(let j=i+1;j<13;j++) verts.push(cs[i][0],cs[i][1],0,cs[j][0],cs[j][1],0);
+    this.totalV=verts.length/3;
+    const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));geo.setDrawRange(0,0);
+    this.lMat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.55,blending:THREE.AdditiveBlending});
+    this.group.add(new THREE.LineSegments(geo,this.lMat));this.lGeo=geo;
+    const geo2=new THREE.BufferGeometry();geo2.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));geo2.setDrawRange(0,0);
+    const ls2=new THREE.LineSegments(geo2,new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,depthWrite:false}));
+    ls2.scale.setScalar(1.04);this.group.add(ls2);this.gGeo=geo2;
+    cs.forEach(([cx,cy])=>{
+      const pts=[];for(let i=0;i<=60;i++){const a=i/60*Math.PI*2;pts.push(new THREE.Vector3(cx+R*Math.cos(a),cy+R*Math.sin(a),0));}
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x9B7BE0,transparent:true,opacity:.30,blending:THREE.AdditiveBlending})));
+      const p2=pts.map(p=>new THREE.Vector3(p.x*1.04,p.y*1.04,0));
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p2),new THREE.LineBasicMaterial({color:0x9B7BE0,transparent:true,opacity:.06,blending:THREE.AdditiveBlending,depthWrite:false})));
+    });
+    this.scene.add(this.group);
+    const n=55;const pp=new Float32Array(n*3);for(let i=0;i<n;i++){pp[i*3]=(Math.random()-.5)*7;pp[i*3+1]=(Math.random()-.5)*7;pp[i*3+2]=(Math.random()-.5)*3;}
+    const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+    this.scene.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0x9B7BE0,size:.034,transparent:true,opacity:.20,blending:THREE.AdditiveBlending})));
+    new ResizeObserver(()=>{const w=canvas.clientWidth,h=canvas.clientHeight;if(w&&h){this.camera.left=-half*(w/h);this.camera.right=half*(w/h);this.camera.updateProjectionMatrix();this.renderer.setSize(w,h);}}).observe(canvas);
+    setTimeout(()=>this._draw(),600);
+    allShapes.add(this);
+  }
+  _draw(){
+    const step=()=>{if(!this.running||this.drawn>=this.totalV)return;this.drawn=Math.min(this.drawn+4,this.totalV);this.lGeo.setDrawRange(0,this.drawn);this.gGeo.setDrawRange(0,this.drawn);setTimeout(step,22);};
+    step();
+  }
+  tick(t,b=1){
+    if(!this.running)return;
+    this.group.rotation.z+=.0018*b;
+    if(this.lMat)this.lMat.opacity=.45+.12*Math.sin(t*1.1);
+    this.renderer.render(this.scene,this.camera);
+  }
+  dispose(){this.running=false;allShapes.delete(this);this.renderer.dispose();}
+}
+
+/* ============================================================
+   HERO — nested solids + fog + parallax
+============================================================ */
+function initHero(){
+  const canvas=document.getElementById('heroCanvas');
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x07040F,.038);
+  const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,100);
+  const orbit=new OrbitControl(camera,8);
+  const renderer=new THREE.WebGLRenderer({preserveDrawingBuffer:true,canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setClearColor(0x000000,0);
+  renderer.setSize(innerWidth,innerHeight);
+
+  scene.add(new THREE.AmbientLight(0x1A0D3D,.5));
+  const mkPL=(c,i,d,x,y,z)=>{const l=new THREE.PointLight(c,i,d);l.position.set(x,y,z);scene.add(l);};
+  mkPL(0xC49A1F,1.6,24,5,4,6); mkPL(0x1E3FAA,.8,18,-4,-2,4); mkPL(0x7B5CB8,.6,14,0,5,-3);
+
+  const mkE=(geo,col,op)=>{const g=new THREE.Group();[[1,op],[1.04,op*.2]].forEach(([s,o])=>{const ls=new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:o,blending:THREE.AdditiveBlending,depthWrite:false}));ls.scale.setScalar(s);g.add(ls);});return g;};
+  const mkF=(geo,col,op)=>new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:col,transparent:true,opacity:op,side:THREE.DoubleSide,emissive:col,emissiveIntensity:.06,fog:true}));
+
+  const dg=new THREE.DodecahedronGeometry(3.4,0); const dod=new THREE.Group(); dod.add(mkE(dg,0x9B7BE0,.44),mkF(dg,0x2E1760,.04)); scene.add(dod);
+  const ig=new THREE.IcosahedronGeometry(2.05,0); const ico=new THREE.Group(); ico.add(mkE(ig,0xC49A1F,.62),mkF(ig,0xC49A1F,.036)); scene.add(ico);
+  const og=new THREE.OctahedronGeometry(1.12,0);  const oct=new THREE.Group(); oct.add(mkE(og,0x3B5FC8,.76),mkF(og,0x1E3FAA,.07));  scene.add(oct);
+  const tg=new THREE.TetrahedronGeometry(.54,0);  const tet=new THREE.Group(); tet.add(mkE(tg,0xFFDF60,.96),mkF(tg,0xC49A1F,.18));  scene.add(tet);
+
+  const torGeo=new THREE.TorusGeometry(4.4,.04,8,120);
+  const mkTor=(col,op,rx,rz)=>{const g=new THREE.Group();g.add(new THREE.LineSegments(new THREE.WireframeGeometry(torGeo),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false})));g.rotation.x=rx;g.rotation.z=rz;scene.add(g);return g;};
+  const tor1=mkTor(0xC49A1F,.18,Math.PI/2.8,0), tor2=mkTor(0x9B7BE0,.14,Math.PI/5,Math.PI/3);
+
+  const pn=290,pp=new Float32Array(pn*3);
+  for(let i=0;i<pn;i++){const r=5.5+Math.random()*2.5,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);pp[i*3]=r*Math.sin(ph)*Math.cos(th);pp[i*3+1]=r*Math.sin(ph)*Math.sin(th);pp[i*3+2]=r*Math.cos(ph);}
+  const ppg=new THREE.BufferGeometry();ppg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  scene.add(new THREE.Points(ppg,new THREE.PointsMaterial({color:0xC49A1F,size:.044,transparent:true,opacity:.50,blending:THREE.AdditiveBlending})));
+
+  orbit.bind(canvas);
+  window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+
+  let ht=0;
+  (function animate(){
+    requestAnimationFrame(animate); ht+=.005;
+    const sb=1+scrollVel*.55;
+    orbit.update(true);
+    dod.rotation.y+=.0022*sb; dod.rotation.x=.08*Math.sin(ht*.28); dod.rotation.z=.04*Math.cos(ht*.18);
+    ico.rotation.y-=.0038*sb; ico.rotation.z+=.0018*sb; ico.rotation.x=.06*Math.cos(ht*.32);
+    oct.rotation.x+=.007*sb; oct.rotation.y+=.005*sb; oct.rotation.z+=.003*sb;
+    tet.rotation.x-=.012*sb; tet.rotation.y+=.014*sb;
+    tor1.rotation.y+=.001*sb; tor2.rotation.y-=.0012*sb;
+    renderer.render(scene,camera);
+  })();
+}
+
+/* ============================================================
+   FULLSCREEN
+============================================================ */
+function openFS(cfg){
+  const ol=document.getElementById('fsOverlay'); ol.classList.add('open');
+  if(fsShape){fsShape.dispose();fsShape=null;}
+  document.getElementById('fsName').textContent=cfg.name;
+  document.getElementById('fsMeta').textContent=`${cfg.element} · ${cfg.facts}`;
+  const canvas=document.getElementById('fsCanvas');
+  const sz=Math.floor(Math.min(innerWidth*.82,innerHeight*.72));
+  canvas.width=sz;canvas.height=sz;canvas.style.width=sz+'px';canvas.style.height=sz+'px';
+  fsShape=new SacredShape(canvas,cfg,[sz,sz]);
+  fsShape.setDisplayMode(globalMode);
+}
+function closeFS(){
+  document.getElementById('fsOverlay').classList.remove('open');
+  if(fsShape){fsShape.dispose();fsShape=null;}
+}
+function fsSetMode(mode,btn){
+  document.querySelectorAll('.fs-mpill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  if(fsShape)fsShape.setDisplayMode(mode);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeFS();});
+document.getElementById('fsOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('fsOverlay'))closeFS();});
+
+/* ============================================================
+   EXPORT PNG
+============================================================ */
+window.__inst={};
+function exportPNG(id){
+  const inst=window.__inst[id]; if(!inst)return;
+  inst.renderer.render(inst.scene,inst.camera);
+  const a=document.createElement('a');
+  a.download=`hardy-house-${id}.png`;
+  a.href=inst.renderer.domElement.toDataURL('image/png');
+  a.click();
+}
+
+/* ============================================================
+   MODE CONTROL
+============================================================ */
+function setMode(mode,btn){
+  globalMode=mode;
+  document.querySelectorAll('.mpill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  allShapes.forEach(s=>{if(s instanceof SacredShape)s.setDisplayMode(mode);});
+  if(fsShape)fsShape.setDisplayMode(mode);
+}
+window.__cfgs={};
+
+/* ============================================================
+   SHAPE CATALOGUES
+============================================================ */
+const PLATONIC=[
+  {id:'tetra',  name:'Tetrahedron', element:'Fire',  elementColor:'#C49A1F',
+   facts:'Faces: 4 · Vertices: 4 · Edges: 6',
+   meaning:'The simplest regular polyhedron. Assertion, initiation, and the most stable structural unit. In ContextForge the Tetrahedron is the Triangle Principle — minimum structure for maximum stability.',
+   edgeHex:'#C49A1F',faceHex:'#C49A1F',faceOpacity:.12,rotX:.006,rotY:.009,rotZ:.003,geo:()=>new THREE.TetrahedronGeometry(1.45,0)},
+  {id:'cube',   name:'Hexahedron',  element:'Earth', elementColor:'#2D8050',
+   facts:'Faces: 6 · Vertices: 8 · Edges: 12',
+   meaning:'Equal axes, maximum enclosure. Structure in the manifest world — ground, stability, the six faces of cardinal direction. Maps to the six-agent coordination ring in ContextForge.',
+   edgeHex:'#2D8050',faceHex:'#1B5E35',faceOpacity:.10,rotX:.004,rotY:.006,rotZ:.002,geo:()=>new THREE.BoxGeometry(2.1,2.1,2.1)},
+  {id:'octa',   name:'Octahedron',  element:'Air',   elementColor:'#3B5FC8',
+   facts:'Faces: 8 · Vertices: 6 · Edges: 12',
+   meaning:'The dual of the cube. Balance of opposites — above and below. Eight triangular faces encode the octave and the two opposing pyramids of ascent and descent.',
+   edgeHex:'#3B5FC8',faceHex:'#1E3FAA',faceOpacity:.10,rotX:.003,rotY:.010,rotZ:.004,geo:()=>new THREE.OctahedronGeometry(1.52,0)},
+  {id:'icosa',  name:'Icosahedron', element:'Water', elementColor:'#20A8C8',
+   facts:'Faces: 20 · Vertices: 12 · Edges: 30',
+   meaning:'The most spherical solid — twenty equilateral triangles. Flow, adaptability, interconnected complexity. Basis of the geodesic dome and the GCMT icosahedral team topology at t3 scale.',
+   edgeHex:'#20A8C8',faceHex:'#0D7A94',faceOpacity:.10,rotX:.005,rotY:.008,rotZ:.003,geo:()=>new THREE.IcosahedronGeometry(1.42,0)},
+  {id:'dodeca', name:'Dodecahedron',element:'Aether', elementColor:'#9B7BE0',
+   facts:'Faces: 12 · Vertices: 20 · Edges: 30',
+   meaning:'The cosmos itself — Plato\'s shape for the heavens. Twelve pentagonal faces map to the zodiac. Encodes the COF-13D framework: cosmos as context.',
+   edgeHex:'#9B7BE0',faceHex:'#4A2D90',faceOpacity:.12,rotX:.002,rotY:.005,rotZ:.002,geo:()=>new THREE.DodecahedronGeometry(1.36,0)}
+];
+
+const EXTENDED=[
+  {id:'torus',  name:'Torus',         element:'Cycle',      elementColor:'#C49A1F',
+   facts:'Genus-1 surface · Self-referential ring · No boundary',
+   meaning:'No beginning, no end. The torus is the fundamental shape of all self-sustaining systems. Torus Theory models identity as a toroidal field — the hole is not absence but the axis of transformation.',
+   edgeHex:'#C49A1F',faceHex:'#8C6B10',faceOpacity:.07,rotX:.005,rotY:.008,rotZ:.002,useWireframe:true,geo:()=>new THREE.TorusGeometry(1.05,.34,16,80)},
+  {id:'merkaba',name:'Merkaba',        element:'Spirit',     elementColor:'#C49A1F',
+   facts:'Star Tetrahedron · Dual-interlocked · Counter-rotating fields',
+   meaning:'Two counter-rotating tetrahedra — one toward spirit, one toward earth. Models the dual-stack ContextForge architecture: top-down orchestration meeting bottom-up emergence.',
+   edgeHex:'#C49A1F',edgeHex2:'#9B7BE0',faceHex:'#8C6B10',faceHex2:'#4A2D90',faceOpacity:.10,rotX:.004,rotY:.007,rotZ:.003,special:'merkaba'},
+  {id:'knot',   name:'Torus Knot',     element:'Infinity',   elementColor:'#1E3FAA',
+   facts:'Trefoil (2,3) knot · p=2 · q=3 · Never-terminating',
+   meaning:'Traced on the surface of a torus — never self-intersecting, never terminating. The trefoil encodes the Plan→Act→Reflect rhythm as a continuous unbroken motion. No entry, no exit.',
+   edgeHex:'#1E3FAA',faceHex:'#162E99',faceOpacity:.07,rotX:.004,rotY:.009,rotZ:.003,useWireframe:true,geo:()=>new THREE.TorusKnotGeometry(.88,.22,128,16)},
+  {id:'cubocta',name:'Cuboctahedron',  element:'Equilibrium',elementColor:'#60B080',
+   facts:'Faces: 14 · Vertices: 12 · Edges: 24',
+   meaning:'Buckminster Fuller\'s Vector Equilibrium — every vertex equidistant from centre. The only form where all vectors are in perfect balance. The φ² configuration in GCMT multi-agent mesh topology.',
+   edgeHex:'#60B080',faceHex:'#1B5E35',faceOpacity:.10,rotX:.003,rotY:.006,rotZ:.002,special:'cuboctahedron'},
+  {id:'sphere', name:'Sphere',          element:'Unity',      elementColor:'#C4B0E8',
+   facts:'∞ symmetry · R constant everywhere · Generator of all forms',
+   meaning:'Perfect symmetry in every direction — the container from which all other forms emerge. The Sphere is the Circle at every scale. In COF it represents the Unity from which all dimensional structure expands.',
+   edgeHex:'#C4B0E8',faceHex:'#6A60A0',faceOpacity:.05,rotX:.002,rotY:.005,rotZ:.001,useWireframe:true,geo:()=>new THREE.SphereGeometry(1.42,24,24)},
+  {id:'golden', name:'Golden Spiral',   element:'φ (Phi)',    elementColor:'#C49A1F',
+   facts:'r = φ^(2θ/π) · φ = 1.6180... · 4.8 turns · Self-similar at every scale',
+   meaning:'The only growth curve self-similar at every scale. φ saturates the icosahedron and dodecahedron. It defines Hardy House brand proportional spacing and the fundamental rhythm of all organic growth.',
+   edgeHex:'#C49A1F',faceHex:'#C49A1F',faceOpacity:.05,rotX:.003,rotY:.006,rotZ:.001,special:'golden'}
+];
+
+[...PLATONIC,...EXTENDED].forEach(c=>{window.__cfgs[c.id]=c;});
+
+/* ============================================================
+   CARD BUILDING
+============================================================ */
+const CMODES=['both','edges','faces'],CLBL={both:'E+F',edges:'E',faces:'F'};
+const cardModes={};
+
+function buildCard(cfg){
+  const card=document.createElement('div');
+  card.className='shape-card'; card.dataset.id=cfg.id;
+  card.innerHTML=`
+    <div class="sc-wrap">
+      <canvas class="sc-canvas"></canvas>
+      <div class="sc-hint">Drag to orbit</div>
+      <div class="sc-btns">
+        <button class="sc-btn" id="mode_${cfg.id}" onclick="cycleMode(event,'${cfg.id}')">E+F</button>
+        <button class="sc-btn" onclick="openFS(window.__cfgs['${cfg.id}'])">⛶</button>
+        <button class="sc-btn" onclick="exportPNG('${cfg.id}')">↓</button>
+      </div>
+    </div>
+    <div class="sc-info">
+      <div class="sc-el" style="color:${cfg.elementColor}">${cfg.element}</div>
+      <div class="sc-name">${cfg.name}</div>
+      <div class="sc-facts">${cfg.facts}</div>
+      <div class="sc-meaning">${cfg.meaning}</div>
+    </div>`;
+  return card;
+}
+
+function cycleMode(e,id){
+  e.stopPropagation();
+  const next=CMODES[(CMODES.indexOf(cardModes[id]||'both')+1)%3];
+  cardModes[id]=next;
+  const btn=document.getElementById('mode_'+id);
+  if(btn)btn.textContent=CLBL[next];
+  if(window.__inst[id])window.__inst[id].setDisplayMode(next);
+}
+
+function initGrid(shapes,cid){
+  const grid=document.getElementById(cid);
+  shapes.forEach((cfg,i)=>{
+    const card=buildCard(cfg); grid.appendChild(card);
+    const canvas=card.querySelector('.sc-canvas');
+    // Stagger init slightly so the browser doesn't freeze on first paint
+    // Cards already in view get a shorter delay; off-screen get longer
+    const delay=50+i*80;
+    setTimeout(()=>{
+      try{
+        const inst=new SacredShape(canvas,cfg);
+        window.__inst[cfg.id]=inst; inst.setDisplayMode(globalMode);
+      }catch(e){ console.warn('SacredShape init failed:',cfg.id,e.message); }
+    },delay);
+  });
+}
+
+function init2D(){
+  const folC=document.getElementById('folCanvas'),metC=document.getElementById('metCanvas');
+  new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){new FOLScene(folC);o.disconnect();}},{threshold:.1}).observe(folC);
+  new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){new MetatronScene(metC);o.disconnect();}},{threshold:.1}).observe(metC);
+}
+
+/* ============================================================
+   GSAP ANIMATIONS
+============================================================ */
+function initGSAP(){
+  if(!window.gsap)return;
+  if(window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+
+  // Hero sequence
+  gsap.timeline({defaults:{ease:'power3.out'}})
+    .from('.h-eyebrow', {opacity:0,y:-8,duration:.7})
+    .from('.h-title',   {opacity:0,y:28,duration:1.0},'-=.2')
+    .from('.h-sub',     {opacity:0,y:18,duration:.8}, '-=.5')
+    .from('.h-scroll',  {opacity:0,duration:.5},      '-=.25');
+
+  // Platonic map cells
+  if(window.ScrollTrigger){
+    gsap.from('.pm',{opacity:0,y:16,stagger:.08,duration:.6,ease:'power2.out',
+      scrollTrigger:{trigger:'.plat-map',start:'top 88%',once:true}});
+
+    // Section headers
+    document.querySelectorAll('.s-lbl,.s-title,.s-desc').forEach(el=>{
+      gsap.from(el,{opacity:0,x:-12,duration:.65,ease:'power2.out',
+        scrollTrigger:{trigger:el,start:'top 90%',once:true}});
+    });
+
+    // Shape cards (staggered per row)
+    document.querySelectorAll('.shape-card').forEach((el,i)=>{
+      gsap.to(el,{opacity:1,y:0,duration:.65,ease:'power2.out',
+        scrollTrigger:{trigger:el,start:'top 90%',once:true},
+        delay:(i%5)*.07});
+    });
+
+    // 2D cards
+    document.querySelectorAll('.s2d-card').forEach((el,i)=>{
+      gsap.to(el,{opacity:1,y:0,duration:.7,ease:'power2.out',
+        scrollTrigger:{trigger:el,start:'top 88%',once:true},delay:i*.12});
+    });
+
+    // Phil cards
+    document.querySelectorAll('.phil-card').forEach((el,i)=>{
+      gsap.from(el,{opacity:0,y:24,duration:.65,ease:'power2.out',
+        scrollTrigger:{trigger:el,start:'top 90%',once:true},delay:i*.1});
+    });
+  } else {
+    // Fallback without ScrollTrigger
+    document.querySelectorAll('.shape-card,.s2d-card').forEach(el=>{el.classList.add('visible');});
+  }
+}
+
+/* ============================================================
+   BOOT
+============================================================ */
+window.addEventListener('DOMContentLoaded',()=>{
+  // Grid DOM cards are built immediately; WebGL attaches lazily via IntersectionObserver.
+  // initHero starts WebGL right away — isolate it so a failure cannot abort the grids.
+  try { initHero(); }              catch(e){ console.warn('[geo] hero init:', e.message); }
+  try { initGrid(PLATONIC,'platonicGrid'); } catch(e){ console.warn('[geo] platonic grid:', e.message); }
+  try { initGrid(EXTENDED,'extendedGrid'); } catch(e){ console.warn('[geo] extended grid:', e.message); }
+  try { init2D(); }                catch(e){ console.warn('[geo] 2D init:', e.message); }
+  setTimeout(()=>{ try { initGSAP(); } catch(e){ console.warn('[geo] GSAP:', e.message); } }, 100);
+});
+</script>
+</body>
+</html>

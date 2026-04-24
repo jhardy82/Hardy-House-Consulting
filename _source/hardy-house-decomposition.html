@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy House — Sacred Geometry Decomposition</title>
+<style>
+/* Fonts loaded from Google CDN when online; fallback to system serif/mono offline */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Lora',Georgia,serif;background:#07040F;color:#F4F0EB;overflow-x:hidden;}
+
+/* ─── NAV ─────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:200;background:rgba(7,4,15,.96);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(196,154,31,.14);display:flex;align-items:center;
+  justify-content:space-between;padding:.65rem 2rem;gap:1rem;}
+.nav-brand{font-family:'Cormorant',serif;font-size:.95rem;font-weight:600;color:#C49A1F;letter-spacing:.1em;white-space:nowrap;}
+.nav-suite{display:flex;gap:.4rem;}
+.sl{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.26rem .65rem;border:1px solid rgba(196,154,31,.2);border-radius:3px;
+  color:rgba(196,154,31,.52);text-decoration:none;transition:all .2s;white-space:nowrap;}
+.sl:hover,.sl.on{border-color:#C49A1F;color:#C49A1F;background:rgba(196,154,31,.06);}
+
+/* ─── HERO ────────────────────────────────────────────────── */
+.hero{padding:4.5rem 2rem 3.5rem;text-align:center;
+  background:radial-gradient(ellipse 100% 80% at 50% 0%,#1A0D3D 0%,#07040F 70%);}
+.h-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(196,154,31,.68);margin-bottom:1.2rem;display:flex;align-items:center;justify-content:center;gap:.85rem;}
+.h-eyebrow::before,.h-eyebrow::after{content:'';width:36px;height:1px;background:#C49A1F;opacity:.32;}
+.h-title{font-family:'Cormorant',serif;font-size:clamp(2.4rem,5vw,4.2rem);font-weight:300;color:#fff;line-height:1.06;margin-bottom:1rem;}
+.h-title em{font-style:italic;color:#C49A1F;}
+.h-sub{font-size:.97rem;color:rgba(244,240,235,.55);line-height:1.78;max-width:620px;margin:0 auto 2.2rem;}
+.path-strip{display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;color:rgba(244,240,235,.35);}
+.path-node{padding:.22rem .65rem;border:1px solid rgba(196,154,31,.22);border-radius:2px;
+  color:rgba(196,154,31,.6);transition:all .3s;}
+.path-node.active{border-color:#C49A1F;color:#C49A1F;background:rgba(196,154,31,.08);text-shadow:0 0 8px rgba(196,154,31,.4);}
+.path-arrow{color:rgba(244,240,235,.18);}
+
+/* ─── DEMO SECTION ────────────────────────────────────────── */
+.demo-section{max-width:1280px;margin:0 auto;padding:3.5rem 2rem;}
+.demo-header{display:flex;align-items:baseline;gap:1.2rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.demo-num{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#C49A1F;}
+.demo-title{font-family:'Cormorant',serif;font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:600;color:#F4F0EB;}
+
+/* ─── CANVAS PAIR ─────────────────────────────────────────── */
+.canvas-pair{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.4rem;}
+.canvas-panel{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06);
+  background:#050210;position:relative;aspect-ratio:1;}
+.canvas-panel canvas{display:block;width:100%;height:100%;}
+.cp-label{position:absolute;top:.65rem;left:.75rem;font-family:'JetBrains Mono',monospace;
+  font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,240,235,.28);
+  z-index:2;pointer-events:none;}
+.cp-hint{position:absolute;bottom:.65rem;right:.75rem;font-family:'JetBrains Mono',monospace;
+  font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,240,235,.18);
+  z-index:2;pointer-events:none;}
+
+/* ─── STATE / SOLID BUTTONS ───────────────────────────────── */
+.btn-strip{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+.state-btn{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.35rem .85rem;border-radius:3px;cursor:pointer;border:none;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  color:rgba(244,240,235,.45);transition:all .22s;position:relative;overflow:hidden;}
+.state-btn:hover{border-color:rgba(196,154,31,.32);color:rgba(196,154,31,.8);}
+.state-btn.on{border-color:rgba(196,154,31,.65);color:#C49A1F;background:rgba(196,154,31,.09);}
+.solid-btn{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.35rem .85rem;border-radius:3px;cursor:pointer;border:none;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  color:rgba(244,240,235,.45);transition:all .22s;}
+.solid-btn:hover,.solid-btn.on{color:#fff;}
+
+/* ─── INFO PANEL ──────────────────────────────────────────── */
+.info-panel{background:rgba(255,255,255,.022);border:1px solid rgba(196,154,31,.1);
+  border-radius:8px;padding:1.35rem 1.5rem;transition:opacity .3s;}
+.ip-head{display:flex;align-items:center;gap:1rem;margin-bottom:.8rem;flex-wrap:wrap;}
+.ip-title{font-family:'Cormorant',serif;font-size:1.3rem;font-weight:600;color:#F4F0EB;}
+.ip-el{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+  padding:.18rem .5rem;border-radius:2px;border:1px solid;}
+.ip-facts{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:rgba(196,154,31,.65);
+  letter-spacing:.06em;margin-bottom:.7rem;}
+.ip-desc{font-size:.82rem;color:rgba(244,240,235,.58);line-height:1.7;margin-bottom:.7rem;}
+.ip-cf{font-size:.78rem;color:rgba(155,123,224,.7);line-height:1.65;
+  border-left:2px solid rgba(155,123,224,.3);padding-left:.75rem;font-style:italic;}
+
+/* ─── SECTION DIVIDER ─────────────────────────────────────── */
+.section-div{max-width:1280px;margin:0 auto;padding:1.5rem 2rem;
+  display:flex;align-items:center;gap:1.5rem;}
+.sd-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(196,154,31,.2),transparent);}
+.sd-text{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(196,154,31,.38);white-space:nowrap;}
+
+footer{text-align:center;padding:2.5rem 2rem;border-top:1px solid rgba(196,154,31,.08);}
+.ft-brand{font-family:'Cormorant',serif;font-size:.95rem;font-weight:600;color:#C49A1F;letter-spacing:.1em;}
+.ft-meta{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:rgba(244,240,235,.18);margin-top:.3rem;}
+
+@media(max-width:700px){
+  .canvas-pair{grid-template-columns:1fr;}
+  nav .nav-suite{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">Hardy House · Decomposition</div>
+  <div class="nav-suite">
+    <a class="sl" href="hardy-house-geometry.html">Geometry</a>
+    <a class="sl" href="hardy-house-variants.html">Variants</a>
+    <a class="sl on" href="#">Decomposition</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="h-eyebrow">Hardy House Consulting · Sacred Geometry</div>
+  <h1 class="h-title">From Circle to <em>Cosmos</em></h1>
+  <p class="h-sub">Every Platonic solid is hidden within the Flower of Life. This demonstration traces the geometric path: from overlapping circles, through the Fruit of Life, into Metatron's Cube — and finally reveals each perfect form extracted from the pattern.</p>
+  <div class="path-strip" id="pathStrip">
+    <span class="path-node" id="pn-fol">Flower of Life</span>
+    <span class="path-arrow">→</span>
+    <span class="path-node" id="pn-seed">Seed of Life</span>
+    <span class="path-arrow">→</span>
+    <span class="path-node" id="pn-fruit">Fruit of Life</span>
+    <span class="path-arrow">→</span>
+    <span class="path-node" id="pn-met">Metatron's Cube</span>
+    <span class="path-arrow">→</span>
+    <span class="path-node" id="pn-solid">Platonic Solids</span>
+  </div>
+</div>
+
+<!-- ─── SECTION 1: FLOWER OF LIFE ───────────────────────── -->
+<div class="demo-section">
+  <div class="demo-header">
+    <span class="demo-num">01</span>
+    <h2 class="demo-title">Flower of Life Decomposition</h2>
+  </div>
+
+  <div class="canvas-pair">
+    <div class="canvas-panel">
+      <canvas id="fol2D"></canvas>
+      <div class="cp-label">2D Source Pattern</div>
+      <div class="cp-hint">Slowly rotating</div>
+    </div>
+    <div class="canvas-panel">
+      <canvas id="fol3D"></canvas>
+      <div class="cp-label">3D Extracted Form</div>
+      <div class="cp-hint">Drag to orbit</div>
+    </div>
+  </div>
+
+  <div class="btn-strip" id="folButtons"></div>
+
+  <div class="info-panel" id="folInfo">
+    <div class="ip-head">
+      <div class="ip-title" id="fol-ip-title">Flower of Life</div>
+      <div class="ip-el" id="fol-ip-el" style="color:#C49A1F;border-color:rgba(196,154,31,.3);background:rgba(196,154,31,.08)">Pattern</div>
+    </div>
+    <div class="ip-facts" id="fol-ip-facts">19 circles · Hexagonal grid · R-spaced centres</div>
+    <div class="ip-desc" id="fol-ip-desc">The Flower of Life is the foundation of all sacred geometry. Begin with one circle — the Seed of Life. Surround it with six identical circles. Surround those with twelve more. The result encodes every geometric form that follows.</div>
+    <div class="ip-cf" id="fol-ip-cf">In ContextForge, the Flower of Life represents the generative origin of the entire framework — the single Circle from which all team topologies, agent architectures, and dimensional structures expand.</div>
+  </div>
+</div>
+
+<div class="section-div">
+  <div class="sd-line"></div>
+  <div class="sd-text">Fruit of Life + Lines = Metatron's Cube → Platonic Solids</div>
+  <div class="sd-line"></div>
+</div>
+
+<!-- ─── SECTION 2: METATRON EXTRACTION ──────────────────── -->
+<div class="demo-section">
+  <div class="demo-header">
+    <span class="demo-num">02</span>
+    <h2 class="demo-title">Metatron's Cube — Platonic Solid Extraction</h2>
+  </div>
+
+  <div class="canvas-pair">
+    <div class="canvas-panel">
+      <canvas id="met2D"></canvas>
+      <div class="cp-label">2D Metatron's Cube · Edges highlighted</div>
+      <div class="cp-hint">Hover to see full pattern</div>
+    </div>
+    <div class="canvas-panel">
+      <canvas id="met3D"></canvas>
+      <div class="cp-label">3D Extracted Solid</div>
+      <div class="cp-hint">Drag to orbit</div>
+    </div>
+  </div>
+
+  <div class="btn-strip" id="solidButtons"></div>
+
+  <div class="info-panel" id="solidInfo">
+    <div class="ip-head">
+      <div class="ip-title" id="met-ip-title">Select a solid above</div>
+    </div>
+    <div class="ip-desc" id="met-ip-desc">Each of the five Platonic solids is encoded within Metatron's Cube. The 78 connecting lines contain all their edges as subsets — the solid exists within the pattern, waiting to be revealed.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-brand">Hardy House Consulting</div>
+  <div class="ft-meta">Sacred Geometry Decomposition · 2026 · Select states and solids above to explore</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE)document.write('<scr'+'ipt src="three.r128.min.js"><\/scr'+'ipt>')</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>if(!window.gsap)document.write('<scr'+'ipt src="gsap.3.12.2.min.js"><\/scr'+'ipt>')</script>
+<script>
+'use strict';
+
+/* ============================================================
+   GLOBAL TICK
+============================================================ */
+const gScenes = new Set();
+let gT = 0;
+(function tick(){ requestAnimationFrame(tick); gT += .005; gScenes.forEach(s => s.tick(gT)); })();
+
+/* ============================================================
+   ORBIT CONTROL
+============================================================ */
+class OrbitControl {
+  constructor(cam, r=4.5) {
+    this.cam=cam; this.r=r;
+    this.th=0; this.ph=Math.PI/2; this.vTh=0; this.vPh=0; this.dn=false; this.lx=0; this.ly=0;
+  }
+  press(x,y){ this.dn=true; this.lx=x; this.ly=y; }
+  move(x,y) { if(!this.dn)return; this.vTh-=(x-this.lx)*.0088; this.vPh-=(y-this.ly)*.0088; this.lx=x; this.ly=y; }
+  release()  { this.dn=false; }
+  update(auto=true){
+    if(!this.dn&&auto) this.th+=.003;
+    this.th+=this.vTh; this.ph=Math.max(.06,Math.min(Math.PI-.06,this.ph+this.vPh));
+    this.vTh*=.88; this.vPh*=.88;
+    const sp=Math.sin(this.ph),cp=Math.cos(this.ph),st=Math.sin(this.th),ct=Math.cos(this.th);
+    this.cam.position.set(this.r*sp*ct,this.r*cp,this.r*sp*st); this.cam.lookAt(0,0,0);
+  }
+  bind(canvas){
+    canvas.addEventListener('mousedown',e=>{ e.preventDefault(); this.press(e.clientX,e.clientY); });
+    canvas.addEventListener('mousemove',e=>this.move(e.clientX,e.clientY));
+    canvas.addEventListener('mouseup',()=>this.release()); canvas.addEventListener('mouseleave',()=>this.release());
+    canvas.addEventListener('touchstart',e=>{ e.preventDefault(); const t=e.touches[0]; this.press(t.clientX,t.clientY); },{passive:false});
+    canvas.addEventListener('touchmove',e=>{ e.preventDefault(); const t=e.touches[0]; this.move(t.clientX,t.clientY); },{passive:false});
+    canvas.addEventListener('touchend',()=>this.release());
+    canvas.style.cursor='grab'; canvas.addEventListener('mousedown',()=>{canvas.style.cursor='grabbing';});
+    canvas.addEventListener('mouseup',()=>{canvas.style.cursor='grab';});
+  }
+}
+
+function buildGlowEdge(geo, hexStr, useWF){
+  const col=parseInt(hexStr.replace('#',''),16),EGC=useWF?THREE.WireframeGeometry:THREE.EdgesGeometry,g=new THREE.Group();
+  [[1,.90],[1.022,.26],[1.058,.09],[1.105,.04]].forEach(([s,op])=>{
+    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false});
+    const ls=new THREE.LineSegments(new EGC(geo),mat); ls.scale.setScalar(s); g.add(ls);
+  });
+  return g;
+}
+
+/* ============================================================
+   GEOMETRIC DATA
+============================================================ */
+const SQ3H = Math.sqrt(3)/2;
+const FOL_AX = [[0,0],[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1],
+  [2,0],[1,1],[0,2],[-1,2],[-2,2],[-2,1],[-2,0],[-1,-1],[0,-2],[1,-2],[2,-2],[2,-1]];
+const R = 1.0;
+// FOL Cartesian (19 positions)
+const FOL_PTS = FOL_AX.map(([q,r])=>[q+r*.5, r*SQ3H]);
+// Fruit of Life indices into FOL_PTS (13 circles)
+const FRUIT_IDX = [0,1,2,3,4,5,6,7,9,11,13,15,17];
+// Metatron centres (13 pts)
+const MET_PTS = FRUIT_IDX.map(i=>FOL_PTS[i]);
+
+// All 78 Metatron edges
+const MET_EDGES=[];
+for(let i=0;i<13;i++) for(let j=i+1;j<13;j++) MET_EDGES.push([i,j]);
+
+/* ============================================================
+   SOLID DEFINITIONS
+============================================================ */
+const SOLIDS = {
+  merkaba: {
+    name: 'Star Tetrahedron',
+    aka: 'Merkaba',
+    element: 'Spirit',
+    ecol: '#C49A1F',
+    ebg: 'rgba(196,154,31,.08)',
+    facts: 'Star Tetrahedron · Two interlocked · Dual-counter-rotating',
+    // Edges colored in two groups (gold + purple)
+    edges1: [[1,3],[3,5],[5,1],[0,1],[0,3],[0,5]],  // upward / gold
+    edges2: [[2,4],[4,6],[6,2],[0,2],[0,4],[0,6]],  // downward / purple
+    col1: 0xC49A1F, col2: 0x9B7BE0,
+    desc: 'Two equilateral triangles within the inner ring of Metatron\'s Cube form the 2D shadow of the Star Tetrahedron. The upward gold triangle (vertices c1, c3, c5) is the spirit-bound tetrahedron; the downward purple triangle (c2, c4, c6) is the earth-bound tetrahedron. Together they form the Star of David — the hexagram central to sacred geometry.',
+    cf: 'In ContextForge, the Merkaba encodes the dual-stack architecture: top-down orchestration from the apex agent meets bottom-up emergent behaviour from the Pentagon ring. The two counter-rotating fields are the Plan phase and the Observe phase in dynamic equilibrium.',
+    geo: 'merkaba',
+    vertHighlight: [0,1,2,3,4,5,6],
+  },
+  cube: {
+    name: 'Hexahedron',
+    aka: 'Cube',
+    element: 'Earth',
+    ecol: '#2D8050',
+    ebg: 'rgba(45,128,80,.08)',
+    facts: 'Faces: 6 · Vertices: 8 · Edges: 12 · Face-diagonal view',
+    edges1: [[1,2],[2,3],[3,4],[4,5],[5,6],[6,1],[1,4],[2,5],[3,6],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]],
+    col1: 0x2D8050,
+    desc: 'The 6 inner circle centres of Metatron\'s Cube form a regular hexagon — the face-on 2D projection of a cube viewed along its 3-fold body diagonal. The 3 long diagonals through the centre (c1–c4, c2–c5, c3–c6) are the cube\'s three mutually perpendicular body axes. This projection reveals all 8 vertices (7 visible + 1 hidden behind the centre).',
+    cf: 'In ContextForge, the Hexahedron is the Earth Principle: the six-agent coordination ring, the grounding operational scaffold. Six equal axes, maximum structural stability. The cube is the only Platonic solid that tiles 3D space without gaps — the grid of all implementation work.',
+    geo: 'cube',
+    vertHighlight: [0,1,2,3,4,5,6],
+  },
+  octahedron: {
+    name: 'Octahedron',
+    aka: 'Octahedron',
+    element: 'Air',
+    ecol: '#3B5FC8',
+    ebg: 'rgba(59,95,200,.08)',
+    facts: 'Faces: 8 · Vertices: 6 · Edges: 12 · Dual of the Cube',
+    edges1: [[1,2],[2,3],[3,4],[4,5],[5,6],[6,1],[1,3],[3,5],[5,1],[2,4],[4,6],[6,2]],
+    col1: 0x3B5FC8,
+    desc: 'The octahedron is the dual of the cube — the same 6 vertices, different edge connections. The 6 inner circle centres, connected by both the hexagon sides AND the inner triangle chords (the upward and downward equilateral triangles), reveal the octahedron\'s 12 edges. The 3 long body diagonals (used by the cube) are omitted here, distinguishing the two duals.',
+    cf: 'In ContextForge, the Octahedron encodes the Air Principle: the information-flow and synchronisation medium between agents. The QSE Quantum Sync Engine operates on octahedral symmetry — balanced exchange between all polarities simultaneously. Eight faces = eight primary communication channels.',
+    geo: 'octahedron',
+    vertHighlight: [1,2,3,4,5,6],
+  },
+  icosahedron: {
+    name: 'Icosahedron',
+    aka: 'Icosahedron',
+    element: 'Water',
+    ecol: '#20A8C8',
+    ebg: 'rgba(32,168,200,.08)',
+    facts: 'Faces: 20 · Vertices: 12 · Edges: 30 · 5-valent vertices',
+    edges1: [
+      [1,2],[2,3],[3,4],[4,5],[5,6],[6,1],
+      [7,8],[8,9],[9,10],[10,11],[11,12],[12,7],
+      [1,7],[1,8],[2,8],[2,9],[3,9],[3,10],[4,10],[4,11],[5,11],[5,12],[6,12],[6,7],
+      [7,9],[8,10],[9,11],[10,12],[11,7],[12,8]
+    ],
+    col1: 0x20A8C8,
+    desc: 'The icosahedron uses all 12 non-centre Metatron circle centres as its 12 vertices. Its 30 edges span both hexagonal rings — the 6 inner, 6 outer, 12 cross-spokes, and 6 outer cross-connections. Each vertex connects to exactly 5 others (5-valent), encoding the golden ratio φ in every non-adjacent vertex distance. The icosahedron is the most spherical Platonic solid.',
+    cf: 'In ContextForge, the Icosahedron encodes the Water Principle: flow, adaptability, and maximum interconnected resilience. The GCMT icosahedral team topology at t3 scale (12 agents + 1 apex) derives directly from this vertex structure. 5-valency = no single node is critical to system function.',
+    geo: 'icosahedron',
+    vertHighlight: [1,2,3,4,5,6,7,8,9,10,11,12],
+  },
+  dodecahedron: {
+    name: 'Dodecahedron',
+    aka: 'Dodecahedron',
+    element: 'Aether',
+    ecol: '#9B7BE0',
+    ebg: 'rgba(155,123,224,.08)',
+    facts: 'Faces: 12 · Vertices: 20 · Edges: 30 · Pentagonal faces · φ-saturated',
+    edges1: [
+      [7,8],[8,9],[9,10],[10,11],[11,12],[12,7],
+      [7,9],[9,11],[11,7],[8,10],[10,12],[12,8],
+      [1,9],[2,10],[3,11],[4,12],[5,7],[6,8],
+      [0,7],[0,8],[0,9],[0,10],[0,11],[0,12],
+      [1,7],[2,8],[3,9],[4,10],[5,11],[6,12]
+    ],
+    col1: 0x9B7BE0,
+    desc: 'The dodecahedron requires the full outer ring of Metatron\'s Cube — it alone "goes one dimension beyond" the inner solids. The alternating triangular cross-connections of the outer hexagon create the pentagonal star patterns encoding its 12 pentagonal faces. Every pentagon contains the golden ratio φ. The dodecahedron is Plato\'s form for the cosmos itself.',
+    cf: 'In ContextForge, the Dodecahedron encodes Aether — the COF-13D framework itself. Its 12 pentagonal faces map to the 12 primary dimensional axes. The golden ratio embedded in every pentagon is the φ⁵ Cosmic Consciousness principle: the self-similar growth pattern that runs from individual task to universal system.',
+    geo: 'dodecahedron',
+    vertHighlight: [0,1,2,3,4,5,6,7,8,9,10,11,12],
+  }
+};
+
+/* ============================================================
+   FOL STATE DEFINITIONS
+============================================================ */
+const FOL_STATES = {
+  fol: {
+    label: 'Flower of Life',
+    pathKey: 'pn-fol',
+    circleOps: new Array(19).fill(.68),
+    circleColors: new Array(19).fill(0xC49A1F),
+    showMetLines: false,
+    title: 'Flower of Life',
+    elLabel: 'Pattern', elCol: '#C49A1F', elBg: 'rgba(196,154,31,.08)',
+    facts: '19 overlapping circles · Hexagonal arrangement · R-spaced centres · Encodes all that follows',
+    desc: 'The Flower of Life begins with one circle (the Seed). Six identical circles are placed touching the first. Twelve more complete the outer ring. All have the same radius R, and all adjacent centres are separated by exactly R — so each circle passes through the centre of its neighbours.',
+    cf: 'In ContextForge, the Flower of Life is the primordial generative pattern — the single origin (Circle) from which the COF framework, the PAOAL cycle, and all team geometries emanate outward in hexagonal rings of increasing complexity.',
+    form3D: 'fol',
+  },
+  seed: {
+    label: 'Seed of Life',
+    pathKey: 'pn-seed',
+    circleOps: [.88,.88,.88,.88,.88,.88,.88,.08,.08,.08,.08,.08,.08,.08,.08,.08,.08,.08,.08],
+    circleColors: [...new Array(7).fill(0xC49A1F), ...new Array(12).fill(0x3B3028)],
+    showMetLines: false,
+    title: 'Seed of Life',
+    elLabel: '7 Circles', elCol: '#C49A1F', elBg: 'rgba(196,154,31,.08)',
+    facts: '7 circles · Centre + 6 · 6-fold symmetry · 6 days of creation',
+    desc: 'The 7 innermost circles of the Flower of Life form the Seed of Life — the central circle surrounded by 6. This is the genesis pattern: the first symmetrical arrangement of touching identical circles. The 6 surrounding circles are perfectly interlocked, each touching the centre and its two neighbours, forming 6 vesica piscis intersections.',
+    cf: 'In ContextForge, the Seed of Life is the 7-agent nucleus: one apex agent at centre, six Pentagon-ring agents surrounding it. This is the minimum complete team topology — the smallest unit that carries all six elemental coordination functions.',
+    form3D: 'seed',
+  },
+  fruit: {
+    label: 'Fruit of Life',
+    pathKey: 'pn-fruit',
+    circleOps: function(i){
+      const bright=[0,1,2,3,4,5,6,7,9,11,13,15,17];
+      return bright.includes(i)?.80:.08;
+    },
+    circleColors: function(i){
+      const bright=[0,1,2,3,4,5,6,7,9,11,13,15,17];
+      return bright.includes(i)?0xC49A1F:0x3B3028;
+    },
+    showMetLines: false,
+    title: 'Fruit of Life',
+    elLabel: '13 Circles', elCol: '#C49A1F', elBg: 'rgba(196,154,31,.08)',
+    facts: '13 circles · 1 + 6 + 6 alternating outer · The generator of Metatron\'s Cube',
+    desc: 'By taking every other circle from the outer ring of the Flower of Life, 13 circles are revealed: the centre, the 6 inner ring, and 6 alternating outer ring circles. This is the Fruit of Life — the direct geometric precursor to Metatron\'s Cube. Connecting all 13 centres with straight lines creates the 78-line lattice of Metatron.',
+    cf: 'In ContextForge, the Fruit of Life is the master topology: 13 dimensional coordinates from which all agent configurations, all team geometries, and all workflow structures can be derived. 13 = the complete COF-13D dimensional manifold.',
+    form3D: 'fruit',
+  },
+  vesica: {
+    label: 'Vesica Piscis',
+    pathKey: null,
+    circleOps: function(i){ return [0,1].includes(i)?.85:.06; },
+    circleColors: function(i){ return [0,1].includes(i)?0xC49A1F:0x3B3028; },
+    showMetLines: false,
+    showVesica: true,
+    title: 'Vesica Piscis',
+    elLabel: 'Foundation', elCol: '#C49A1F', elBg: 'rgba(196,154,31,.08)',
+    facts: 'Two intersecting circles · Height = R√3 · Width = R · Ratio 1:√3',
+    desc: 'The Vesica Piscis is formed where any two adjacent FOL circles overlap — the lens-shaped intersection. Its height-to-width ratio is √3 : 1 (the root of three). This shape is the geometric mother of the equilateral triangle, the √2, √3, and √5 ratios, and ultimately the golden ratio φ. The FOL is constructed entirely from vesica piscis intersections.',
+    cf: 'In ContextForge, the Vesica Piscis represents the fundamental overlap between any two agents\' context fields — the shared relational space where collaboration occurs. All agent interaction is a vesica: two complete fields generating a third, richer, emergent form.',
+    form3D: 'vesica',
+  },
+  metatron: {
+    label: "→ Metatron's Cube",
+    pathKey: 'pn-met',
+    circleOps: function(i){
+      const bright=[0,1,2,3,4,5,6,7,9,11,13,15,17];
+      return bright.includes(i)?.65:.06;
+    },
+    circleColors: function(i){
+      const bright=[0,1,2,3,4,5,6,7,9,11,13,15,17];
+      return bright.includes(i)?0xC49A1F:0x3B3028;
+    },
+    showMetLines: true,
+    title: "Metatron's Cube",
+    elLabel: '78 Lines', elCol: '#9B7BE0', elBg: 'rgba(155,123,224,.08)',
+    facts: '13 circles · 78 connecting lines · All 5 Platonic solids encoded within',
+    desc: 'Connecting every Fruit of Life circle centre to every other with a straight line creates Metatron\'s Cube — 78 lines encoding all five Platonic solids simultaneously. The lines are drawn progressively, revealing the lattice. The solid geometry of the universe is encoded in this flat pattern, waiting to be extracted in three dimensions.',
+    cf: 'In ContextForge, Metatron\'s Cube is the COF-13D unified field — all dimensional relationships encoded in a single geometric structure. Every team topology, workflow state, and agent configuration is a subset of lines within this pattern.',
+    form3D: 'metatron',
+  }
+};
+
+/* ============================================================
+   RENDERER + SCENE FACTORY
+============================================================ */
+function makeRenderer(canvas) {
+  const W=canvas.parentElement.clientWidth||400, H=canvas.parentElement.clientHeight||400;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(W,H); renderer.setClearColor(0,0);
+  new ResizeObserver(()=>{
+    const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;
+    if(w&&h)renderer.setSize(w,h);
+  }).observe(canvas.parentElement);
+  return {renderer,W,H};
+}
+function orthoScene(W,H,half=3.5){
+  const asp=W/H;
+  const scene=new THREE.Scene(), camera=new THREE.OrthographicCamera(-half*asp,half*asp,half,-half,.1,50);
+  camera.position.z=10; scene.add(new THREE.AmbientLight(0xffffff,1));
+  return {scene,camera,half,asp};
+}
+function perspScene(){
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,.1,100);
+  const al=new THREE.AmbientLight(0x1A0D3D,.65);
+  const pl1=new THREE.PointLight(0xC49A1F,1.4,14); pl1.position.set(2.5,2,3.5);
+  const pl2=new THREE.PointLight(0x1E3FAA,.5,10); pl2.position.set(-2,-1,2);
+  scene.add(al,pl1,pl2);
+  return {scene,camera};
+}
+
+/* ============================================================
+   FOL 2D SCENE
+============================================================ */
+class FOL2DScene {
+  constructor(canvas) {
+    const {renderer,W,H}=makeRenderer(canvas);
+    const {scene,camera,half,asp}=orthoScene(W,H,3.6);
+    this.renderer=renderer; this.scene=scene; this.camera=camera;
+    this.group=new THREE.Group(); scene.add(this.group);
+
+    // Build 19 circles
+    this.circles=[];
+    this.circleMats=[];
+    this.vesicaLines=[];
+    const seg=72;
+    FOL_PTS.forEach(([cx,cy],idx)=>{
+      const pts=[];
+      for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2;pts.push(new THREE.Vector3(cx+R*Math.cos(a),cy+R*Math.sin(a),0));}
+      const mat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.68,blending:THREE.AdditiveBlending});
+      const mat2=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.05,blending:THREE.AdditiveBlending,depthWrite:false});
+      const c=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat);
+      const c2=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(p.x*1.04,p.y*1.04,0))),mat2);
+      this.group.add(c,c2);
+      this.circles.push(c); this.circleMats.push(mat);
+    });
+
+    // Vesica piscis overlay (hidden initially)
+    const vPts=[];
+    for(let i=-60;i<=60;i+=3){const a=i*Math.PI/180;vPts.push(new THREE.Vector3(R*Math.cos(a),R*Math.sin(a),0));}
+    for(let i=120;i<=240;i+=3){const a=i*Math.PI/180;vPts.push(new THREE.Vector3(R+R*Math.cos(a),R*Math.sin(a),0));}
+    vPts.push(vPts[0].clone());
+    const vMat=new THREE.LineBasicMaterial({color:0xFFDE80,transparent:true,opacity:0,blending:THREE.AdditiveBlending});
+    const vGlow=new THREE.LineBasicMaterial({color:0xFFDE80,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+    this.vesicaMain=new THREE.Line(new THREE.BufferGeometry().setFromPoints(vPts),vMat);
+    const vGlowPts=vPts.map(p=>new THREE.Vector3(p.x*1.05,p.y*1.05,0));
+    this.vesicaGlow=new THREE.Line(new THREE.BufferGeometry().setFromPoints(vGlowPts),vGlow);
+    this.group.add(this.vesicaMain,this.vesicaGlow);
+    this.vesicaMat=vMat; this.vesicaGlowMat=vGlow;
+
+    // Height line for vesica
+    const hPts=[new THREE.Vector3(R*.5,R*SQ3H,0),new THREE.Vector3(R*.5,-R*SQ3H,0)];
+    const hMat=new THREE.LineBasicMaterial({color:0xFFDE80,transparent:true,opacity:0,blending:THREE.AdditiveBlending});
+    this.vesicaH=new THREE.Line(new THREE.BufferGeometry().setFromPoints(hPts),hMat);
+    this.vesicaHMat=hMat; this.group.add(this.vesicaH);
+
+    // Metatron lines overlay (hidden initially)
+    const metVerts=[];
+    MET_EDGES.forEach(([a,b])=>{metVerts.push(MET_PTS[a][0],MET_PTS[a][1],0,MET_PTS[b][0],MET_PTS[b][1],0);});
+    const metGeo=new THREE.BufferGeometry();
+    metGeo.setAttribute('position',new THREE.Float32BufferAttribute(metVerts,3));
+    metGeo.setDrawRange(0,0); this.metGeo=metGeo;
+    this.metMat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.55,blending:THREE.AdditiveBlending});
+    this.metLines=new THREE.LineSegments(metGeo,this.metMat);
+    this.group.add(this.metLines);
+
+    new ResizeObserver(()=>{
+      const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight,newAsp=w/h;
+      camera.left=-3.6*newAsp; camera.right=3.6*newAsp; camera.updateProjectionMatrix();
+    }).observe(canvas.parentElement);
+
+    gScenes.add(this);
+  }
+
+  setState(stateKey) {
+    const state=FOL_STATES[stateKey];
+    const opFn=typeof state.circleOps==='function'?state.circleOps:(i)=>state.circleOps[i];
+    const colFn=typeof state.circleColors==='function'?state.circleColors:(i)=>state.circleColors[i];
+    this.circleMats.forEach((m,i)=>{
+      if(window.gsap){gsap.to(m,{opacity:opFn(i),duration:.55}); m.color.setHex(colFn(i));}
+      else{m.opacity=opFn(i); m.color.setHex(colFn(i));}
+    });
+    // Vesica
+    const showV=state.showVesica;
+    if(window.gsap){
+      gsap.to(this.vesicaMat,{opacity:showV?.85:0,duration:.5});
+      gsap.to(this.vesicaGlowMat,{opacity:showV?.2:0,duration:.5});
+      gsap.to(this.vesicaHMat,{opacity:showV?.45:0,duration:.5});
+    } else { this.vesicaMat.opacity=showV?.85:0; this.vesicaGlowMat.opacity=showV?.2:0; this.vesicaHMat.opacity=showV?.45:0; }
+    // Metatron lines
+    if(state.showMetLines) {
+      this.metGeo.setDrawRange(0,0);
+      if(window.gsap){gsap.to(this.metMat,{opacity:.50,duration:.3}); }
+      let drawn=0; const total=MET_EDGES.length*2;
+      const step=()=>{if(drawn>=total)return;drawn=Math.min(drawn+4,total);this.metGeo.setDrawRange(0,drawn);setTimeout(step,18);};
+      setTimeout(step,200);
+    } else {
+      if(window.gsap) gsap.to(this.metMat,{opacity:0,duration:.4});
+      else this.metMat.opacity=0;
+      this.metGeo.setDrawRange(0,0);
+    }
+  }
+
+  tick(t){
+    this.group.rotation.z+=.0015;
+    this.renderer.render(this.scene,this.camera);
+  }
+}
+
+/* ============================================================
+   FOL 3D SCENE — extracted forms
+============================================================ */
+class FOL3DScene {
+  constructor(canvas){
+    const {renderer,W,H}=makeRenderer(canvas);
+    const {scene,camera}=perspScene();
+    this.renderer=renderer; this.scene=scene; this.camera=camera;
+    this.orbit=new OrbitControl(camera,4.5); this.orbit.update(false);
+    this.orbit.bind(canvas);
+    this.group=new THREE.Group(); scene.add(this.group);
+    this.currentForm='fol';
+    this._buildFOL();
+    gScenes.add(this);
+    new ResizeObserver(()=>{const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;if(w&&h){renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}}).observe(canvas.parentElement);
+  }
+
+  _clearGroup(){ while(this.group.children.length) this.group.remove(this.group.children[0]); }
+
+  _addGlowSphere(pos, col, r=.12){
+    const geo=new THREE.SphereGeometry(r,12,12);
+    const mat=new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.5});
+    const m=new THREE.Mesh(geo,mat); m.position.set(pos[0],pos[1],0); this.group.add(m);
+    // Glow ring
+    const rGeo=new THREE.TorusGeometry(r*1.6,.015,6,36);
+    const rMat=new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.7,transparent:true,opacity:.6});
+    const ring=new THREE.Mesh(rGeo,rMat); ring.position.set(pos[0],pos[1],0); this.group.add(ring);
+  }
+
+  _buildFOL(){
+    this._clearGroup();
+    const scale=.9;
+    // All 19 circles as gold rings in 3D
+    FOL_PTS.forEach(([cx,cy])=>{
+      const seg=60; const pts=[];
+      for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2;pts.push(new THREE.Vector3((cx+R*Math.cos(a))*scale,(cy+R*Math.sin(a))*scale,0));}
+      const mat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.38,blending:THREE.AdditiveBlending});
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat));
+    });
+    this.group.rotation.x=0.3;
+  }
+  _buildSeed(){
+    this._clearGroup();
+    const s=1.1;
+    FOL_PTS.slice(0,7).forEach(([cx,cy])=>{this._addGlowSphere([cx*s,cy*s],0xC49A1F);});
+    // Circle outlines for seed
+    FOL_PTS.slice(0,7).forEach(([cx,cy])=>{
+      const pts=[]; for(let i=0;i<=60;i++){const a=i/60*Math.PI*2;pts.push(new THREE.Vector3((cx+R*Math.cos(a))*s,(cy+R*Math.sin(a))*s,0));}
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.22,blending:THREE.AdditiveBlending})));
+    });
+  }
+  _buildFruit(){
+    this._clearGroup();
+    const s=.8;
+    FRUIT_IDX.forEach(i=>{ const [cx,cy]=FOL_PTS[i]; this._addGlowSphere([cx*s,cy*s],0xC49A1F,.1); });
+    FRUIT_IDX.forEach(i=>{
+      const [cx,cy]=FOL_PTS[i]; const pts=[];
+      for(let j=0;j<=60;j++){const a=j/60*Math.PI*2;pts.push(new THREE.Vector3((cx+R*Math.cos(a))*s,(cy+R*Math.sin(a))*s,0));}
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.18,blending:THREE.AdditiveBlending})));
+    });
+  }
+  _buildVesica(){
+    this._clearGroup();
+    // Two intersecting spheres (transparent)
+    const matA=new THREE.MeshPhongMaterial({color:0xC49A1F,emissive:0xC49A1F,emissiveIntensity:.08,transparent:true,opacity:.12,side:THREE.DoubleSide});
+    const matB=new THREE.MeshPhongMaterial({color:0x9B7BE0,emissive:0x9B7BE0,emissiveIntensity:.08,transparent:true,opacity:.12,side:THREE.DoubleSide});
+    const sGeo=new THREE.SphereGeometry(1.8,24,24);
+    const sA=new THREE.Mesh(sGeo,matA); sA.position.x=-0.9;
+    const sB=new THREE.Mesh(sGeo,matB); sB.position.x=0.9;
+    this.group.add(sA,sB);
+    // Edge circles
+    [[-0.9,0xC49A1F],[0.9,0x9B7BE0]].forEach(([ox,col])=>{
+      const pts=[]; for(let i=0;i<=80;i++){const a=i/80*Math.PI*2;pts.push(new THREE.Vector3(ox+1.8*Math.cos(a),1.8*Math.sin(a),0));}
+      const gg=buildGlowEdge(new THREE.BufferGeometry().setFromPoints(pts),col===0xC49A1F?'#C49A1F':'#9B7BE0',false);
+      this.group.add(gg); // No-op since buildGlowEdge expects a geo with EdgesGeometry
+    });
+    // Actually draw glow circles manually
+    [[-0.9,0xC49A1F],[0.9,0x9B7BE0]].forEach(([ox,col])=>{
+      [[1,0.7],[1.04,.15]].forEach(([sc,op])=>{
+        const pts=[]; for(let i=0;i<=80;i++){const a=i/80*Math.PI*2;pts.push(new THREE.Vector3(ox+1.8*sc*Math.cos(a),1.8*sc*Math.sin(a),0));}
+        this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,blending:THREE.AdditiveBlending})));
+      });
+    });
+    // Vesica lens outline
+    const vPts=[];
+    for(let i=-60;i<=60;i+=3){const a=i*Math.PI/180;vPts.push(new THREE.Vector3(-0.9+1.8*Math.cos(a),1.8*Math.sin(a),0));}
+    for(let i=120;i<=240;i+=3){const a=i*Math.PI/180;vPts.push(new THREE.Vector3(0.9+1.8*Math.cos(a),1.8*Math.sin(a),0));}
+    vPts.push(vPts[0].clone());
+    [[1,.9],[1.04,.2]].forEach(([sc,op])=>{
+      const sp=vPts.map(p=>new THREE.Vector3(p.x*sc,p.y*sc,0));
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(sp),new THREE.LineBasicMaterial({color:0xFFDE80,transparent:true,opacity:op,blending:THREE.AdditiveBlending})));
+    });
+    this.group.rotation.x=0.2;
+  }
+  _buildMetatron(){
+    this._clearGroup();
+    const sc=.82;
+    // All 13 circles
+    MET_PTS.forEach(([cx,cy])=>{
+      const pts=[]; for(let i=0;i<=60;i++){const a=i/60*Math.PI*2;pts.push(new THREE.Vector3((cx+R*Math.cos(a))*sc,(cy+R*Math.sin(a))*sc,0));}
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.30,blending:THREE.AdditiveBlending})));
+    });
+    // All 78 lines
+    const verts=[]; MET_EDGES.forEach(([a,b])=>{verts.push(MET_PTS[a][0]*sc,MET_PTS[a][1]*sc,0,MET_PTS[b][0]*sc,MET_PTS[b][1]*sc,0);});
+    const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+    this.group.add(new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.45,blending:THREE.AdditiveBlending})));
+    this.group.rotation.x=0.3;
+  }
+
+  setForm(formKey){
+    if(this.currentForm===formKey)return;
+    this.currentForm=formKey;
+    if(window.gsap){ gsap.to(this.group.scale,{x:0,y:0,z:0,duration:.3,ease:'power2.in',onComplete:()=>{this._buildFor(formKey);gsap.fromTo(this.group.scale,{x:0,y:0,z:0},{x:1,y:1,z:1,duration:.5,ease:'back.out(1.5)'}); }}); }
+    else { this._buildFor(formKey); }
+  }
+  _buildFor(k){
+    if(k==='fol')this._buildFOL();
+    else if(k==='seed')this._buildSeed();
+    else if(k==='fruit')this._buildFruit();
+    else if(k==='vesica')this._buildVesica();
+    else if(k==='metatron')this._buildMetatron();
+  }
+
+  tick(t){
+    this.orbit.update(!this.orbit.dn);
+    this.group.rotation.y+=.006; this.group.rotation.x+=.002;
+    this.renderer.render(this.scene,this.camera);
+  }
+}
+
+/* ============================================================
+   METATRON 2D SCENE — highlight system
+============================================================ */
+class Met2DScene {
+  constructor(canvas){
+    const {renderer,W,H}=makeRenderer(canvas);
+    const {scene,camera,half,asp}=orthoScene(W,H,3.6);
+    this.renderer=renderer; this.scene=scene; this.camera=camera;
+    this.group=new THREE.Group(); scene.add(this.group);
+    this.hlGeo1=null; this.hlGeo2=null;
+
+    // 13 circles (dimly)
+    this.circMats=[];
+    const seg=60;
+    MET_PTS.forEach(([cx,cy])=>{
+      const pts=[]; for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2;pts.push(new THREE.Vector3(cx+R*Math.cos(a),cy+R*Math.sin(a),0));}
+      const mat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.28,blending:THREE.AdditiveBlending});
+      this.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat));
+      this.circMats.push(mat);
+    });
+
+    // Background: all 78 lines (dim)
+    const bgV=[]; MET_EDGES.forEach(([a,b])=>{bgV.push(MET_PTS[a][0],MET_PTS[a][1],0,MET_PTS[b][0],MET_PTS[b][1],0);});
+    const bgGeo=new THREE.BufferGeometry(); bgGeo.setAttribute('position',new THREE.Float32BufferAttribute(bgV,3));
+    this.bgMat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.06,blending:THREE.AdditiveBlending});
+    this.group.add(new THREE.LineSegments(bgGeo,this.bgMat));
+
+    // Highlight overlays (initially empty)
+    this.hl1=this._makeHL();
+    this.hl2=this._makeHL();
+    this.group.add(this.hl1, this.hl2);
+
+    new ResizeObserver(()=>{
+      const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight,a=w/h;
+      camera.left=-3.6*a; camera.right=3.6*a; camera.updateProjectionMatrix();
+    }).observe(canvas.parentElement);
+
+    gScenes.add(this);
+  }
+
+  _makeHL(){
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute([0,0,0,0,0,0],3));
+    geo.setDrawRange(0,0);
+    const mat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:0,blending:THREE.AdditiveBlending});
+    return new THREE.LineSegments(geo,mat);
+  }
+
+  _buildEdgesGeo(edgePairs){
+    const v=[]; edgePairs.forEach(([a,b])=>{v.push(MET_PTS[a][0],MET_PTS[a][1],0,MET_PTS[b][0],MET_PTS[b][1],0);});
+    const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3)); geo.setDrawRange(0,0); return geo;
+  }
+
+  selectSolid(solidKey){
+    const def=SOLIDS[solidKey];
+    const {edges1,edges2,col1,col2,vertHighlight}=def;
+
+    // Fade background dim
+    if(window.gsap) gsap.to(this.bgMat,{opacity:.04,duration:.35});
+    else this.bgMat.opacity=.04;
+
+    // Circle highlights
+    this.circMats.forEach((m,i)=>{
+      const on=vertHighlight.includes(i);
+      const targetOp=on?.55:.14;
+      if(window.gsap) gsap.to(m,{opacity:targetOp,duration:.4});
+      else m.opacity=targetOp;
+      if(on) m.color.setHex(col1);
+    });
+
+    // Highlight 1 (primary)
+    const geo1=this._buildEdgesGeo(edges1);
+    this.hl1.geometry.dispose(); this.hl1.geometry=geo1;
+    this.hl1.material.color.setHex(col1);
+    if(window.gsap) gsap.to(this.hl1.material,{opacity:0,duration:.2,onComplete:()=>{
+      this.hl1.material.opacity=0;
+      const total=edges1.length*2; let drawn=0;
+      const step=()=>{if(drawn>=total)return;drawn=Math.min(drawn+2,total);geo1.setDrawRange(0,drawn);setTimeout(step,35);};
+      step(); if(window.gsap) gsap.to(this.hl1.material,{opacity:.88,duration:.3});
+    }});
+    else { geo1.setDrawRange(0,edges1.length*2); this.hl1.material.opacity=.88; }
+
+    // Highlight 2 (secondary, for Merkaba)
+    const geo2=this._buildEdgesGeo(edges2||[]);
+    this.hl2.geometry.dispose(); this.hl2.geometry=geo2;
+    if(edges2?.length){
+      this.hl2.material.color.setHex(col2||col1);
+      if(window.gsap) gsap.to(this.hl2.material,{opacity:0,duration:.2,onComplete:()=>{
+        const total=edges2.length*2; let drawn=0;
+        const step=()=>{if(drawn>=total)return;drawn=Math.min(drawn+2,total);geo2.setDrawRange(0,drawn);setTimeout(step,35+15);};
+        setTimeout(step,120); if(window.gsap) gsap.to(this.hl2.material,{opacity:.80,duration:.3,delay:.1});
+      }});
+      else { geo2.setDrawRange(0,edges2.length*2); this.hl2.material.opacity=.80; }
+    } else { this.hl2.material.opacity=0; }
+  }
+
+  tick(t){
+    this.group.rotation.z+=.0008;
+    this.renderer.render(this.scene,this.camera);
+  }
+}
+
+/* ============================================================
+   METATRON 3D SOLID SCENE
+============================================================ */
+class Met3DScene {
+  constructor(canvas){
+    const {renderer,W,H}=makeRenderer(canvas);
+    const {scene,camera}=perspScene();
+    this.renderer=renderer; this.scene=scene; this.camera=camera;
+    this.orbit=new OrbitControl(camera,5); this.orbit.update(false);
+    this.orbit.bind(canvas);
+
+    // Faint Metatron background (flat, z=-1.5)
+    const sc=1.3;
+    const bgV=[]; MET_EDGES.forEach(([a,b])=>{bgV.push(MET_PTS[a][0]*sc,MET_PTS[a][1]*sc,-1.6,MET_PTS[b][0]*sc,MET_PTS[b][1]*sc,-1.6);});
+    const bgGeo=new THREE.BufferGeometry(); bgGeo.setAttribute('position',new THREE.Float32BufferAttribute(bgV,3));
+    const bgMat=new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.055,blending:THREE.AdditiveBlending});
+    scene.add(new THREE.LineSegments(bgGeo,bgMat));
+
+    // 13 circles in background
+    MET_PTS.forEach(([cx,cy])=>{
+      const pts=[]; for(let i=0;i<=48;i++){const a=i/48*Math.PI*2;pts.push(new THREE.Vector3(cx*sc+R*sc*Math.cos(a),cy*sc+R*sc*Math.sin(a),-1.6));}
+      scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xC49A1F,transparent:true,opacity:.04,blending:THREE.AdditiveBlending})));
+    });
+
+    this.solidGroup=new THREE.Group(); scene.add(this.solidGroup);
+    this.currentSolid=null;
+    new ResizeObserver(()=>{const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;if(w&&h){renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}}).observe(canvas.parentElement);
+    gScenes.add(this);
+  }
+
+  _clear(){ while(this.solidGroup.children.length) this.solidGroup.remove(this.solidGroup.children[0]); }
+
+  _buildMerkaba(col1,col2){
+    const geo=new THREE.TetrahedronGeometry(1.55,0);
+    const mk=(col,ry=0,rx=0)=>{
+      const g=new THREE.Group();
+      const fc=parseInt(col.replace('#',''),16);
+      g.add(new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:fc,emissive:fc,emissiveIntensity:.12,transparent:true,opacity:.12,side:THREE.DoubleSide})));
+      const gg=buildGlowEdge(geo,col,false); g.add(gg); g.rotation.x=rx; g.rotation.y=ry; return g;
+    };
+    this.solidGroup.add(mk('#C49A1F'));
+    const t2=mk('#9B7BE0',Math.PI/3,Math.PI); this.solidGroup.add(t2); this._tet2=t2;
+  }
+
+  _buildSolid(geoFn, hexColor){
+    const geo=geoFn();
+    const col=parseInt(hexColor.replace('#',''),16);
+    this.solidGroup.add(new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color:col,emissive:col,emissiveIntensity:.13,transparent:true,opacity:.13,side:THREE.DoubleSide})));
+    this.solidGroup.add(buildGlowEdge(geo,hexColor,false));
+  }
+
+  setSolid(solidKey){
+    const def=SOLIDS[solidKey];
+    this._tet2=null;
+    if(window.gsap){
+      gsap.to(this.solidGroup.scale,{x:0,y:0,z:0,duration:.28,ease:'power2.in',onComplete:()=>{
+        this._clear(); this._doBuild(def);
+        gsap.fromTo(this.solidGroup.scale,{x:0,y:0,z:0},{x:1,y:1,z:1,duration:.55,ease:'back.out(1.8)'});
+      }});
+    } else { this._clear(); this._doBuild(def); }
+  }
+  _doBuild(def){
+    if(def.geo==='merkaba') this._buildMerkaba(def.col1,def.col2);
+    else if(def.geo==='cube')         this._buildSolid(()=>new THREE.BoxGeometry(2.1,2.1,2.1), '#2D8050');
+    else if(def.geo==='octahedron')   this._buildSolid(()=>new THREE.OctahedronGeometry(1.52,0), '#3B5FC8');
+    else if(def.geo==='icosahedron')  this._buildSolid(()=>new THREE.IcosahedronGeometry(1.42,0), '#20A8C8');
+    else if(def.geo==='dodecahedron') this._buildSolid(()=>new THREE.DodecahedronGeometry(1.36,0), '#9B7BE0');
+  }
+
+  tick(t){
+    this.orbit.update(!this.orbit.dn);
+    this.solidGroup.rotation.x+=.005; this.solidGroup.rotation.y+=.008;
+    if(this._tet2) this._tet2.rotation.y+=.013;
+    this.renderer.render(this.scene,this.camera);
+  }
+}
+
+/* ============================================================
+   UI & INTERACTION
+============================================================ */
+let fol2D, fol3D, met2D, met3D;
+let currentFolState='fol', currentSolid=null;
+
+// FOL state buttons
+const FOL_BTN_ORDER=[['fol','Flower of Life'],['seed','Seed of Life'],['fruit','Fruit of Life'],['vesica','Vesica Piscis'],['metatron',"→ Metatron's Cube"]];
+
+function buildFOLButtons(){
+  const strip=document.getElementById('folButtons');
+  FOL_BTN_ORDER.forEach(([key,label])=>{
+    const btn=document.createElement('button');
+    btn.className='state-btn'+(key==='fol'?' on':''); btn.textContent=label; btn.dataset.key=key;
+    btn.addEventListener('click',()=>selectFOLState(key));
+    strip.appendChild(btn);
+  });
+}
+
+function selectFOLState(key){
+  if(currentFolState===key)return;
+  currentFolState=key;
+  document.querySelectorAll('#folButtons .state-btn').forEach(b=>b.classList.toggle('on',b.dataset.key===key));
+  fol2D.setState(key);
+  const state=FOL_STATES[key];
+  fol3D.setForm(state.form3D);
+  updateFOLInfo(state);
+  updatePathStrip(state.pathKey);
+}
+
+function updateFOLInfo(state){
+  const ip=document.getElementById('folInfo');
+  if(window.gsap) gsap.to(ip,{opacity:0,duration:.2,onComplete:()=>{
+    _setFOLInfo(state); gsap.to(ip,{opacity:1,duration:.35});
+  }}); else _setFOLInfo(state);
+}
+function _setFOLInfo(s){
+  document.getElementById('fol-ip-title').textContent=s.title;
+  const el=document.getElementById('fol-ip-el');
+  el.textContent=s.elLabel; el.style.color=s.elCol; el.style.borderColor=s.elBg.replace('.08)','.3)'); el.style.background=s.elBg;
+  document.getElementById('fol-ip-facts').textContent=s.facts;
+  document.getElementById('fol-ip-desc').textContent=s.desc;
+  document.getElementById('fol-ip-cf').textContent=s.cf;
+}
+
+function updatePathStrip(activeKey){
+  ['pn-fol','pn-seed','pn-fruit','pn-met','pn-solid'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('active',id===activeKey);
+  });
+}
+
+// Solid buttons
+function buildSolidButtons(){
+  const strip=document.getElementById('solidButtons');
+  const order=[['merkaba','Star Tetrahedron','#C49A1F'],['cube','Hexahedron (Cube)','#2D8050'],['octahedron','Octahedron','#3B5FC8'],['icosahedron','Icosahedron','#20A8C8'],['dodecahedron','Dodecahedron','#9B7BE0']];
+  order.forEach(([key,label,col])=>{
+    const btn=document.createElement('button');
+    btn.className='solid-btn'; btn.textContent=label; btn.dataset.key=key;
+    btn.style.setProperty('--c',col);
+    btn.addEventListener('click',()=>selectSolid(key));
+    strip.appendChild(btn);
+  });
+}
+
+function selectSolid(key){
+  currentSolid=key;
+  document.querySelectorAll('#solidButtons .solid-btn').forEach(b=>{
+    const on=b.dataset.key===key;
+    b.classList.toggle('on',on);
+    if(on){const def=SOLIDS[key];b.style.borderColor=def.ecol+'99';b.style.color=def.ecol;b.style.background=def.ebg;}
+    else{b.style.borderColor='';b.style.color='';b.style.background='';}
+  });
+  met2D.selectSolid(key);
+  met3D.setSolid(key);
+  updateSolidInfo(SOLIDS[key]);
+  // advance path strip
+  document.getElementById('pn-solid').classList.add('active');
+}
+
+function updateSolidInfo(def){
+  const ip=document.getElementById('solidInfo');
+  if(window.gsap) gsap.to(ip,{opacity:0,duration:.2,onComplete:()=>{ _setSolidInfo(def); gsap.to(ip,{opacity:1,duration:.35}); }});
+  else _setSolidInfo(def);
+}
+function _setSolidInfo(def){
+  document.getElementById('met-ip-title').textContent=def.name;
+  const ipHead=document.querySelector('#solidInfo .ip-head');
+  let el=document.getElementById('met-ip-el');
+  if(!el){ el=document.createElement('div'); el.id='met-ip-el'; el.className='ip-el'; ipHead.appendChild(el); }
+  el.textContent=def.element; el.style.color=def.ecol; el.style.borderColor=def.ecol+'55'; el.style.background=def.ebg;
+  let facts=document.getElementById('met-ip-facts');
+  if(!facts){ facts=document.createElement('div'); facts.id='met-ip-facts'; facts.className='ip-facts'; document.getElementById('met-ip-title').after(facts); }
+  facts.textContent=def.facts;
+  document.getElementById('met-ip-desc').textContent=def.desc;
+  let cf=document.getElementById('met-ip-cf');
+  if(!cf){ cf=document.createElement('div'); cf.id='met-ip-cf'; cf.className='ip-cf'; document.querySelector('#solidInfo .ip-desc').after(cf); }
+  cf.textContent=def.cf;
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+window.addEventListener('DOMContentLoaded',()=>{
+  // ── UI first — always succeeds regardless of WebGL availability ──
+  buildFOLButtons();
+  buildSolidButtons();
+  updatePathStrip('pn-fol');
+
+  // ── Three.js scenes — each isolated so one failure cannot block the rest ──
+  try { fol2D = new FOL2DScene(document.getElementById('fol2D')); }
+  catch(e){ console.warn('[decomp] fol2D init failed:', e.message); }
+
+  try { fol3D = new FOL3DScene(document.getElementById('fol3D')); }
+  catch(e){ console.warn('[decomp] fol3D init failed:', e.message); }
+
+  try { met2D = new Met2DScene(document.getElementById('met2D')); }
+  catch(e){ console.warn('[decomp] met2D init failed:', e.message); }
+
+  try { met3D = new Met3DScene(document.getElementById('met3D')); }
+  catch(e){ console.warn('[decomp] met3D init failed:', e.message); }
+
+  // ── GSAP hero animation ──
+  if(window.gsap){
+    gsap.from('.h-eyebrow',{opacity:0,y:-8,duration:.7,ease:'power2.out'});
+    gsap.from('.h-title',  {opacity:0,y:24,duration:.9,ease:'power3.out',delay:.1});
+    gsap.from('.h-sub',    {opacity:0,y:16,duration:.8,ease:'power2.out',delay:.3});
+    gsap.from('.path-strip',{opacity:0,y:10,duration:.6,delay:.6});
+  }
+});
+</script>
+</body>
+</html>

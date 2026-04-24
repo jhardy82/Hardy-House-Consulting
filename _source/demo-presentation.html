@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy House · Client Presentation</title>
+<style>
+/* Fonts loaded from Google CDN when online; fallback to system serif/mono offline */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+</style>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #07040F; overflow: hidden; }
+body { font-family: 'Cormorant', Georgia, serif; color: #F4F0EB; }
+
+/* ── Canvas (behind everything) ─────────────────────────── */
+#bgCanvas {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  display: block; pointer-events: none; z-index: 0;
+}
+
+/* ── Slide container ─────────────────────────────────────── */
+#slides { position: fixed; inset: 0; z-index: 10; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center;
+  opacity: 0; transition: opacity .55s ease;
+}
+.slide.active { opacity: 1; pointer-events: all; }
+.slide.exit   { opacity: 0; }
+
+/* ── Layout variants ─────────────────────────────────────── */
+/* center — big statement */
+.slide.layout-center {
+  justify-content: center; text-align: center; flex-direction: column;
+  padding: 6rem 10vw;
+}
+/* split — text left, shape right (shape is in the bg canvas) */
+.slide.layout-split {
+  justify-content: flex-start; align-items: center;
+  padding: 0 9vw;
+}
+.slide.layout-split .text-col {
+  max-width: min(580px, 50vw);
+}
+/* list — text left, bullet list */
+.slide.layout-list {
+  justify-content: flex-start; align-items: center;
+  padding: 0 9vw;
+}
+.slide.layout-list .text-col { max-width: min(640px, 58vw); }
+
+/* ── Typography ──────────────────────────────────────────── */
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(.58rem, 1.1vw, .75rem);
+  letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(196,154,31,.7); margin-bottom: 1.1rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.eyebrow::before {
+  content: ''; width: 28px; height: 1px; background: rgba(196,154,31,.5);
+}
+.slide-title {
+  font-size: clamp(2.4rem, 5.5vw, 5.2rem);
+  font-weight: 300; line-height: 1.06; letter-spacing: -.01em;
+  color: #fff; margin-bottom: 1.3rem;
+}
+.slide-title em { font-style: italic; color: rgba(244,240,235,.65); }
+.slide-title strong { font-weight: 700; }
+.slide-sub {
+  font-size: clamp(.9rem, 1.7vw, 1.18rem);
+  color: rgba(244,240,235,.58); line-height: 1.72;
+  max-width: 560px;
+}
+/* Centered sub variant */
+.layout-center .slide-sub { margin: 0 auto; }
+
+/* Pull-quote style */
+.pull-quote {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(1.5rem, 3.2vw, 2.9rem);
+  font-weight: 300; font-style: italic;
+  color: rgba(244,240,235,.82); line-height: 1.3;
+  border-left: 3px solid rgba(196,154,31,.45);
+  padding-left: 1.4rem; margin: 1.6rem 0;
+}
+
+/* Bullet list */
+.bullet-list {
+  list-style: none; margin-top: 1.5rem;
+  display: flex; flex-direction: column; gap: .7rem;
+}
+.bullet-list li {
+  display: flex; align-items: baseline; gap: .7rem;
+  font-size: clamp(.88rem, 1.6vw, 1.05rem);
+  color: rgba(244,240,235,.7); line-height: 1.55;
+}
+.bullet-list li::before {
+  content: '◈'; font-size: .7em; color: #C49A1F; flex-shrink: 0;
+  position: relative; top: -.05em;
+}
+.bullet-list li strong { color: #F4F0EB; font-weight: 600; }
+
+/* Tag row */
+.tag-row { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.3rem; }
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(.52rem, .95vw, .68rem);
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: .25rem .65rem; border-radius: 3px;
+  border: 1px solid rgba(196,154,31,.22); color: rgba(196,154,31,.65);
+}
+.tag.hi { border-color: rgba(196,154,31,.55); color: #C49A1F; background: rgba(196,154,31,.07); }
+
+/* Element badge */
+.element-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+  letter-spacing: .15em; text-transform: uppercase;
+  margin-bottom: .8rem;
+}
+.el-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Swatch grid (slide 9) */
+.swatch-row {
+  display: flex; gap: .7rem; flex-wrap: wrap;
+  margin-top: 1.4rem;
+}
+.swatch {
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+}
+.swatch-block {
+  width: clamp(44px, 6vw, 72px); height: clamp(44px, 6vw, 72px);
+  border-radius: 6px; border: 1px solid rgba(255,255,255,.08);
+}
+.swatch-label {
+  font-family: 'JetBrains Mono', monospace; font-size: .5rem;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: rgba(244,240,235,.35);
+}
+
+/* ── Progress ────────────────────────────────────────────── */
+#progress {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  display: flex; gap: .5rem; z-index: 50; pointer-events: none;
+}
+.prog-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(196,154,31,.22); transition: all .35s;
+}
+.prog-dot.on { background: #C49A1F; transform: scale(1.5); }
+
+/* ── Nav HUD ─────────────────────────────────────────────── */
+#nav-hud {
+  position: fixed; bottom: 1.5rem; right: 1.8rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .54rem;
+  letter-spacing: .12em; color: rgba(244,240,235,.18);
+  z-index: 50; pointer-events: none; text-align: right;
+  display: flex; flex-direction: column; gap: .2rem;
+}
+#slide-counter { color: rgba(196,154,31,.4); font-size: .6rem; }
+
+/* ── Back-to-hub button ──────────────────────────────────── */
+#hub-btn {
+  position: fixed; top: 1rem; left: 1.2rem; z-index: 50;
+  font-family: 'JetBrains Mono', monospace; font-size: .56rem;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: .28rem .65rem; border-radius: 3px;
+  border: 1px solid rgba(196,154,31,.18); color: rgba(196,154,31,.38);
+  background: rgba(7,4,15,.7); cursor: pointer; text-decoration: none;
+  transition: all .2s;
+}
+#hub-btn:hover { border-color: rgba(196,154,31,.45); color: rgba(196,154,31,.75); }
+
+
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div id="slides"></div>
+<div id="progress"></div>
+<div id="nav-hud">
+  <div id="slide-counter">1 / 10</div>
+  <div>← → navigate · F fullscreen · H hub</div>
+</div>
+<a href="demo-hub.html" id="hub-btn">← Hub</a>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE)document.write('<scr'+'ipt src="three.r128.min.js"><\/scr'+'ipt>')</script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDE CONTENT DEFINITIONS
+══════════════════════════════════════════════════════════════ */
+const SLIDES = [
+  /* 0 — TITLE ──────────────────────────────────────────── */
+  {
+    layout: 'center',
+    eyebrow: 'Hardy House Consulting',
+    title: 'Sacred Geometry<br>as <em>Operating System</em>',
+    sub: 'A framework for building enterprise technology that is structurally sound, geometrically coherent, and philosophically grounded.',
+    shape: 'dodeca', shapeSize: 2.4, shapePos: [0, 0], shapeOpacity: 0.8,
+    col: 0x9B7BE0, fogCol: 0x1A0D3D,
+  },
+  /* 1 — FRAMEWORK ──────────────────────────────────────── */
+  {
+    layout: 'split',
+    eyebrow: 'The Framework',
+    title: 'Geometry is not<br><strong>metaphor.</strong>',
+    pullQuote: 'It is the actual structural logic of how teams communicate, how systems scale, and how information flows.',
+    shape: 'icosa', shapeSize: 2.1, shapePos: [2.2, 0], shapeOpacity: 0.9,
+    col: 0x20A8C8, fogCol: 0x050E2A,
+  },
+  /* 2 — THE FIVE ────────────────────────────────────────── */
+  {
+    layout: 'split',
+    eyebrow: 'The Five Platonic Solids',
+    title: 'Five perfect forms.<br>Five <em>consulting roles.</em>',
+    list: [
+      ['🔥 Fire · Tetrahedron', 'Initiate, focus, execute. Minimum structure, maximum directed energy.'],
+      ['🜃 Earth · Cube', 'Build and stabilise. The only solid that tiles space with no gaps.'],
+      ['💨 Air · Octahedron', 'Orchestrate information. Dual of the cube — same vertices, free motion.'],
+      ['💧 Water · Icosahedron', 'Adapt and connect. 12 vertices, 5-valent, maximum resilience.'],
+      ['✦ Aether · Dodecahedron', 'The framework itself. 12 pentagonal faces, φ at every vertex.'],
+    ],
+    shape: 'tetra', shapeSize: 1.7, shapePos: [2.2, 0], shapeOpacity: 0.75,
+    col: 0xC49A1F, fogCol: 0x150A00,
+  },
+  /* 3 — CONTEXTFORGE ───────────────────────────────────── */
+  {
+    layout: 'split',
+    eyebrow: 'ContextForge',
+    title: 'All five agents,<br><strong>orchestrated.</strong>',
+    sub: 'ContextForge is a multi-agent AI orchestration framework. Five Pentagon agents operate in a COF-13D dimensional structure. Sacred Geometry is not decoration — it is the architectural logic of the system itself.',
+    tags: ['Pentagon Agents', 'COF-13D', 'PAOAL Cycle', 'UCL', 'AAR Engine', 'TaskMan', 'Multi-Agent Checkout'],
+    shape: 'merkaba', shapeSize: 2.0, shapePos: [2.2, 0], shapeOpacity: 0.88,
+    col: 0xC49A1F, col2: 0x9B7BE0, fogCol: 0x180D30,
+  },
+  /* 4 — METATRON ────────────────────────────────────────── */
+  {
+    layout: 'center',
+    eyebrow: "Metatron's Cube",
+    title: '<em>All five solids</em><br>hidden in one pattern.',
+    sub: "Connect every centre of the Fruit of Life's 13 circles to every other and you draw all 78 edges that contain every Platonic solid simultaneously. The structure of the universe encoded in a flat diagram.",
+    shape: 'dodeca', shapeSize: 2.6, shapePos: [0, 0], shapeOpacity: 0.55,
+    col: 0x9B7BE0, fogCol: 0x0E0820,
+  },
+  /* 5 — TEAM GEOMETRY ──────────────────────────────────── */
+  {
+    layout: 'split',
+    eyebrow: 'Team Architecture · GCMT',
+    title: 'Team size <em>follows</em><br>Fibonacci. Always.',
+    sub: 'Geometric Configuration for Multi-agent Teams. Teams of 2/3/5/8/13/21 map to Platonic solids. Shape predicts communication topology, information flow, and resilience. Pentagon (5) → Dodecahedron faces. Cube (8) → octahedral coordination ring.',
+    tags: ['2 · Line', '3 · Triangle', '5 · Pentagon', '8 · Cube Ring', '13 · Icosahedron', '21 · Dodecahedron'],
+    shape: 'octa', shapeSize: 1.9, shapePos: [2.2, 0], shapeOpacity: 0.85,
+    col: 0x3B5FC8, fogCol: 0x050E28,
+  },
+  /* 6 — MODERN WORKPLACE ────────────────────────────────── */
+  {
+    layout: 'list',
+    eyebrow: 'Modern Workplace Engineering',
+    title: 'The Microsoft<br><strong>stack, delivered.</strong>',
+    list: [
+      ['Intune & Autopilot', 'Zero-touch Windows 11 deployment at enterprise scale. Compliance, configuration, and certificate management.'],
+      ['ConfigMgr / SCCM', 'Hybrid co-management, task sequence engineering, software packaging, and OSD.'],
+      ['Azure Virtual Desktop', 'Host-pool image builds, FSLogix, RDP Shortpath, multi-session optimisation.'],
+      ['Microsoft 365 & Copilot', 'Copilot Studio agents, SharePoint architecture, OneDrive migration, Teams governance.'],
+      ['Entra ID & Graph API', 'Identity engineering, conditional access, PowerShell Graph automation, app registrations.'],
+    ],
+    shape: 'cube', shapeSize: 1.8, shapePos: [2.2, 0.2], shapeOpacity: 0.65,
+    col: 0x2D8050, fogCol: 0x051410,
+  },
+  /* 7 — BRAND SYSTEM ───────────────────────────────────── */
+  {
+    layout: 'split',
+    eyebrow: 'Brand System · 7 Variants',
+    title: 'Seven variants.<br><em>One identity.</em>',
+    sub: 'Regal Standard · Burnished Metal · Lunar Glow · Prismatic Shift · Bold Ink · Aged Parchment · Holographic. Every variant carries full WCAG contrast analysis, score bars across four dimensions, and a geometry background that responds to the variant\'s elemental character.',
+    swatches: [
+      { col: '#2E1760', label: 'Regal' },
+      { col: '#1F1040', label: 'Metal' },
+      { col: '#5A3A8C', label: 'Pearl' },
+      { col: '#3D1A8C', label: 'Prism' },
+      { col: '#5B21B6', label: 'Ink' },
+      { col: '#3A1850', label: 'Academic' },
+      { col: '#030108', label: 'Holo' },
+    ],
+    shape: 'knot', shapeSize: 1.6, shapePos: [2.2, 0], shapeOpacity: 0.82,
+    col: 0xC49A1F, fogCol: 0x150A00,
+  },
+  /* 8 — GOLDEN RATIO ───────────────────────────────────── */
+  {
+    layout: 'center',
+    eyebrow: 'The Golden Ratio · φ⁵',
+    title: 'φ = 1.6180339887…',
+    sub: 'The growth pattern woven into nature. Every spiral in a nautilus, every branching in a tree, every proportion in the human body follows r(θ) = base · φ^(2θ/π). In ContextForge, every system level is φ times the one below it — from task to sprint, sprint to epic, epic to program, program to enterprise.',
+    pullQuote: 'Structure is not constraint. It is the condition that makes creativity possible.',
+    shape: 'golden', shapeSize: 1.0, shapePos: [0, 0], shapeOpacity: 0.7,
+    col: 0xC49A1F, fogCol: 0x120900,
+  },
+  /* 9 — CONTACT ────────────────────────────────────────── */
+  {
+    layout: 'center',
+    eyebrow: 'Hardy House Consulting · Denver, CO',
+    title: 'Let&#39;s build something<br><em>geometric.</em>',
+    sub: 'Modern Workplace · Endpoint Engineering · ContextForge · Sacred Geometry\n\nJames Hardy · Avanade · james@hardyhouseconsulting.com',
+    tags: ['Intune', 'SCCM', 'Azure', 'M365 Copilot', 'Graph API', 'PowerShell', 'ContextForge'],
+    shape: 'torus', shapeSize: 2.2, shapePos: [0, 0], shapeOpacity: 0.65,
+    col: 0xC49A1F, fogCol: 0x140900,
+  },
+];
+
+/* ══════════════════════════════════════════════════════════════
+   THREE.JS — SINGLE SHARED RENDERER
+══════════════════════════════════════════════════════════════ */
+const bgCanvas = document.getElementById('bgCanvas');
+const renderer = new THREE.WebGLRenderer({preserveDrawingBuffer:true, canvas: bgCanvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0, 0);
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 60);
+camera.position.set(0, 0, 7);
+
+const ambLight = new THREE.AmbientLight(0x1A0D3D, 0.6); scene.add(ambLight);
+const pl1 = new THREE.PointLight(0xC49A1F, 1.2, 20); pl1.position.set(3, 2.5, 5); scene.add(pl1);
+const pl2 = new THREE.PointLight(0x1E3FAA, 0.45, 14); pl2.position.set(-3, -2, 3); scene.add(pl2);
+
+// Particle field
+const ptN = 320, ptPos = new Float32Array(ptN * 3);
+for (let i = 0; i < ptN; i++) {
+  const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+  const r = 7 + Math.random() * 10;
+  ptPos[i*3] = r*Math.sin(ph)*Math.cos(th); ptPos[i*3+1] = r*Math.sin(ph)*Math.sin(th); ptPos[i*3+2] = r*Math.cos(ph);
+}
+const ptGeo = new THREE.BufferGeometry(); ptGeo.setAttribute('position', new THREE.Float32BufferAttribute(ptPos, 3));
+const ptMat = new THREE.PointsMaterial({ color: 0xC49A1F, size: 0.04, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending });
+scene.add(new THREE.Points(ptGeo, ptMat));
+
+// Main shape group
+const shapeGroup = new THREE.Group(); scene.add(shapeGroup);
+scene.fog = new THREE.FogExp2(0x07040F, 0.038);
+
+function resize() {
+  const W = window.innerWidth, H = window.innerHeight;
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize); resize();
+
+/* ── Shape builders ────────────────────────────────────────── */
+const PHI = (1 + Math.sqrt(5)) / 2;
+
+function buildGlowEdges(geo, col, ops = [[1, 0.88], [1.03, 0.14], [1.08, 0.04]]) {
+  const g = new THREE.Group();
+  ops.forEach(([s, op]) => {
+    const ls = new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false }));
+    ls.scale.setScalar(s); g.add(ls);
+  });
+  return g;
+}
+function buildFaceMesh(geo, col, op = 0.09) {
+  return new THREE.Mesh(geo, new THREE.MeshPhongMaterial({
+    color: col, emissive: col, emissiveIntensity: 0.1,
+    transparent: true, opacity: op, side: THREE.DoubleSide
+  }));
+}
+function buildSolid(geo, col) {
+  const g = new THREE.Group();
+  g.add(buildGlowEdges(geo, col));
+  g.add(buildFaceMesh(geo, col));
+  return g;
+}
+
+function makeShape(def) {
+  const g = new THREE.Group();
+  const col = def.col;
+
+  switch (def.shape) {
+    case 'dodeca': g.add(buildSolid(new THREE.DodecahedronGeometry(def.shapeSize, 0), col)); break;
+    case 'icosa':  g.add(buildSolid(new THREE.IcosahedronGeometry(def.shapeSize, 0), col)); break;
+    case 'tetra':  g.add(buildSolid(new THREE.TetrahedronGeometry(def.shapeSize, 0), col)); break;
+    case 'cube':   g.add(buildSolid(new THREE.BoxGeometry(def.shapeSize*1.5, def.shapeSize*1.5, def.shapeSize*1.5), col)); break;
+    case 'octa':   g.add(buildSolid(new THREE.OctahedronGeometry(def.shapeSize, 0), col)); break;
+    case 'torus':  {
+      const geo = new THREE.TorusGeometry(def.shapeSize, def.shapeSize * 0.33, 12, 60);
+      g.add(buildGlowEdges(geo, col, [[1, 0.80], [1.03, 0.12]]));
+      g.add(buildFaceMesh(geo, col, 0.06));
+      break;
+    }
+    case 'knot':   {
+      const geo = new THREE.TorusKnotGeometry(def.shapeSize * 0.75, def.shapeSize * 0.22, 90, 14);
+      g.add(buildGlowEdges(geo, col, [[1, 0.78], [1.03, 0.11]]));
+      g.add(buildFaceMesh(geo, col, 0.05));
+      break;
+    }
+    case 'merkaba': {
+      const tGeo = new THREE.TetrahedronGeometry(def.shapeSize, 0);
+      [[0, col], [Math.PI, def.col2 || 0x9B7BE0]].forEach(([rx, c]) => {
+        const sub = new THREE.Group();
+        sub.add(buildGlowEdges(tGeo, c));
+        sub.add(buildFaceMesh(tGeo, c, 0.08));
+        sub.rotation.x = rx;
+        g.add(sub);
+      });
+      break;
+    }
+    case 'golden': {
+      const N = 360, pts = [];
+      for (let i = 0; i < N; i++) {
+        const t = i / (N - 1), theta = t * 5 * Math.PI * 2;
+        const r = 0.08 * Math.pow(PHI, 2 * theta / Math.PI) * def.shapeSize;
+        pts.push(new THREE.Vector3(r * Math.cos(theta), r * Math.sin(theta), r * 0.15 * Math.sin(theta * 0.45)));
+      }
+      const lGeo = new THREE.BufferGeometry().setFromPoints(pts);
+      [[1, 0.85], [1.025, 0.18], [1.06, 0.05]].forEach(([s, op]) => {
+        const l = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: op, blending: THREE.AdditiveBlending }));
+        l.scale.setScalar(s); g.add(l);
+      });
+      break;
+    }
+    default: g.add(buildSolid(new THREE.SphereGeometry(def.shapeSize, 16, 12), col)); break;
+  }
+  return g;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDE STATE
+══════════════════════════════════════════════════════════════ */
+let currentSlide = 0;
+let currentShape = null;
+let targetTh = 0, currentTh = 0, currentPh = Math.PI / 2;
+let autoTh = 0;
+
+function transitionShape(def) {
+  // Remove old shape
+  if (currentShape) {
+    const old = currentShape;
+    const t0 = performance.now();
+    (function out(now) {
+      const p = Math.min((now - t0) / 300, 1);
+      old.scale.setScalar(1 - p);
+      old.traverse(n => { if (n.material) n.material.opacity = (n.material.opacity || 0) * (1 - p * 0.04); });
+      if (p < 1) requestAnimationFrame(out); else scene.remove(old);
+    })(t0);
+  }
+
+  const g = makeShape(def);
+  g.scale.setScalar(0.01);
+
+  // Position: shapePos [x, y] — for split layouts the shape goes right
+  if (def.shapePos) {
+    g.position.set(def.shapePos[0], def.shapePos[1], 0);
+  }
+
+  scene.add(g);
+  currentShape = g;
+
+  // Scale in
+  const t0 = performance.now();
+  (function inn(now) {
+    const p = Math.min((now - t0) / 500, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    g.scale.setScalar(e);
+    if (p < 1) requestAnimationFrame(inn);
+  })(t0);
+
+  // Update lights
+  pl1.color.setHex(def.col);
+  if (def.fogCol !== undefined) scene.fog.color.set(def.fogCol);
+  scene.fog.density = 0.038;
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= SLIDES.length) return;
+  const prev = currentSlide;
+  currentSlide = idx;
+
+  const slideEls = document.querySelectorAll('.slide');
+  slideEls[prev].classList.remove('active');
+  slideEls[prev].classList.add('exit');
+  setTimeout(() => slideEls[prev].classList.remove('exit'), 600);
+  slideEls[idx].classList.add('active');
+
+  // Update progress
+  document.querySelectorAll('.prog-dot').forEach((d, i) => d.classList.toggle('on', i === idx));
+  document.getElementById('slide-counter').textContent = `${idx + 1} / ${SLIDES.length}`;
+
+  transitionShape(SLIDES[idx]);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BUILD SLIDE DOM
+══════════════════════════════════════════════════════════════ */
+const slidesEl = document.getElementById('slides');
+
+SLIDES.forEach((def, i) => {
+  const slide = document.createElement('div');
+  slide.className = `slide layout-${def.layout}`;
+  if (i === 0) slide.classList.add('active');
+
+  let innerHtml = `<div class="text-col">`;
+
+  if (def.eyebrow) innerHtml += `<div class="eyebrow">${def.eyebrow}</div>`;
+  if (def.title)   innerHtml += `<div class="slide-title">${def.title}</div>`;
+  if (def.pullQuote) innerHtml += `<div class="pull-quote">${def.pullQuote}</div>`;
+  if (def.sub)     innerHtml += `<div class="slide-sub">${def.sub.replace(/\n/g,'<br>')}</div>`;
+
+  if (def.list) {
+    innerHtml += `<ul class="bullet-list">`;
+    def.list.forEach(([h, b]) => { innerHtml += `<li><div><strong>${h}</strong> — ${b}</div></li>`; });
+    innerHtml += `</ul>`;
+  }
+
+  if (def.tags) {
+    innerHtml += `<div class="tag-row">` + def.tags.map(t => `<span class="tag">${t}</span>`).join('') + `</div>`;
+  }
+
+  if (def.swatches) {
+    innerHtml += `<div class="swatch-row">` + def.swatches.map(s =>
+      `<div class="swatch"><div class="swatch-block" style="background:${s.col}"></div><div class="swatch-label">${s.label}</div></div>`
+    ).join('') + `</div>`;
+  }
+
+  innerHtml += `</div>`;  // close text-col
+  slide.innerHTML = innerHtml;
+  slidesEl.appendChild(slide);
+});
+
+// Progress dots
+const progressEl = document.getElementById('progress');
+SLIDES.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'prog-dot' + (i === 0 ? ' on' : '');
+  progressEl.appendChild(d);
+});
+
+// Init first shape
+transitionShape(SLIDES[0]);
+
+/* ══════════════════════════════════════════════════════════════
+   INPUT
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+    e.preventDefault(); goTo(currentSlide + 1);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault(); goTo(currentSlide - 1);
+  } else if (e.key === 'f' || e.key === 'F') {
+    document.documentElement.requestFullscreen?.();
+  } else if (e.key === 'h' || e.key === 'H') {
+    window.location.href = 'demo-hub.html';
+  } else if (e.key === 'Escape') {
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else if (currentSlide > 0) goTo(0);
+  } else {
+    const n = parseInt(e.key);
+    if (n >= 1 && n <= SLIDES.length) goTo(n - 1);
+  }
+});
+
+// Click to advance
+document.addEventListener('click', e => {
+  if (e.target.tagName === 'A' || e.target.id === 'hub-btn') return;
+  if (e.clientX > window.innerWidth * 0.15 && e.clientX < window.innerWidth * 0.85) {
+    if (e.clientX > window.innerWidth / 2) goTo(currentSlide + 1);
+    else goTo(currentSlide - 1);
+  }
+});
+
+// Track mouse for gentle camera drift
+let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER LOOP
+══════════════════════════════════════════════════════════════ */
+let rafT = 0;
+(function tick(now) {
+  requestAnimationFrame(tick);
+  rafT = now * 0.001;
+  if (currentShape) {
+    currentShape.rotation.y += 0.005;
+    currentShape.rotation.x += 0.001;
+    // Merkaba counter-rotate second tetra
+    if (currentShape.children[1]) currentShape.children[1].rotation.y += 0.01;
+  }
+  // Gentle camera drift
+  camera.position.x += (mx / window.innerWidth - 0.5) * 0.3 * 0.02;
+  camera.position.y -= (my / window.innerHeight - 0.5) * 0.2 * 0.02;
+  camera.lookAt(0, 0, 0);
+  pl1.intensity = 1.1 + Math.sin(rafT * 0.7) * 0.15;
+  renderer.render(scene, camera);
+})(0);
+</script>
+</body>
+</html>

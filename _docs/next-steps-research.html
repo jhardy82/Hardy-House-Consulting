@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardy House · Next Steps Research</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300&family=JetBrains+Mono:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --void:#07040F;--purple:#2E1760;--gold:#C49A1F;--royal:#1E3FAA;
+  --forest:#1B5E35;--aether:#9B7BE0;--water:#20A8C8;--fire:#E05C20;
+  --fg:#F4F0EB;--fg2:rgba(244,240,235,.62);--fg3:rgba(244,240,235,.3);
+  --border:rgba(196,154,31,.14);--border-hi:rgba(196,154,31,.4);
+  --card:rgba(255,255,255,.025);
+}
+html{background:var(--void);color:var(--fg);scroll-behavior:smooth;}
+body{font-family:'Lora',Georgia,serif;line-height:1.68;font-size:15px;}
+h1,h2,h3,h4,h5{font-family:'Cormorant',serif;line-height:1.1;}
+code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+code{background:rgba(196,154,31,.1);padding:.1em .35em;border-radius:3px;
+     font-size:.85em;color:rgba(196,154,31,.9);}
+pre{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+    border-radius:8px;padding:1.1rem 1.3rem;overflow-x:auto;font-size:.78rem;
+    line-height:1.7;color:rgba(244,240,235,.75);margin:1rem 0;}
+pre code{background:none;padding:0;color:inherit;}
+a{color:var(--water);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+/* ── Nav ─────────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:50;background:rgba(7,4,15,.96);
+  border-bottom:1px solid var(--border);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.65rem 2.4rem;gap:1rem;}
+.nav-brand{font-family:'Cormorant',serif;font-size:.95rem;font-weight:700;
+  color:var(--gold);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+.nav-links{display:flex;gap:.3rem;flex-wrap:wrap;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:.54rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);
+  text-decoration:none;padding:.18rem .48rem;border-radius:2px;
+  border:1px solid transparent;transition:all .2s;}
+.nav-links a:hover{color:var(--gold);border-color:var(--border-hi);}
+
+/* ── Page layout ─────────────────────────────────────────────── */
+.hero{padding:4.5rem 2.4rem 3.5rem;text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,#1A0D3D,transparent);}
+.hero-eye{font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  letter-spacing:.25em;text-transform:uppercase;color:rgba(196,154,31,.6);
+  margin-bottom:1rem;}
+.hero h1{font-size:clamp(2rem,4.5vw,3.8rem);font-weight:300;color:#fff;margin-bottom:.9rem;}
+.hero h1 em{font-style:italic;color:var(--gold);}
+.hero p{font-size:.95rem;color:var(--fg2);max-width:600px;margin:0 auto;}
+
+.wrap{max-width:1120px;margin:0 auto;padding:3rem 2.4rem;}
+.section{margin-bottom:3.5rem;}
+.sec-num{font-family:'JetBrains Mono',monospace;font-size:.58rem;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem;}
+.sec-h{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;margin-bottom:.5rem;}
+.sec-lead{font-size:.88rem;color:var(--fg2);max-width:700px;line-height:1.72;margin-bottom:1.4rem;}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+@media(max-width:920px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.05);
+  border-radius:9px;padding:1.2rem 1.35rem;}
+.card.gold{border-color:rgba(196,154,31,.22);}
+.card.purple{border-color:rgba(155,123,224,.2);}
+.card.blue{border-color:rgba(30,63,170,.25);}
+.card.green{border-color:rgba(27,94,53,.28);}
+.card.red{border-color:rgba(224,92,32,.2);}
+.card h3{font-size:1.08rem;font-weight:600;color:var(--fg);margin-bottom:.35rem;}
+.card h4{font-family:'JetBrains Mono',monospace;font-size:.58rem;
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;}
+.card.gold h4{color:var(--gold);}
+.card.purple h4{color:var(--aether);}
+.card.blue h4{color:var(--royal);}
+.card.green h4{color:var(--forest);}
+.card.red h4{color:var(--fire);}
+.card p{font-size:.78rem;color:var(--fg2);line-height:1.65;}
+.card ul{list-style:none;margin-top:.5rem;}
+.card ul li{font-size:.76rem;color:var(--fg2);line-height:1.7;
+  display:flex;align-items:baseline;gap:.4rem;}
+.card ul li::before{content:'◈';font-size:.6em;color:var(--gold);flex-shrink:0;}
+.verdict{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.52rem;
+  letter-spacing:.08em;text-transform:uppercase;padding:.12rem .4rem;border-radius:2px;
+  margin-top:.55rem;}
+.v-easy{background:rgba(27,94,53,.3);color:#86efac;}
+.v-med {background:rgba(196,154,31,.2);color:var(--gold);}
+.v-hard{background:rgba(224,92,32,.2);color:#fbb;}
+
+/* ── Inline citation style ───────────────────────────────────── */
+.cite{font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  color:rgba(32,168,200,.7);vertical-align:super;cursor:default;}
+
+/* ── Key-value rows ──────────────────────────────────────────── */
+.kv{display:grid;grid-template-columns:200px 1fr;gap:.3rem .7rem;
+  align-items:baseline;font-size:.8rem;margin:.6rem 0;}
+.kv dt{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--gold);padding-top:.05rem;}
+.kv dd{color:var(--fg2);}
+
+/* ── Timeline ────────────────────────────────────────────────── */
+.timeline{border-left:2px solid rgba(196,154,31,.2);padding-left:1.8rem;
+  display:flex;flex-direction:column;gap:1.2rem;}
+.tl-item{position:relative;}
+.tl-item::before{content:'◈';position:absolute;left:-2.2rem;top:.05rem;
+  font-size:.7rem;color:var(--gold);}
+.tl-phase{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:.2rem;}
+.tl-title{font-family:'Cormorant',serif;font-size:1.1rem;font-weight:600;
+  color:var(--fg);margin-bottom:.3rem;}
+.tl-body{font-size:.79rem;color:var(--fg2);line-height:1.65;}
+.tl-effort{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.08em;
+  color:var(--fg3);margin-top:.3rem;}
+
+/* ── Pull quote ──────────────────────────────────────────────── */
+.pull{font-family:'Cormorant',serif;font-size:clamp(1.1rem,2.2vw,1.65rem);
+  font-weight:300;font-style:italic;color:rgba(244,240,235,.72);
+  border-left:3px solid rgba(196,154,31,.35);padding-left:1.2rem;
+  margin:1.6rem 0;max-width:680px;line-height:1.35;}
+
+/* ── Table ───────────────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.77rem;}
+thead th{font-family:'JetBrains Mono',monospace;font-size:.56rem;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(196,154,31,.65);
+  border-bottom:1px solid var(--border);padding:.55rem .75rem;text-align:left;white-space:nowrap;}
+tbody td{border-bottom:1px solid rgba(255,255,255,.04);padding:.62rem .75rem;
+  color:var(--fg2);vertical-align:top;}
+tbody tr:hover td{background:rgba(255,255,255,.02);}
+.td-hi{color:var(--fg);font-weight:500;}
+
+/* ── Divider ─────────────────────────────────────────────────── */
+.div-line{height:1px;background:linear-gradient(90deg,transparent,rgba(196,154,31,.18),transparent);margin:2.5rem 0;}
+
+footer{text-align:center;padding:1.8rem 2rem 2.2rem;
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;
+  letter-spacing:.1em;color:var(--fg3);border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Hardy House · Next Steps</div>
+  <div class="nav-links">
+    <a href="#findings">Findings</a>
+    <a href="#technical">Technical</a>
+    <a href="#tree">Sacred Tree</a>
+    <a href="#entertainment">Entertainment</a>
+    <a href="#risks">Risks</a>
+    <a href="#plan">Build Plan</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eye">Research Report · April 2026</div>
+  <h1>Next steps for the<br><em>Hardy House App</em></h1>
+  <p>Technical feasibility research covering the Tree of Life, Sri Yantra, L-system fractal trees, phyllotaxis, force-directed agent graphs, and the unified app shell — with verified implementation paths for each.</p>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════════
+  0. EXECUTIVE SUMMARY
+══════════════════════════════════════════════════════ -->
+<div class="section" id="findings">
+  <div class="sec-num">00</div>
+  <h2 class="sec-h">Executive findings</h2>
+  <p class="sec-lead">Every proposed next step is technically feasible using only the tools already present (Three.js, Canvas 2D, vanilla JS). No additional npm dependencies are required for any Phase 1–3 deliverable. The only high-risk item is the Sri Yantra geometry — its construction is an under-determined algebraic system that requires pre-computed verified coordinates rather than runtime construction. Verified coordinate sets exist and are publishable under open licenses.</p>
+
+  <div class="grid-3">
+    <div class="card gold">
+      <h4>Feasibility summary</h4>
+      <ul>
+        <li>App shell + hash routing — trivial</li>
+        <li>Element Oracle quiz — straightforward</li>
+        <li>Tree of Life interactive — straightforward</li>
+        <li>PAOAL Torus animation — straightforward</li>
+        <li>L-system fractal tree — well-understood</li>
+        <li>Phyllotaxis slider — simple formula</li>
+        <li>Agent force graph — use custom spring solver or CDN lib</li>
+        <li>Sri Yantra — feasible with pre-computed coords</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <h4>Key research outputs</h4>
+      <ul>
+        <li>Tree of Life overlays exactly on Flower of Life intersection points</li>
+        <li>Sri Yantra verified coords available (Gérard Huet, 2002)</li>
+        <li>L-system golden angle (137.5°) produces phyllotaxis instantly</li>
+        <li><code>3d-force-graph</code> by vasturiano uses Three.js natively — CDN-available</li>
+        <li>Phyllotaxis formula: <code>θ=n×137.5°, r=c√n</code></li>
+        <li>Tree of Life Middle Pillar IS the ContextForge coordination chain</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <h4>Recommended immediate next steps</h4>
+      <ul>
+        <li><strong>1.</strong> Build the app shell (1 session)</li>
+        <li><strong>2.</strong> Element Oracle + guided journey (1 session)</li>
+        <li><strong>3.</strong> Tree of Life interactive (1 session)</li>
+        <li><strong>4.</strong> PAOAL Torus + Phyllotaxis slider (1 session)</li>
+        <li><strong>5.</strong> Fractal tree L-system builder (1 session)</li>
+        <li><strong>6.</strong> Agent graph (1 session)</li>
+        <li><strong>7.</strong> Sri Yantra (1–2 sessions)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ══════════════════════════════════════════════════
+  1. TECHNICAL FINDINGS
+══════════════════════════════════════════════════════ -->
+<div class="section" id="technical">
+  <div class="sec-num">01</div>
+  <h2 class="sec-h">Technical research findings</h2>
+  <p class="sec-lead">Per-feature technical analysis with exact implementation paths, formulas, and library recommendations.</p>
+
+  <!-- App shell -->
+  <div class="card gold" style="margin-bottom:1rem;">
+    <h4>App Shell — Hash routing, shared state, single entry point</h4>
+    <h3>Pattern: single HTML + <code>hashchange</code> event</h3>
+    <p>No framework or build step needed. The shell loads once; each section is a <code>&lt;div id="section-name"&gt;</code> toggled via <code>display</code>. Three.js loads once globally. All existing HTML files become inlined sections or dynamically-fetched partials. The <code>hashchange</code> event handles navigation; <code>localStorage</code> persists element affinity and journey progress.</p>
+    <pre>// Core routing pattern
+window.addEventListener('hashchange', () => {
+  const id = location.hash.slice(1) || 'home';
+  document.querySelectorAll('.section').forEach(s => s.hidden = s.id !== id);
+  initSection(id);   // lazy-init Three.js scenes only when needed
+});
+// Persist element assignment
+localStorage.setItem('hh-element', 'Water');
+// CSS variable switching for element accent colour
+document.documentElement.style.setProperty('--accent', '#20A8C8');</pre>
+    <span class="verdict v-easy">Effort: 0.5 session · No new dependencies</span>
+  </div>
+
+  <!-- Oracle -->
+  <div class="card purple" style="margin-bottom:1rem;">
+    <h4>Element Oracle — 5 questions → Platonic solid assignment</h4>
+    <h3>Pattern: weighted scoring across 5 binary axes</h3>
+    <p>Each question targets one axis: Initiate vs Complete, Structure vs Improvise, Motion vs Stillness, Detail vs Vision, Alone vs Collective. Each answer increments a score for one element. Highest score wins. Tie-breaking uses a sixth question. On reveal: the assigned solid spins up in 3D (already built), the CSS accent variable changes, and the assignment is stored in <code>localStorage</code>. The accent persists across all sections on every subsequent visit.</p>
+    <pre>const ELEMENT_MAP = {
+  fire:  { shape:'tetra', hex:'#C49A1F', acc:'rgba(196,154,31,.9)' },
+  earth: { shape:'cube',  hex:'#2D8050', acc:'rgba(45,128,80,.9)'  },
+  air:   { shape:'octa',  hex:'#3B5FC8', acc:'rgba(59,95,200,.9)'  },
+  water: { shape:'icosa', hex:'#20A8C8', acc:'rgba(32,168,200,.9)' },
+  aether:{ shape:'dodeca',hex:'#9B7BE0', acc:'rgba(155,123,224,.9)'},
+};</pre>
+    <span class="verdict v-easy">Effort: 0.5 session · No new dependencies</span>
+  </div>
+
+  <!-- Phyllotaxis -->
+  <div class="card blue" style="margin-bottom:1rem;">
+    <h4>Phyllotaxis Slider — Fibonacci spirals and golden angle</h4>
+    <h3>Formula: <code>θ = n × 137.5°</code>, <code>r = c√n</code></h3>
+    <p>The golden angle (137.5076…° = 360°/φ²) is the only divergence angle that produces a fully packed non-overlapping spiral. At exactly 137.5° the result looks like a sunflower. A deviation of 0.1° in either direction produces visible straight-arm spokes instead — this contrast is the "wow moment". The slider runs from 1° to 180°. Fibonacci numbers on the scale (2, 3, 5, 8, 13, 21, 34, 55, 89) get tick marks mapped to GCMT team sizes.</p>
+    <pre>function drawPhyllotaxis(angle_deg, N=500) {
+  const ga = angle_deg * Math.PI / 180;
+  ctx.clearRect(0,0,W,H);
+  for (let n = 0; n < N; n++) {
+    const theta = n * ga;
+    const r = SCALE * Math.sqrt(n);
+    const x = cx + r * Math.cos(theta);
+    const y = cy + r * Math.sin(theta);
+    ctx.beginPath();
+    ctx.arc(x, y, DOT_R, 0, Math.PI*2);
+    ctx.fillStyle = seedColor(n);  // colour by Fibonacci ring
+    ctx.fill();
+  }
+}</pre>
+    <dl class="kv">
+      <dt>Key insight</dt><dd>At 137.5°: sunflower. At 137.6°: faint spokes appear. At 138°: clear 5-arm star. This is the most dramatic single-slider demo possible.</dd>
+      <dt>GCMT mapping</dt><dd>Fibonacci numbers on the N axis light up the team shape: 5 seeds = Pentagon, 8 = Cube ring, 13 = Icosahedron, 21 = Dodecahedron.</dd>
+    </dl>
+    <span class="verdict v-easy">Effort: 0.5 session · Canvas 2D only</span>
+  </div>
+
+  <!-- L-system fractal tree -->
+  <div class="card green" style="margin-bottom:1rem;">
+    <h4>L-System Fractal Tree — Lindenmayer system with turtle graphics</h4>
+    <h3>Stack-based turtle: <code>[</code> push, <code>]</code> pop, <code>+</code>/<code>-</code> rotate, <code>F</code> draw</h3>
+    <p>The L-system is a string-rewriting formalism. Starting axiom: <code>F</code>. Production rule: <code>F → F[+F]F[-F]F</code>. After 5 iterations, the string encodes thousands of branch instructions. A turtle graphics interpreter walks the string, drawing lines and rotating. Branching is implemented via <code>ctx.save()</code>/<code>ctx.restore()</code>. The golden angle (137.5°) as the branching angle produces the most natural-looking trees. The φ-mode toggle sets the child branch length to <code>parent/φ</code> at each level — produces true Fibonacci proportions.</p>
+    <pre>function drawTree(ctx, length, angle, depth) {
+  if (depth === 0) return;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, -length);
+  ctx.stroke();
+  ctx.translate(0, -length);
+  // Right branch
+  ctx.save(); ctx.rotate(angle);
+  drawTree(ctx, length / PHI, angle, depth - 1);
+  ctx.restore();
+  // Left branch
+  ctx.save(); ctx.rotate(-angle);
+  drawTree(ctx, length / PHI, angle, depth - 1);
+  ctx.restore();
+}</pre>
+    <dl class="kv">
+      <dt>Sliders</dt><dd>Branching angle (15°–90°), depth (2–9), length ratio (0.5–0.8), φ-mode toggle, randomness ±N°</dd>
+      <dt>Golden angle mode</dt><dd>Set angle to 137.5° → phyllotaxis on a tree. The branches fan into sunflower-like spirals instead of a symmetric tree.</dd>
+      <dt>ContextForge mapping</dt><dd>Depth = hierarchy level. Trunk = strategic objective. Branches = epics. Leaves = tasks. φ-mode = all sub-work is scaled by the golden ratio from its parent.</dd>
+    </dl>
+    <span class="verdict v-easy">Effort: 0.5–1 session · Canvas 2D only</span>
+  </div>
+
+  <!-- Agent force graph -->
+  <div class="card blue" style="margin-bottom:1rem;">
+    <h4>ContextForge Agent Graph — Force-directed live workflow simulation</h4>
+    <h3>Option A: custom spring solver (lightweight) · Option B: vasturiano's <code>3d-force-graph</code> (CDN)</h3>
+    <p><strong>Option A (recommended):</strong> A minimal custom Verlet spring solver runs in ~50 lines. 6 nodes (apex + 5 Pentagon agents), 10–15 edges. Each tick: apply repulsion (inverse square), apply spring forces along edges, dampen velocity, update positions. Renders as Three.js spheres + lines. No extra library. At equilibrium the graph self-organises toward the Dodecahedron vertex projection — this is the demonstration.</p>
+    <p style="margin-top:.5rem;"><strong>Option B:</strong> <code>vasturiano/3d-force-graph</code> (CDN: unpkg.com) wraps Three.js + d3-force-3d. Accepts JSON <code>{nodes, links}</code>. Supports DAG mode (top-down hierarchy). Directional arrows on edges. Click callbacks. This is production-grade with 5k+ stars and active maintenance. The cost is ~250KB extra from CDN.</p>
+    <pre>// Custom spring solver — core loop (~50 lines total)
+nodes.forEach(a => {
+  nodes.forEach(b => {
+    if (a===b) return;
+    const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+    const d = Math.sqrt(dx*dx+dy*dy+dz*dz) || 0.001;
+    const f = REPULSE / (d*d);
+    a.vx -= f*dx/d;  a.vy -= f*dy/d;  a.vz -= f*dz/d;
+  });
+});
+edges.forEach(({a,b,rest}) => {
+  const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z;
+  const d = Math.sqrt(dx*dx+dy*dy+dz*dz);
+  const f = SPRING * (d - rest);
+  a.vx += f*dx/d;  // pull toward rest length
+  b.vx -= f*dx/d;
+});</pre>
+    <dl class="kv">
+      <dt>Baton pulse animation</dt><dd>When a handoff occurs, a particle travels along the edge from source to target over 1.5s, coloured by the handoff type.</dd>
+      <dt>Self-organisation result</dt><dd>With 5 Pentagon agents at equal strength and one apex node, equilibrium produces a pentagonal ring with the apex centred above — the Dodecahedron's cap projection. No hard-coding required.</dd>
+    </dl>
+    <span class="verdict v-med">Effort: 1 session · Custom solver: no deps · vasturiano: CDN</span>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ══════════════════════════════════════════════════
+  2. TREE OF LIFE
+══════════════════════════════════════════════════════ -->
+<div class="section" id="tree">
+  <div class="sec-num">02</div>
+  <h2 class="sec-h">Sacred Tree of Life — detailed research</h2>
+  <p class="sec-lead">The Kabbalistic Tree of Life overlays directly on the Flower of Life — its 10 Sephiroth positions align with FOL intersection points. This is not coincidental: both encode the same underlying hexagonal grid. The mapping to ContextForge is structural, not metaphorical.</p>
+
+  <div class="pull">"The Tree of Life can be overlaid on the Flower of Life, showing that its positions line up with intersection points in that famous sacred geometry pattern — its proportions are inherently harmonious." — Pardesco</div>
+
+  <div class="grid-2" style="margin-bottom:1rem;">
+    <div class="card gold">
+      <h4>Node positions (normalised to unit circle)</h4>
+      <p>The 10 Sephiroth have exact positions on a 3-pillar layout. Pillar spacing = 1 unit. Vertical spacing follows a non-uniform pattern (Kether higher, Malkuth lower). These are hardcoded constants — no algorithmic construction needed.</p>
+      <pre style="font-size:.68rem;">const SEPHIROTH = [
+  {id:'kether',   x: 0,    y: 1.0,  label:'Crown'},
+  {id:'chokmah',  x: 1,    y: 0.75, label:'Wisdom'},
+  {id:'binah',    x:-1,    y: 0.75, label:'Understanding'},
+  {id:'chesed',   x: 1,    y: 0.35, label:'Mercy'},
+  {id:'geburah',  x:-1,    y: 0.35, label:'Severity'},
+  {id:'tiphareth',x: 0,    y: 0.05, label:'Beauty'},
+  {id:'netzach',  x: 1,    y:-0.3,  label:'Victory'},
+  {id:'hod',      x:-1,    y:-0.3,  label:'Splendour'},
+  {id:'yesod',    x: 0,    y:-0.6,  label:'Foundation'},
+  {id:'malkuth',  x: 0,    y:-1.0,  label:'Kingdom'},
+];</pre>
+    </div>
+    <div class="card gold">
+      <h4>22 paths and ContextForge mapping</h4>
+      <p>The 22 paths connect every pair of Sephiroth. In the ContextForge mapping, paths are baton handoff types. The 3 pillar structure maps exactly:</p>
+      <ul>
+        <li><strong>Middle Pillar</strong> (Kether→Tiphareth→Yesod→Malkuth) = Apex Agent coordination chain: strategic vision → synthesis → memory (UCL) → delivery</li>
+        <li><strong>Pillar of Mercy</strong> (right, Chokmah→Chesed→Netzach) = Expansion agents: insight, scale, creative output</li>
+        <li><strong>Pillar of Severity</strong> (left, Binah→Geburah→Hod) = Constraint agents: structure, enforcement, analysis</li>
+        <li><strong>Tiphareth</strong> (centre, connects all) = The integration node: the QSE Quantum Sync Engine</li>
+        <li><strong>Yesod</strong> (foundation) = UCL Universal Context Law: the memory and context store</li>
+        <li><strong>Malkuth</strong> (kingdom) = Execution layer: actual endpoint delivery</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h4>Four Worlds overlay — optional depth layer</h4>
+    <p>The Kabbalistic tradition divides the Tree into 4 vertical worlds: Atziluth (Kether only = strategic), Beriah (Chokmah/Binah = architectural), Yetzirah (middle 6 = operational), Assiah (Malkuth = physical delivery). These map exactly to the four ContextForge engagement phases: Strategy → Architecture → Operations → Delivery. A toggle button overlays coloured zones showing which Sephiroth belong to which world.</p>
+  </div>
+
+  <!-- Sri Yantra -->
+  <div class="sec-num" style="margin-top:2rem;">02b</div>
+  <h2 class="sec-h">Sri Yantra — geometry research</h2>
+  <div class="sec-lead">The Sri Yantra is mathematically the most complex pattern in the set. Research confirms it is an under-determined system — there are infinitely many valid configurations. The "Classical" Sri Yantra is defined by a specific set of verified real-number coordinates. The only correct implementation path is pre-computed coordinates, not runtime construction.</div>
+
+  <div class="grid-2">
+    <div class="card red">
+      <h4>Why it's hard</h4>
+      <h3>Under-determined Euclidean problem</h3>
+      <p>Nine interlocking triangles (4 upward, 5 downward) must satisfy three simultaneous constraints: <strong>Concurrency</strong> (all triple-intersection points must be exact points, not polygons), <strong>Concentricity</strong> (inner circle concentric with outer), and an <strong>equilateral inner triangle</strong>. Previous computer implementations all failed the concurrency constraint, producing small polygons at intersections instead of points.</p>
+      <p style="margin-top:.5rem;">The correct solution (Gérard Huet, <em>Theoretical Computer Science</em> 281, 2002) encodes the Sri Yantra as a system of line-line intersection equations and solves for the 9 key y-coordinates numerically.</p>
+      <span class="verdict v-hard">Effort: 1–2 sessions · Pre-computed coords required</span>
+    </div>
+    <div class="card red">
+      <h4>Implementation path</h4>
+      <h3>Use the TeXample verified coordinate set</h3>
+      <p>A verified TikZ implementation (texample.net, 2025) provides pixel-accurate coordinates derived from Huet's equations, with correct superposition at all intersection points. The approach:</p>
+      <ul>
+        <li>Translate the verified coordinate set to Canvas 2D (scale + y-invert)</li>
+        <li>Draw 9 triangles sequentially with staggered animation (35ms per triangle, matching the Metatron edge-reveal pattern)</li>
+        <li>Outer rings: 3 concentric circles + 2 lotus petal rings (8 and 16 petals)</li>
+        <li>Square outer frame (Bhupura) with 4 gates</li>
+        <li>ContextForge overlay toggle: colour each triangle by its PAOAL phase</li>
+      </ul>
+      <dl class="kv">
+        <dt>Key coord</dt><dd>Center at (0,0), outer circle r=1. Inner triangle vertices at known offsets from Huet's solution.</dd>
+        <dt>Animation</dt><dd>Construct from innermost triangle outward — the reverse of how it's traditionally drawn but more visually dramatic.</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ══════════════════════════════════════════════════
+  3. ENTERTAINMENT MECHANICS — REVISED
+══════════════════════════════════════════════════════ -->
+<div class="section" id="entertainment">
+  <div class="sec-num">03</div>
+  <h2 class="sec-h">Entertainment mechanics — implementation detail</h2>
+  <p class="sec-lead">Research confirms all six entertainment mechanics are buildable. Two require clarification on exact implementation path.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Mechanic</th>
+          <th>Core technique</th>
+          <th>Key formula / pattern</th>
+          <th>Duration</th>
+          <th>Effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-hi">A — Breathing Circle</td>
+          <td>Canvas 2D, click-to-expand, event-driven circle growth</td>
+          <td><code>r += (target - r) * 0.08</code> each frame — eased expansion</td>
+          <td>45–90 sec</td>
+          <td><span class="verdict v-easy">0.5 sess</span></td>
+        </tr>
+        <tr>
+          <td class="td-hi">B — Element Oracle</td>
+          <td>Scoring array, 5 binary questions, CSS var switch on result</td>
+          <td>Weighted axes → highest score wins element</td>
+          <td>2–3 min</td>
+          <td><span class="verdict v-easy">0.5 sess</span></td>
+        </tr>
+        <tr>
+          <td class="td-hi">C — Phi Hunt</td>
+          <td>SVG overlaid on images, hover to reveal golden ratio guides</td>
+          <td>φ spiral: <code>r=base·φ^(2θ/π)</code> drawn as SVG path</td>
+          <td>3–5 min</td>
+          <td><span class="verdict v-med">1 sess</span></td>
+        </tr>
+        <tr>
+          <td class="td-hi">D — Build the Solid</td>
+          <td>Three.js face dragging + snap detection</td>
+          <td>Face centroid distance < threshold → snap + lock</td>
+          <td>5–10 min</td>
+          <td><span class="verdict v-hard">2 sess</span></td>
+        </tr>
+        <tr>
+          <td class="td-hi">E — Edge Reveal</td>
+          <td>Existing decomposition.html pattern — setDrawRange at 35ms/edge</td>
+          <td>Already built and working — just needs UI wrapper</td>
+          <td>1–2 min</td>
+          <td><span class="verdict v-easy">0.25 sess</span></td>
+        </tr>
+        <tr>
+          <td class="td-hi">F — Fibonacci Slider</td>
+          <td>Canvas 2D phyllotaxis, input range slider, Fibonacci markers</td>
+          <td><code>θ=n×angle_deg×π/180, r=c√n</code></td>
+          <td>Open-ended</td>
+          <td><span class="verdict v-easy">0.5 sess</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pull" style="margin-top:1.5rem;">"Try adjusting the [phyllotaxis] angle by just 0.1° or 0.2° from 137.5°, and you'll see the spiral pattern change dramatically, forming straight-arm spirals. This shows that the golden angle is the optimal arrangement angle." — Elysiatools</div>
+
+  <div class="card purple" style="margin-top:1rem;">
+    <h4>Mechanic D — Build the Solid: revised scope</h4>
+    <h3>Simplification: assemble edges, not face tiles</h3>
+    <p>Dragging face tiles in 3D with snap detection is genuinely hard (2 sessions). A simpler and equally satisfying version: display the solid's vertices as glowing spheres and give the visitor a set of unconnected edge "sticks" to drag between the correct vertex pairs. When the correct edge snaps into place, it locks gold and the count updates. Completing all edges triggers the face-fill animation. This reduces to point-to-point distance checks rather than polygon-in-3D-space detection — tractable in 1 session.</p>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ══════════════════════════════════════════════════
+  4. RISKS AND UNKNOWNS
+══════════════════════════════════════════════════════ -->
+<div class="section" id="risks">
+  <div class="sec-num">04</div>
+  <h2 class="sec-h">Risks and unknowns</h2>
+
+  <div class="grid-3">
+    <div class="card red">
+      <h4>Risk 1 — Sri Yantra coordinate accuracy</h4>
+      <h3>Medium risk</h3>
+      <p>The TeXample coordinates are from a TikZ implementation, not a Canvas 2D one. Translating between coordinate systems (scale, y-invert, origin shift) must be done precisely or the concurrency constraint fails (intersections become polygons). Mitigation: validate each triangle-pair intersection visually before moving on. Expected: 1 re-iteration.</p>
+    </div>
+    <div class="card red">
+      <h4>Risk 2 — Agent graph self-organisation</h4>
+      <h3>Low risk</h3>
+      <p>The claim that a 6-node force graph with Pentagon symmetry self-organises to the Dodecahedron cap projection assumes equal repulsion and equal spring constants. In practice, slight asymmetries in initial positions or floating-point accumulation may produce a rotated or distorted Pentagon. Mitigation: apply angular constraints (each Pentagon agent constrained to 72° increments) in addition to spring forces.</p>
+    </div>
+    <div class="card red">
+      <h4>Risk 3 — Single-file app size</h4>
+      <h3>Low risk</h3>
+      <p>Inlining all 7 existing HTML files plus all new sections into a single file produces a 400–600KB HTML file. This is fine for a local file but may feel slow on first cloud/CDN load. Mitigation: hash-based lazy-loading (fetch section HTML on first visit to that section, cache in memory). All Three.js scenes remain lazy-init regardless.</p>
+    </div>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ══════════════════════════════════════════════════
+  5. PRIORITISED BUILD PLAN
+══════════════════════════════════════════════════════ -->
+<div class="section" id="plan">
+  <div class="sec-num">05</div>
+  <h2 class="sec-h">Prioritised build plan</h2>
+  <p class="sec-lead">Seven sessions to a complete app. Each session produces a shippable increment — nothing is blocked waiting for something else. Total estimated effort: 7–9 focused build sessions.</p>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 1 — Foundation</div>
+      <div class="tl-title">App shell + Element Oracle</div>
+      <div class="tl-body">Build <code>hardy-house-app.html</code>: hash router, section toggling, shared Three.js + GSAP load, sticky nav with section icons. Inline the 5 existing desktop HTML files as sections. Add the Element Oracle: 5 binary questions, scoring logic, solid reveal animation, CSS variable switching for element accent colour, <code>localStorage</code> persistence. Add the Breathing Circle as the default home state — click anywhere on void to begin.</div>
+      <div class="tl-effort">Output: hardy-house-app.html · Effort: ~4h</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 2 — Journey</div>
+      <div class="tl-title">6-step guided onboarding path</div>
+      <div class="tl-body">Build the journey section: 6 sequential steps with canvas transitions. Steps 3–5 reuse the decomposition.html FOL/Seed/Fruit scenes. Step 6 launches the Element Oracle. Add first-visit detection (if <code>localStorage</code> has no element assignment, route to journey on load; otherwise route to last section). Add journey progress indicator (dots below the canvas).</div>
+      <div class="tl-effort">Output: #journey section in app · Effort: ~4h</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 3 — Sacred Tree</div>
+      <div class="tl-title">Tree of Life interactive + PAOAL Torus</div>
+      <div class="tl-body">Build the Tree of Life: 10 Sephiroth as clickable Three.js spheres, 22 path edges, 3 pillar colouring, click-to-expand ContextForge mapping panel, Four Worlds overlay toggle. Build the PAOAL Torus: animated particle tracing the torus surface, 5 phase zones coloured by element, dual-loop mode (sprint inside engagement). Both in the <code>#tree</code> section with a tab switcher.</div>
+      <div class="tl-effort">Output: #tree section (2 demos) · Effort: ~5h</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 4 — Growth</div>
+      <div class="tl-title">Phyllotaxis slider + L-system fractal tree</div>
+      <div class="tl-body">Build the Fibonacci/Phyllotaxis slider: Canvas 2D, angle range 1–180°, golden angle marker at 137.5°, Fibonacci N-markers mapped to GCMT team sizes, real-time redraw on slider drag. Build the fractal tree L-system: recursive Canvas 2D, sliders for angle/depth/ratio, φ-mode toggle (sets child/parent = 1/φ), golden-angle mode producing phyllotaxis tree. Both in a new <code>#grow</code> section.</div>
+      <div class="tl-effort">Output: #grow section (2 demos) · Effort: ~4h</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 5 — ContextForge Graph</div>
+      <div class="tl-title">Agent force-directed graph + baton animation</div>
+      <div class="tl-body">Build the ContextForge agent graph using a custom Verlet spring solver (no extra library). 6 nodes: 1 apex + 5 Pentagon agents. Edges coloured by handoff type. Baton pulse animation (particle travels edge on simulated workflow event). Toolbar with pre-set workflow scenarios (daily standup, sprint kickoff, AAR loop, incident). Watch the graph self-organise into the Dodecahedron vertex projection. Add to <code>#tree</code> section as a third tab.</div>
+      <div class="tl-effort">Output: agent graph in #tree section · Effort: ~5h</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 6 — Entertainment</div>
+      <div class="tl-title">Phi Hunt + Edge Reveal polish</div>
+      <div class="tl-body">Build Phi Hunt: 6 natural image panels with SVG golden-ratio overlay revealed on hover. Counter ticks up. At 6/6: Golden Spiral unfurls in 3D. Polish the Edge Reveal mechanic (already in decomposition.html) with a narration strip that names each edge as it draws. Add element-affinity personalisation throughout: if your element is Water, the Icosahedron is pre-selected in the geometry explorer and all accent colours are teal.</div>
+      <div class="tl-effort">Output: #entertainment section, full personalisation · Effort: ~4h</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase">Session 7 — Sri Yantra</div>
+      <div class="tl-title">Sri Yantra interactive construction</div>
+      <div class="tl-body">Translate the Huet/TeXample verified coordinates to Canvas 2D. Draw 9 triangles from innermost outward with 35ms stagger (same pattern as Metatron edge reveal). Add outer lotus rings (8 and 16 petals) and the Bhupura square frame. Add ContextForge mapping overlay toggle: colour each of the 9 triangle layers by PAOAL phase or engagement phase. Add to <code>#geometry</code> section alongside the existing Platonic solids and extended forms.</div>
+      <div class="tl-effort">Output: Sri Yantra in #geometry section · Effort: ~6h</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ══════════════════════════════════════════════════
+  6. DECISION MATRIX
+══════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">06</div>
+  <h2 class="sec-h">Decision matrix — what to build first</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Deliverable</th><th>Client impact</th><th>Entertainment value</th><th>Tech risk</th><th>Effort</th><th>Recommendation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-hi">App shell + routing</td><td>High — unifies everything</td><td>Low</td><td>None</td><td>0.5 sess</td><td>⭐ Build first</td></tr>
+        <tr><td class="td-hi">Element Oracle</td><td>High — personalises entire app</td><td>High</td><td>None</td><td>0.5 sess</td><td>⭐ Build first</td></tr>
+        <tr><td class="td-hi">Guided journey</td><td>High — onboarding for new visitors</td><td>High</td><td>None</td><td>1 sess</td><td>⭐ Build first</td></tr>
+        <tr><td class="td-hi">Tree of Life</td><td>Very high — ContextForge proof</td><td>High</td><td>Low</td><td>1 sess</td><td>⭐ Session 3</td></tr>
+        <tr><td class="td-hi">PAOAL Torus</td><td>High — workflow cycle demo</td><td>Medium</td><td>None</td><td>0.5 sess</td><td>⭐ Session 3</td></tr>
+        <tr><td class="td-hi">Phyllotaxis slider</td><td>Medium — Fibonacci proof</td><td>Very high</td><td>None</td><td>0.5 sess</td><td>⭐ Session 4</td></tr>
+        <tr><td class="td-hi">Fractal tree</td><td>Medium — workflow hierarchy</td><td>High</td><td>Low</td><td>0.5 sess</td><td>⭐ Session 4</td></tr>
+        <tr><td class="td-hi">Agent graph</td><td>Very high — ContextForge live demo</td><td>Very high</td><td>Low</td><td>1 sess</td><td>⭐ Session 5</td></tr>
+        <tr><td class="td-hi">Phi Hunt</td><td>Low — brand storytelling only</td><td>High</td><td>None</td><td>1 sess</td><td>Session 6</td></tr>
+        <tr><td class="td-hi">Sri Yantra</td><td>Medium — depth/uniqueness</td><td>Very high</td><td>Medium</td><td>1.5 sess</td><td>Session 7</td></tr>
+        <tr><td class="td-hi">Build the Solid game</td><td>Low — entertainment only</td><td>High</td><td>Medium</td><td>1 sess</td><td>Post-MVP</td></tr>
+        <tr><td class="td-hi">PWA manifest</td><td>High — install to phone</td><td>None</td><td>None</td><td>0.25 sess</td><td>Session 1</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+
+<footer>
+  Hardy House Consulting · Next Steps Research · April 2026<br>
+  <span style="color:rgba(196,154,31,.35);">Sources: Pardesco (Tree of Life / FOL overlay) · TeXample (Sri Yantra verified coords, Gérard Huet 2002) · gpfault.net / thecodingtrain.com (L-system) · Elysiatools (phyllotaxis / golden angle) · vasturiano/3d-force-graph (agent graph library) · Nature.com (golden angle biophysics, Okabe 2015)</span>
+</footer>
+
+</body>
+</html>

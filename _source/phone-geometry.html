@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07040F">
+<title>Sacred Geometry · Hardy House</title>
+<style>
+/* Fonts loaded from Google CDN when online; fallback to system serif/mono offline */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:#07040F;}
+body{font-family:'Lora',Georgia,serif;color:#F4F0EB;touch-action:none;user-select:none;}
+
+canvas{position:fixed;inset:0;width:100%!important;height:100%!important;display:block;}
+
+/* ── top bar ───────────────────────────────────────────────── */
+#topBar{
+  position:fixed;top:0;left:0;right:0;
+  padding:max(env(safe-area-inset-top),14px) 20px 12px;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  background:linear-gradient(180deg,rgba(7,4,15,.88) 0%,transparent 100%);
+  pointer-events:none;z-index:10;
+}
+#shapeName{
+  font-family:'Cormorant',serif;font-size:clamp(1.8rem,8vw,2.8rem);
+  font-weight:300;letter-spacing:-.01em;color:#fff;line-height:1;
+  text-shadow:0 2px 24px rgba(7,4,15,.8);
+  transition:opacity .35s,transform .35s;
+}
+#shapeName.fade{opacity:0;transform:translateY(-6px);}
+#shapeMeta{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(196,154,31,.75);margin-top:.3rem;
+  transition:opacity .35s;
+}
+#shapeMeta.fade{opacity:0;}
+#hh{
+  font-family:'Cormorant',serif;font-size:.85rem;font-weight:600;
+  color:rgba(196,154,31,.55);letter-spacing:.08em;text-align:right;line-height:1.2;
+}
+
+/* ── nav arrows ────────────────────────────────────────────── */
+.nav-btn{
+  position:fixed;top:50%;transform:translateY(-50%);
+  width:44px;height:80px;display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;color:rgba(196,154,31,.45);cursor:pointer;z-index:10;
+  background:transparent;border:none;transition:color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-btn:active{color:#C49A1F;}
+#btnPrev{left:4px;}
+#btnNext{right:4px;}
+
+/* ── dot indicators ─────────────────────────────────────────── */
+#dots{
+  position:fixed;bottom:calc(env(safe-area-inset-bottom) + 148px);
+  left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:10;
+  pointer-events:none;
+}
+.dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(196,154,31,.25);transition:all .3s;
+}
+.dot.on{background:#C49A1F;transform:scale(1.4);}
+
+/* ── pull-up bottom sheet ───────────────────────────────────── */
+#sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:20;
+  background:rgba(14,8,32,.97);
+  border-top:1px solid rgba(196,154,31,.18);
+  border-radius:18px 18px 0 0;
+  transform:translateY(calc(100% - 52px));
+  transition:transform .4s cubic-bezier(.22,1,.36,1);
+  will-change:transform;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#sheet.open{transform:translateY(0);}
+#sheetHandle{
+  height:52px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+#sheetHandle::before{
+  content:'';width:36px;height:4px;border-radius:2px;
+  background:rgba(196,154,31,.35);
+}
+#sheetBody{padding:4px 24px 28px;max-height:55vh;overflow-y:auto;}
+#sheetTitle{
+  font-family:'Cormorant',serif;font-size:1.5rem;font-weight:600;
+  color:#F4F0EB;margin-bottom:.15rem;
+}
+#sheetEl{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;
+  text-transform:uppercase;color:#C49A1F;margin-bottom:.9rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.el-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+#sheetMeaning{
+  font-size:.82rem;color:rgba(244,240,235,.65);line-height:1.7;
+  margin-bottom:.75rem;
+}
+#sheetCF{
+  font-size:.75rem;color:rgba(155,123,224,.75);line-height:1.65;
+  border-left:2px solid rgba(155,123,224,.3);padding-left:.7rem;
+  font-style:italic;
+}
+#sheetCFLabel{
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(155,123,224,.5);margin-bottom:.3rem;
+}
+
+/* ── swipe hint ─────────────────────────────────────────────── */
+#hint{
+  position:fixed;bottom:calc(env(safe-area-inset-bottom) + 60px);
+  left:0;right:0;text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(244,240,235,.18);
+  pointer-events:none;z-index:10;
+  animation:hintFade 6s ease-in-out forwards;
+}
+@keyframes hintFade{0%,60%{opacity:1;}100%{opacity:0;}}
+
+/* ── element color classes ──────────────────────────────────── */
+.el-fire    {background:#C49A1F;}
+.el-earth   {background:#2D8050;}
+.el-air     {background:#3B5FC8;}
+.el-water   {background:#20A8C8;}
+.el-aether  {background:#9B7BE0;}
+.el-spirit  {background:#C49A1F;}
+.el-cycle   {background:#C49A1F;}
+.el-infinity{background:#1E3FAA;}
+.el-equil   {background:#60B080;}
+.el-unity   {background:#C4B0E8;}
+.el-phi     {background:#C49A1F;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="topBar">
+  <div>
+    <div id="shapeName">Dodecahedron</div>
+    <div id="shapeMeta">Aether · 5 of 11</div>
+  </div>
+  <div id="hh">Hardy House<br><span style="font-size:.62rem;font-weight:300;font-style:italic;color:rgba(196,154,31,.35);">Consulting</span></div>
+</div>
+
+<button class="nav-btn" id="btnPrev">‹</button>
+<button class="nav-btn" id="btnNext">›</button>
+<div id="dots"></div>
+<div id="hint">drag to orbit · swipe to change</div>
+
+<div id="sheet">
+  <div id="sheetHandle"></div>
+  <div id="sheetBody">
+    <div id="sheetTitle">Dodecahedron</div>
+    <div id="sheetEl"><span class="el-dot el-aether"></span>Aether · 12 pentagonal faces · 20 vertices · 30 edges</div>
+    <div id="sheetMeaning"></div>
+    <div id="sheetCFLabel">ContextForge</div>
+    <div id="sheetCF"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>if(!window.THREE)document.write('<scr'+'ipt src="three.r128.min.js"><\/scr'+'ipt>')</script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════
+   SHAPE CATALOGUE
+══════════════════════════════════════════════════════════════ */
+const PHI = (1 + Math.sqrt(5)) / 2;
+
+const SHAPES = [
+  {
+    id:'dodeca', name:'Dodecahedron', element:'Aether', elClass:'aether',
+    color:'#9B7BE0', col:0x9B7BE0, faceCol:0x4A2D90, faceOp:.10,
+    geo:()=>new THREE.DodecahedronGeometry(1.65,0),
+    stats:'12 pentagonal faces · 20 vertices · 30 edges',
+    meaning:'Plato assigned the dodecahedron to the cosmos itself — 12 pentagonal faces, each saturated with the golden ratio φ. It is the most complex Platonic solid, the form that closes the universe.',
+    cf:'The COF-13D framework: 12 primary dimensional axes (the pentagonal faces) plus the Void centre. Every team topology and agent configuration is a subset of this single structure.',
+  },
+  {
+    id:'icosa', name:'Icosahedron', element:'Water', elClass:'water',
+    color:'#20A8C8', col:0x20A8C8, faceCol:0x0D7A94, faceOp:.09,
+    geo:()=>new THREE.IcosahedronGeometry(1.72,0),
+    stats:'20 triangular faces · 12 vertices · 30 edges',
+    meaning:'The most spherical Platonic solid. Water takes the shape of its container, and the icosahedron — with its 20 faces — approaches the sphere more closely than any other solid. Every vertex connects to exactly 5 others.',
+    cf:'The GCMT icosahedral team topology: 12 agents at equal distance from the apex. 5-valent vertices encode maximum resilience — no single node is critical to system function.',
+  },
+  {
+    id:'octa', name:'Octahedron', element:'Air', elClass:'air',
+    color:'#3B5FC8', col:0x3B5FC8, faceCol:0x1E3FAA, faceOp:.10,
+    geo:()=>new THREE.OctahedronGeometry(1.75,0),
+    stats:'8 triangular faces · 6 vertices · 12 edges',
+    meaning:'The dual of the cube — same 6 vertices, different connections. The octahedron rotates freely when held by two opposite vertices. Plato assigned it to air for its quality of lightness and free motion through all orientations.',
+    cf:'The QSE Quantum Sync Engine: balanced exchange between all polarities simultaneously. 8 faces = 8 primary communication channels in a healthy multi-agent system.',
+  },
+  {
+    id:'cube', name:'Hexahedron', element:'Earth', elClass:'earth',
+    color:'#2D8050', col:0x2D8050, faceCol:0x1B5E35, faceOp:.10,
+    geo:()=>new THREE.BoxGeometry(2.2,2.2,2.2),
+    stats:'6 square faces · 8 vertices · 12 edges',
+    meaning:'The only Platonic solid that tiles 3D space perfectly without gaps. This property of stable, gap-free packing is why Plato assigned it to earth — the solid of foundation, infrastructure, and material structure.',
+    cf:'The six-agent operational ring: the grounding scaffold of all delivery cycles. The cube\'s tiling property = endpoint management at enterprise scale with no configuration gaps.',
+  },
+  {
+    id:'tetra', name:'Tetrahedron', element:'Fire', elClass:'fire',
+    color:'#C49A1F', col:0xC49A1F, faceCol:0x8C6B10, faceOp:.12,
+    geo:()=>new THREE.TetrahedronGeometry(1.9,0),
+    stats:'4 triangular faces · 4 vertices · 6 edges',
+    meaning:'The simplest 3D form — minimum faces, minimum vertices, maximum point concentration. Plato assigned it to fire because the tetrahedron is the sharpest, most penetrating of all solids. Pure directed energy.',
+    cf:'The Fire Agent: the initiator in every ContextForge pipeline. Minimum viable structure, maximum directed force. A triangle team (3+1) is a Tetrahedron.',
+  },
+  {
+    id:'merkaba', name:'Star Tetrahedron', element:'Spirit', elClass:'spirit',
+    color:'#C49A1F', col:0xC49A1F, col2:0x9B7BE0,
+    stats:'Two interlocked tetrahedra · Star of David · Counter-rotating fields',
+    meaning:'Two tetrahedra — one pointing up (spirit-bound), one pointing down (earth-bound) — interpenetrate to form the Merkaba. The Star of David hexagram appears in every face-on projection. This is the geometry of consciousness bridging dimensions.',
+    cf:'Dual-stack architecture: top-down orchestration from the apex agent interpenetrates bottom-up emergence from the Pentagon ring. The Plan phase (upward) in dynamic equilibrium with the Observe phase (downward).',
+    special:'merkaba',
+  },
+  {
+    id:'torus', name:'Torus', element:'Cycle', elClass:'cycle',
+    color:'#C49A1F', col:0xC49A1F, faceCol:0x8C6B10, faceOp:.07,
+    geo:()=>new THREE.TorusGeometry(1.35,0.46,14,60),
+    stats:'0 vertices · Continuous surface · Genus 1 topology',
+    meaning:'The torus is the fundamental shape of flow, recursion, and self-reference. A donut is a sphere with a hole — but that hole is not absence, it is the axis of transformation. Every torus contains a point that is equidistant from all points on the surface.',
+    cf:'The PAOAL cycle: Plan → Act → Observe → Assess → Learn. No beginning, no end. The hole at the centre is the Void — the space of pure potential from which the next iteration is born.',
+  },
+  {
+    id:'knot', name:'Torus Knot', element:'Infinity', elClass:'infinity',
+    color:'#1E3FAA', col:0x1E3FAA, faceCol:0x162E99, faceOp:.07,
+    geo:()=>new THREE.TorusKnotGeometry(1.1,0.32,90,14),
+    stats:'(3,2) knot · Self-intersecting path · Topological invariant',
+    meaning:'A path that winds three times around the torus in one direction while winding twice in the other. It returns to its origin without ever crossing itself in 3D space. The torus knot is mathematical infinity made visible — a path with no exits.',
+    cf:'The ContextForge multi-agent feedback loop: each task winds through planning, execution, validation, and learning before returning to its origin — changed but continuous.',
+  },
+  {
+    id:'sphere', name:'Sphere', element:'Unity', elClass:'unity',
+    color:'#C4B0E8', col:0xC4B0E8, faceOp:.05,
+    geo:()=>new THREE.SphereGeometry(1.75,22,22), wf:true,
+    stats:'∞ symmetry axes · Perfect isotropy · Limit of all Platonic solids',
+    meaning:'The sphere is the limit approached by every Platonic solid as faces are added without bound. It is the only form with perfect symmetry in all directions simultaneously — every point on the surface is indistinguishable from every other.',
+    cf:'The Universal Context Law: complete, bounded, self-referential. Every agent\'s context field is a sphere of awareness — the UCL defines its boundary conditions and ensures continuity across handoffs.',
+  },
+  {
+    id:'cubocta', name:'Cuboctahedron', element:'Equilibrium', elClass:'equil',
+    color:'#60B080', col:0x60B080, faceCol:0x2D6040, faceOp:.10,
+    stats:'14 faces (8 triangles + 6 squares) · 12 vertices · 24 edges',
+    meaning:'Fuller called this the "Vector Equilibrium" — the only form in which the distance from the centre to any vertex equals the edge length. Every vertex is exactly equidistant from the centre. It is the geometry of perfect balance.',
+    cf:'The 12-node balanced team: every member at equal relational distance from the coordinating core. Used in ContextForge for the stable equilibrium phase of a delivery cycle when all forces are in balance.',
+    special:'cubocta',
+  },
+  {
+    id:'golden', name:'Golden Spiral', element:'φ (Phi)', elClass:'phi',
+    color:'#C49A1F', col:0xC49A1F,
+    stats:`r(θ) = base · φ^(2θ/π) · φ = ${PHI.toFixed(6)}`,
+    meaning:`The golden spiral expands by a factor of φ (${PHI.toFixed(4)}...) with each quarter turn. It appears in nautilus shells, galaxy arms, sunflower seeds, and the proportions of the human body. It is the growth pattern woven into the fabric of existence.`,
+    cf:'The φ⁵ Cosmic Consciousness principle: self-similar growth from individual task to universal system. Every ContextForge level — task, sprint, epic, program, enterprise — is φ times the one below it.',
+    special:'golden',
+  },
+];
+
+/* ══════════════════════════════════════════════════════════════
+   THREE.JS SCENE
+══════════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({preserveDrawingBuffer:true,
+  canvas, antialias:true, alpha:false, powerPreference:'high-performance'
+});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x07040F, 1);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x07040F, 0.065);
+
+const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 50);
+camera.position.set(0, 0, 5.5);
+
+// Lights
+scene.add(new THREE.AmbientLight(0x1A0D3D, 0.7));
+const pl1 = new THREE.PointLight(0xC49A1F, 1.2, 18); pl1.position.set(2.5, 2, 4); scene.add(pl1);
+const pl2 = new THREE.PointLight(0x1E3FAA, 0.5, 12); pl2.position.set(-2, -1, 2); scene.add(pl2);
+
+// Particle field background
+const ptGeo = new THREE.BufferGeometry();
+const ptCount = 280;
+const ptPos = new Float32Array(ptCount * 3);
+for (let i = 0; i < ptCount; i++) {
+  const θ = Math.random() * Math.PI * 2, φ = Math.acos(2*Math.random()-1);
+  const r = 4.5 + Math.random() * 5;
+  ptPos[i*3]   = r * Math.sin(φ) * Math.cos(θ);
+  ptPos[i*3+1] = r * Math.sin(φ) * Math.sin(θ);
+  ptPos[i*3+2] = r * Math.cos(φ);
+}
+ptGeo.setAttribute('position', new THREE.Float32BufferAttribute(ptPos, 3));
+const ptMat = new THREE.PointsMaterial({ color:0xC49A1F, size:0.035, transparent:true, opacity:0.35, blending:THREE.AdditiveBlending });
+scene.add(new THREE.Points(ptGeo, ptMat));
+
+// Main shape group
+const shapeGroup = new THREE.Group();
+scene.add(shapeGroup);
+
+function buildGlow(geo, hex) {
+  const col = parseInt(hex.replace('#',''), 16);
+  const g = new THREE.Group();
+  [[1, 0.88], [1.035, 0.18]].forEach(([s, op]) => {
+    const m = new THREE.LineBasicMaterial({ color:col, transparent:true, opacity:op, blending:THREE.AdditiveBlending, depthWrite:false });
+    const ls = new THREE.LineSegments(new THREE.EdgesGeometry(geo), m);
+    ls.scale.setScalar(s);
+    g.add(ls);
+  });
+  return g;
+}
+
+function buildFace(geo, hex, op) {
+  const col = parseInt(hex.replace('#',''), 16);
+  return new THREE.Mesh(geo, new THREE.MeshPhongMaterial({ color:col, emissive:col, emissiveIntensity:0.08, transparent:true, opacity:op, side:THREE.DoubleSide }));
+}
+
+function buildMerkaba() {
+  const g = new THREE.Group();
+  const tGeo = new THREE.TetrahedronGeometry(1.85, 0);
+  [[0, '#C49A1F', 0xC49A1F], [Math.PI, '#9B7BE0', 0x9B7BE0]].forEach(([ry, hex, col], i) => {
+    const sub = new THREE.Group();
+    sub.add(buildGlow(tGeo, hex));
+    sub.add(new THREE.Mesh(tGeo, new THREE.MeshPhongMaterial({ color:col, emissive:col, emissiveIntensity:0.1, transparent:true, opacity:0.10, side:THREE.DoubleSide })));
+    sub.rotation.x = i * Math.PI;
+    g.add(sub);
+  });
+  return g;
+}
+
+function buildCubocta() {
+  // Manually define cuboctahedron vertices + faces
+  const geo = new THREE.BufferGeometry();
+  const r = 1.68;
+  const verts = [
+    [r,r,0],[r,-r,0],[-r,r,0],[-r,-r,0],
+    [r,0,r],[r,0,-r],[-r,0,r],[-r,0,-r],
+    [0,r,r],[0,r,-r],[0,-r,r],[0,-r,-r],
+  ].map(([x,y,z]) => new THREE.Vector3(x,y,z));
+  // Build triangles using convex hull approach via IcosahedronGeometry substitute
+  const positions = [];
+  // Use hand-picked triangular and square faces
+  const tris = [
+    [0,8,4],[0,5,9],[1,4,10],[1,11,5],
+    [2,6,8],[2,9,7],[3,10,6],[3,7,11],
+    [0,4,1],[0,1,5],[2,3,6],[2,7,3],
+    [8,2,0],[9,0,2],[4,8,10],[10,8,6],
+    [5,1,11],[11,1,10],[6,3,10],[3,11,7],
+    [9,2,7],[5,11,9],[4,1,10],[4,10,3],
+  ];
+  tris.forEach(([a,b,c]) => {
+    positions.push(...verts[a].toArray(), ...verts[b].toArray(), ...verts[c].toArray());
+  });
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.computeVertexNormals();
+  return new THREE.Group()
+    .add(buildGlow(geo, '#60B080'))
+    .add(new THREE.Mesh(geo, new THREE.MeshPhongMaterial({ color:0x60B080, emissive:0x2D6040, emissiveIntensity:0.1, transparent:true, opacity:0.10, side:THREE.DoubleSide })));
+}
+
+function buildGoldenSpiral() {
+  const N = 320; const turns = 4.5;
+  const pts = [];
+  for (let i = 0; i < N; i++) {
+    const t = i / (N-1);
+    const θ = t * turns * Math.PI * 2;
+    const r = 0.08 * Math.pow(PHI, 2*θ/Math.PI);
+    pts.push(new THREE.Vector3(r*Math.cos(θ), r*Math.sin(θ), r * 0.18 * Math.sin(θ*0.5)));
+  }
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  const gr = new THREE.Group();
+  [[1,0.9],[1.02,0.2]].forEach(([s,op]) => {
+    const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color:0xC49A1F, transparent:true, opacity:op, blending:THREE.AdditiveBlending }));
+    l.scale.setScalar(s);
+    gr.add(l);
+  });
+  return gr;
+}
+
+let currentMesh = null;
+let currentIdx = 0;
+let autoRotate = true;
+
+function buildShape(shape) {
+  const g = new THREE.Group();
+  if (shape.special === 'merkaba') { g.add(buildMerkaba()); }
+  else if (shape.special === 'cubocta') { g.add(buildCubocta()); }
+  else if (shape.special === 'golden') { g.add(buildGoldenSpiral()); }
+  else {
+    const geo = shape.geo();
+    g.add(buildGlow(geo, shape.color));
+    if (!shape.wf) {
+      const fh = shape.faceCol ? '#'+shape.faceCol.toString(16).padStart(6,'0') : shape.color;
+      g.add(buildFace(geo, fh, shape.faceOp || 0.10));
+    } else {
+      g.add(new THREE.LineSegments(new THREE.WireframeGeometry(shape.geo()), new THREE.LineBasicMaterial({ color:shape.col, transparent:true, opacity:0.15, blending:THREE.AdditiveBlending })));
+    }
+  }
+  return g;
+}
+
+function setShape(idx, direction = 1) {
+  const shape = SHAPES[idx];
+  const nameEl = document.getElementById('shapeName');
+  const metaEl = document.getElementById('shapeMeta');
+  nameEl.classList.add('fade');
+  metaEl.classList.add('fade');
+
+  // Animate old shape out
+  if (currentMesh) {
+    const old = currentMesh;
+    const startTime = performance.now();
+    function fadeOut(t) {
+      const p = Math.min((t - startTime) / 280, 1);
+      old.scale.setScalar(Math.max(0, 1 - p * p));
+      old.children.forEach(c => c.traverse && c.traverse(n => {
+        if (n.material) { n.material.opacity *= (1 - p * 0.04); }
+      }));
+      if (p < 1) requestAnimationFrame(fadeOut);
+      else scene.remove(old);
+    }
+    requestAnimationFrame(fadeOut);
+  }
+
+  currentMesh = buildShape(shape);
+  currentMesh.scale.setScalar(0.01);
+  scene.add(currentMesh);
+
+  const s0 = performance.now();
+  function scaleIn(t) {
+    const p = Math.min((t - s0) / 380, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    currentMesh.scale.setScalar(ease);
+    if (p < 1) requestAnimationFrame(scaleIn);
+  }
+  requestAnimationFrame(scaleIn);
+
+  // Update UI
+  setTimeout(() => {
+    nameEl.textContent = shape.name;
+    metaEl.textContent = `${shape.element} · ${idx+1} of ${SHAPES.length}`;
+    nameEl.classList.remove('fade');
+    metaEl.classList.remove('fade');
+    updateSheet(shape);
+  }, 180);
+
+  // Update dots
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === idx));
+
+  // Update point light colour
+  const col = shape.col || 0xC49A1F;
+  pl1.color.setHex(col);
+}
+
+function updateSheet(shape) {
+  document.getElementById('sheetTitle').textContent = shape.name;
+  const elDot = document.querySelector('#sheetEl .el-dot');
+  elDot.className = `el-dot el-${shape.elClass}`;
+  document.getElementById('sheetEl').innerHTML =
+    `<span class="el-dot el-${shape.elClass}"></span>${shape.element} · ${shape.stats}`;
+  document.getElementById('sheetMeaning').textContent = shape.meaning;
+  document.getElementById('sheetCF').textContent = shape.cf;
+}
+
+// Build dots
+const dotsEl = document.getElementById('dots');
+SHAPES.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' on' : '');
+  dotsEl.appendChild(d);
+});
+
+// Init first shape
+setShape(0);
+updateSheet(SHAPES[0]);
+
+/* ══════════════════════════════════════════════════════════════
+   TOUCH / GESTURE HANDLING
+══════════════════════════════════════════════════════════════ */
+let th = 0, ph = Math.PI * 0.42, r = 5.5;
+let vTh = 0, vPh = 0;
+let touchStart = null, lastTouch = null;
+let tVx = 0, tVy = 0;
+let sheetOpen = false;
+let sheetTouchStart = null;
+let sheetTouchStartTransform = 0;
+
+// Shape navigation
+function nextShape() {
+  currentIdx = (currentIdx + 1) % SHAPES.length;
+  setShape(currentIdx, 1);
+}
+function prevShape() {
+  currentIdx = (currentIdx - 1 + SHAPES.length) % SHAPES.length;
+  setShape(currentIdx, -1);
+}
+
+document.getElementById('btnNext').addEventListener('click', nextShape);
+document.getElementById('btnPrev').addEventListener('click', prevShape);
+
+// Canvas touch — orbit or swipe to change shape
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  touchStart = lastTouch = { x:t.clientX, y:t.clientY, t:Date.now() };
+  tVx = tVy = 0;
+  autoRotate = false;
+}, { passive:false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!lastTouch) return;
+  const t = e.touches[0];
+  const dx = t.clientX - lastTouch.x;
+  const dy = t.clientY - lastTouch.y;
+  const dt = Math.max(1, Date.now() - lastTouch.t);
+  tVx = dx / dt; tVy = dy / dt;
+  th -= dx * 0.008;
+  ph = Math.max(0.08, Math.min(Math.PI - 0.08, ph - dy * 0.008));
+  lastTouch = { x:t.clientX, y:t.clientY, t:Date.now() };
+}, { passive:false });
+
+canvas.addEventListener('touchend', e => {
+  if (!touchStart || !lastTouch) return;
+  const totalX = lastTouch.x - touchStart.x;
+  const totalY = lastTouch.y - touchStart.y;
+  const speed = Math.sqrt(tVx**2 + tVy**2);
+  // Swipe threshold: fast + mostly horizontal + minimum distance
+  if (speed > 0.45 && Math.abs(totalX) > Math.abs(totalY) * 1.3 && Math.abs(totalX) > 28) {
+    if (totalX < 0) nextShape();
+    else prevShape();
+  }
+  setTimeout(() => { autoRotate = true; }, 2200);
+});
+
+// Sheet touch
+const sheet = document.getElementById('sheet');
+const sheetHandle = document.getElementById('sheetHandle');
+
+sheetHandle.addEventListener('click', () => {
+  sheetOpen = !sheetOpen;
+  sheet.classList.toggle('open', sheetOpen);
+});
+
+sheet.addEventListener('touchstart', e => {
+  sheetTouchStart = { y:e.touches[0].clientY, open:sheetOpen };
+}, { passive:true });
+
+sheet.addEventListener('touchmove', e => {
+  if (!sheetTouchStart) return;
+  const dy = e.touches[0].clientY - sheetTouchStart.y;
+  const h = sheet.offsetHeight - 52;
+  if (!sheetOpen && dy < -20) {
+    sheetOpen = true;
+    sheet.style.transition = 'none';
+    sheet.classList.add('open');
+  } else if (sheetOpen && dy > 40) {
+    sheetOpen = false;
+    sheet.style.transition = '';
+    sheet.classList.remove('open');
+    sheetTouchStart = null;
+  }
+}, { passive:true });
+
+sheet.addEventListener('touchend', () => {
+  sheet.style.transition = '';
+  sheetTouchStart = null;
+});
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER LOOP
+══════════════════════════════════════════════════════════════ */
+let W = 0, H = 0;
+function resize() {
+  W = window.innerWidth; H = window.innerHeight;
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+let lastTime = 0;
+function tick(now) {
+  requestAnimationFrame(tick);
+  const dt = Math.min(now - lastTime, 50) / 1000;
+  lastTime = now;
+
+  if (autoRotate) {
+    th += 0.006;
+    ph += Math.sin(now * 0.0003) * 0.0005;
+    ph = Math.max(0.3, Math.min(Math.PI - 0.3, ph));
+  }
+
+  vTh *= 0.88; vPh *= 0.88;
+  th += vTh; ph = Math.max(0.08, Math.min(Math.PI-0.08, ph+vPh));
+
+  const sp = Math.sin(ph), cp = Math.cos(ph), st = Math.sin(th), ct = Math.cos(th);
+  camera.position.set(r*sp*ct, r*cp, r*sp*st);
+  camera.lookAt(0, 0, 0);
+
+  if (currentMesh) currentMesh.rotation.y += 0.003;
+
+  ptMat.opacity = 0.25 + Math.sin(now * 0.0004) * 0.08;
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
