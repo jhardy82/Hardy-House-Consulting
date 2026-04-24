@@ -10,7 +10,7 @@
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/",
     "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/api/",
     "test:e2e": "playwright test",
-    "lint": "eslint public/js/ src/ routes/"
+    "lint": "eslint public/js/ routes/ tasks/"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
