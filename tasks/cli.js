@@ -48,14 +48,18 @@ function getCurrentSession() {
   return readFileSync(SESSION_FILE, 'utf8').trim();
 }
 
+const VALUE_FLAGS = new Set(['priority', 'section', 'desc', 'note', 'status']);
+
 function parseFlags(args) {
   const flags = {};
   for (let i = 0; i < args.length; i++) {
-    if (args[i].startsWith('--') && i + 1 < args.length) {
-      flags[args[i].slice(2)] = args[i + 1];
+    if (!args[i].startsWith('--')) continue;
+    const key = args[i].slice(2);
+    if (VALUE_FLAGS.has(key) && i + 1 < args.length && !args[i + 1].startsWith('--')) {
+      flags[key] = args[i + 1];
       i++;
-    } else if (args[i].startsWith('--')) {
-      flags[args[i].slice(2)] = true;
+    } else {
+      flags[key] = true;
     }
   }
   return flags;
