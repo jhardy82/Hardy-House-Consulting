@@ -9,7 +9,13 @@ const __dirname    = dirname(fileURLToPath(import.meta.url));
 const DB_PATH      = join(__dirname, 'tasks.db');
 const SESSION_FILE = join(__dirname, '.current-session');
 
-const db = new Database(DB_PATH);
+let db;
+try {
+  db = new Database(DB_PATH);
+} catch (err) {
+  console.error('tasks: failed to open database:', err.message);
+  process.exit(1);
+}
 
 db.prepare(`CREATE TABLE IF NOT EXISTS sessions (
   id          TEXT PRIMARY KEY,
@@ -115,7 +121,7 @@ function cmdContext() {
   const doneThis   = session
     ? allTasks.filter(t => t.status === 'done' && t.session_completed === session.id)
     : [];
-  const openAll    = session ? allTasks.filter(t => t.status === 'open') : allTasks.filter(t => t.status === 'open');
+  const openAll    = allTasks.filter(t => t.status === 'open');
 
   const lastSession = db.prepare(
     "SELECT * FROM sessions WHERE status = 'complete' ORDER BY ended_at DESC LIMIT 1"
@@ -258,6 +264,10 @@ if (cmd === 'session') {
   if (!title) { console.error('Usage: add "title" [--priority 1-4] [--section name] [--desc "text"]'); process.exit(1); }
   const flags    = parseFlags(rest.slice(1));
   const rawPri   = flags.priority !== undefined ? parseInt(flags.priority, 10) : 3;
+  if (flags.priority !== undefined && !Number.isInteger(Number(flags.priority))) {
+    console.error('Error: --priority must be an integer (1-4)');
+    process.exit(1);
+  }
   if (isNaN(rawPri) || rawPri < 1 || rawPri > 4) {
     console.error('Error: --priority must be 1 (critical), 2 (high), 3 (medium), or 4 (low)');
     process.exit(1);

@@ -290,7 +290,7 @@ router.get('/', (_req, res) => {
     const all     = db.prepare("SELECT * FROM tasks ORDER BY priority ASC, updated_at DESC").all();
     res.send(buildHtml(session, groupTasks(all)));
   } catch (err) {
-    res.status(500).send(`<pre>Error: ${err.message}</pre>`);
+    res.status(500).send(`<pre>Error: ${escapeHtml(err.message)}</pre>`);
   }
 });
 
