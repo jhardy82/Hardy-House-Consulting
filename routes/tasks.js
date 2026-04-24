@@ -23,7 +23,7 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-const PRIORITY_LABEL  = { 1: 'CRITICAL', 2: 'HIGH', 3: 'MEDIUM', 4: 'LOW' };
+const PRIORITY_LABEL  = { 1: 'CRITICAL', 2: 'HIGH', 3: 'MED', 4: 'LOW' };
 const PRIORITY_COLOUR = {
   1: '#C49A1F',
   2: '#E05C20',

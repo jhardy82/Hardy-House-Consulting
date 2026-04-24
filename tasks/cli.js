@@ -51,7 +51,7 @@ function getCurrentSession() {
 function parseFlags(args) {
   const flags = {};
   for (let i = 0; i < args.length; i++) {
-    if (args[i].startsWith('--') && i + 1 < args.length && !args[i + 1].startsWith('--')) {
+    if (args[i].startsWith('--') && i + 1 < args.length) {
       flags[args[i].slice(2)] = args[i + 1];
       i++;
     } else if (args[i].startsWith('--')) {
