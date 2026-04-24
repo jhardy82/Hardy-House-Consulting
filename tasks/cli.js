@@ -139,7 +139,7 @@ function cmdContext() {
   }
 
   function taskLine(t) {
-    const label = `[${PRIORITY_LABEL[t.priority] || t.priority}]`;
+    const label = `[${PRIORITY_LABEL[t.priority] ?? t.priority}]`;
     const title = t.title.length > 44 ? t.title.slice(0, 43) + '…' : t.title;
     return boxLine(`  #${String(t.id).padEnd(3)} ${label.padEnd(10)} ${title}`);
   }
@@ -227,10 +227,18 @@ if (cmd === 'session') {
     console.log(`Focus: ${description}`);
 
   } else if (sub === 'end') {
-    const sessionId = getCurrentSession();
-    if (!sessionId) { console.error('No active session.'); process.exit(1); }
-    db.prepare("UPDATE sessions SET status = 'complete', ended_at = datetime('now') WHERE id = ?").run(sessionId);
-    unlinkSync(SESSION_FILE);
+    let sessionId = getCurrentSession();
+    if (!sessionId) {
+      const active = db.prepare("SELECT id FROM sessions WHERE status = 'active' ORDER BY started_at DESC LIMIT 1").get();
+      if (!active) { console.error('No active session.'); process.exit(1); }
+      sessionId = active.id;
+      console.log(`Note: session file missing — ending session from DB: ${sessionId}`);
+    }
+    const result = db.prepare("UPDATE sessions SET status = 'complete', ended_at = datetime('now') WHERE id = ?").run(sessionId);
+    if (result.changes === 0) {
+      console.error(`Warning: session "${sessionId}" not found in DB — file cleared but DB unchanged.`);
+    }
+    if (existsSync(SESSION_FILE)) unlinkSync(SESSION_FILE);
     console.log(`Session ended: ${sessionId}`);
 
   } else {
@@ -244,8 +252,13 @@ if (cmd === 'session') {
 } else if (cmd === 'add') {
   const title = rest[0];
   if (!title) { console.error('Usage: add "title" [--priority 1-4] [--section name] [--desc "text"]'); process.exit(1); }
-  const flags       = parseFlags(rest.slice(1));
-  const priority    = flags.priority ? parseInt(flags.priority, 10) : 3;
+  const flags    = parseFlags(rest.slice(1));
+  const rawPri   = flags.priority !== undefined ? parseInt(flags.priority, 10) : 3;
+  if (isNaN(rawPri) || rawPri < 1 || rawPri > 4) {
+    console.error('Error: --priority must be 1 (critical), 2 (high), 3 (medium), or 4 (low)');
+    process.exit(1);
+  }
+  const priority    = rawPri;
   const section     = flags.section || null;
   const description = flags.desc || null;
   const sessionId   = getCurrentSession();
@@ -265,13 +278,24 @@ if (cmd === 'session') {
   console.log(`✓ Task #${id} in progress`);
 
 } else if (cmd === 'done') {
-  const id = parseInt(rest[0], 10);
-  if (!id) { console.error('Usage: done <id> [--note "text"]'); process.exit(1); }
+  const rawId = rest[0];
+  if (!rawId || !Number.isInteger(Number(rawId))) {
+    console.error('Usage: done <id> [--note "text"]  (id must be a whole number)');
+    process.exit(1);
+  }
+  const id   = parseInt(rawId, 10);
   const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
   if (!task) { console.error(`Task #${id} not found.`); process.exit(1); }
   const flags     = parseFlags(rest.slice(1));
   const sessionId = getCurrentSession();
-  let notes       = task.notes || null;
+  if (sessionId) {
+    const sessionExists = db.prepare("SELECT id FROM sessions WHERE id = ?").get(sessionId);
+    if (!sessionExists) {
+      console.error(`Error: Session "${sessionId}" not found in DB. Run "session end" then "session start" to reset.`);
+      process.exit(1);
+    }
+  }
+  let notes = task.notes || null;
   if (flags.note) notes = appendNote(notes, flags.note);
 
   db.prepare(
@@ -313,7 +337,7 @@ if (cmd === 'session') {
   console.log(`${'ID'.padEnd(6)} ${'PRI'.padEnd(5)} ${'STATUS'.padEnd(12)} ${'SECTION'.padEnd(12)} TITLE`);
   console.log('─'.repeat(70));
   tasks.forEach(t => {
-    const pri  = PRIORITY_LABEL[t.priority] || t.priority;
+    const pri  = String(PRIORITY_LABEL[t.priority] ?? t.priority);
     const sec  = (t.section || '').padEnd(12).slice(0, 12);
     const stat = t.status.padEnd(12).slice(0, 12);
     const titl = t.title.length > 30 ? t.title.slice(0, 29) + '…' : t.title;

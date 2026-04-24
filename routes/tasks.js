@@ -4,9 +4,24 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const db = new Database(join(__dirname, '../tasks/tasks.db'));
+
+let db;
+try {
+  db = new Database(join(__dirname, '../tasks/tasks.db'));
+} catch (err) {
+  console.error('tasks: failed to open tasks.db:', err.message);
+  process.exit(1);
+}
 
 const router = Router();
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 const PRIORITY_LABEL  = { 1: 'CRITICAL', 2: 'HIGH', 3: 'MEDIUM', 4: 'LOW' };
 const PRIORITY_COLOUR = {
@@ -27,9 +42,10 @@ function groupTasks(all) {
 
 function taskCard(t) {
   const colour = PRIORITY_COLOUR[t.priority] || PRIORITY_COLOUR[4];
-  const label  = PRIORITY_LABEL[t.priority]  || String(t.priority);
-  const title  = t.title.length > 60 ? t.title.slice(0, 59) + '…' : t.title;
-  const sec    = t.section ? `<span class="tag">${t.section}</span>` : '';
+  const label  = escapeHtml(PRIORITY_LABEL[t.priority] ?? t.priority);
+  const raw    = t.title.length > 60 ? t.title.slice(0, 59) + '…' : t.title;
+  const title  = escapeHtml(raw);
+  const sec    = t.section ? `<span class="tag">${escapeHtml(t.section)}</span>` : '';
   const ts     = (t.updated_at || t.created_at || '').slice(0, 16);
   return `
     <div class="card" style="border-left:3px solid ${colour}">
@@ -58,7 +74,7 @@ function buildHtml(session, grouped) {
   const sessionBanner = session
     ? `<div class="session-banner active">
          <span class="dot"></span>
-         <strong>${session.id}</strong> — ${session.description}
+         <strong>${escapeHtml(session.id)}</strong> — ${escapeHtml(session.description)}
        </div>`
     : `<div class="session-banner inactive">
          No active session — run: <code>node tasks/cli.js session start "description"</code>
