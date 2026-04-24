@@ -54,7 +54,7 @@ function getCurrentSession() {
   return readFileSync(SESSION_FILE, 'utf8').trim();
 }
 
-import { VALUE_FLAGS, parseFlags } from './flags.js';
+import { parseFlags } from './flags.js';
 
 function appendNote(existing, text) {
   const timestamp = new Date().toISOString().slice(0, 16);
