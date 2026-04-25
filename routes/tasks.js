@@ -8,6 +8,27 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 let db;
 try {
   db = new Database(join(__dirname, '../tasks/tasks.db'));
+  // Ensure tables exist — idempotent, safe to run on every boot
+  db.prepare(`CREATE TABLE IF NOT EXISTS sessions (
+    id          TEXT PRIMARY KEY,
+    description TEXT NOT NULL,
+    status      TEXT NOT NULL DEFAULT 'active',
+    started_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    ended_at    TEXT
+  )`).run();
+  db.prepare(`CREATE TABLE IF NOT EXISTS tasks (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    title             TEXT NOT NULL,
+    description       TEXT,
+    status            TEXT NOT NULL DEFAULT 'open',
+    priority          INTEGER NOT NULL DEFAULT 3,
+    section           TEXT,
+    session_created   TEXT REFERENCES sessions(id),
+    session_completed TEXT REFERENCES sessions(id),
+    created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at        TEXT NOT NULL DEFAULT (datetime('now')),
+    notes             TEXT
+  )`).run();
 } catch (err) {
   console.error('tasks: failed to open tasks.db:', err.message);
   process.exit(1);
