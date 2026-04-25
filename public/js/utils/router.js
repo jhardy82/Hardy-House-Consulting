@@ -29,7 +29,7 @@ async function navigate() {
     if (el.tagName === 'SECTION') el.hidden = el.dataset.section !== id;
   });
   document.querySelectorAll('.nav-link')
-    .forEach(a => a.classList.toggle('active', a.dataset.section === id));
+    .forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
 
   if (!loaded.has(id) && SECTIONS[id]) {
     try {
