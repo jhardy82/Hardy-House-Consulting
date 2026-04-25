@@ -1,0 +1,251 @@
+/**
+ * presentation.css — Hardy House Consulting presentation section
+ * Migrated from _source/demo-presentation.html
+ * Styles for the Three.js presentation viewer with GSAP animations.
+ */
+
+@import 'tokens.css';
+
+/* ============================================================
+   Section Container & Canvas
+============================================================ */
+
+[data-section="presentation"] {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--hh-void);
+}
+
+[data-section="presentation"] canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: var(--z-base);
+}
+
+/* ============================================================
+   Overlay Content
+============================================================ */
+
+.pres-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-canvas);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--section-pad-y) var(--section-pad-x);
+  gap: var(--space-12);
+}
+
+.pres-content {
+  pointer-events: auto;
+}
+
+.pres-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--accent);
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+}
+
+.pres-title {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  color: var(--hh-fg);
+  margin: 0 0 var(--space-4) 0;
+  line-height: var(--leading-tight);
+  max-width: 60%;
+}
+
+.pres-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  color: var(--hh-fg-2);
+  margin: 0 0 var(--space-4) 0;
+  line-height: var(--leading-normal);
+  max-width: 50%;
+}
+
+.pres-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--hh-fg-2);
+}
+
+.pres-list li {
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-4);
+  position: relative;
+}
+
+.pres-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 0.4em;
+  height: 0.4em;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* ============================================================
+   Controls
+============================================================ */
+
+.pres-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+  gap: var(--space-8);
+}
+
+.pres-dots {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.pres-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--hh-fg-3);
+  cursor: pointer;
+  transition: all var(--dur-base) ease;
+  border: 1px solid transparent;
+}
+
+.pres-dot:hover {
+  background: var(--hh-fg-2);
+  transform: scale(1.2);
+}
+
+.pres-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.pres-nav {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.pres-prev,
+.pres-next {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid var(--border-2);
+  color: var(--hh-fg-2);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  transition: all var(--dur-base) ease;
+}
+
+.pres-prev:hover,
+.pres-next:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+.pres-prev:active,
+.pres-next:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   Responsive
+============================================================ */
+
+@media (max-width: 1050px) {
+  .pres-title {
+    font-size: var(--text-3xl);
+    max-width: 70%;
+  }
+
+  .pres-sub {
+    max-width: 65%;
+  }
+}
+
+@media (max-width: 768px) {
+  [data-section="presentation"] {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .pres-overlay {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .pres-title {
+    font-size: var(--text-2xl);
+    max-width: 90%;
+  }
+
+  .pres-sub {
+    font-size: var(--text-base);
+    max-width: 85%;
+  }
+
+  .pres-list {
+    font-size: var(--text-sm);
+  }
+
+  .pres-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .pres-title {
+    font-size: var(--text-xl);
+    max-width: 100%;
+  }
+
+  .pres-sub {
+    max-width: 100%;
+  }
+
+  .pres-eyebrow {
+    font-size: 0.65rem;
+  }
+
+  .pres-nav {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .pres-prev,
+  .pres-next {
+    width: 100%;
+  }
+}
