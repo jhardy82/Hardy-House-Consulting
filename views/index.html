@@ -10,33 +10,48 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:wght@400;600;700&family=Lora:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 
   <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/presentation.css">
 </head>
 <body>
 
   <nav class="site-nav" aria-label="Primary">
-    <a class="brand" href="#home" data-section="home">Hardy House</a>
+    <a class="brand" href="#home">Hardy House</a>
     <ul class="nav-links">
-      <li><a class="nav-link" href="#home"          data-section="home">Home</a></li>
-      <li><a class="nav-link" href="#oracle"        data-section="oracle">Oracle</a></li>
-      <li><a class="nav-link" href="#geometry"      data-section="geometry">Geometry</a></li>
-      <li><a class="nav-link" href="#decomposition" data-section="decomposition">Decomposition</a></li>
-      <li><a class="nav-link" href="#variants"      data-section="variants">Variants</a></li>
-      <li><a class="nav-link" href="#tree"          data-section="tree">Tree</a></li>
-      <li><a class="nav-link" href="#grow"          data-section="grow">Grow</a></li>
-      <li><a class="nav-link" href="#presentation"  data-section="presentation">Presentation</a></li>
-      <li><a class="nav-link" href="#contact"       data-section="contact">Contact</a></li>
+      <li><a class="nav-link" href="#home">Home</a></li>
+      <li><a class="nav-link" href="#oracle">Oracle</a></li>
+      <li><a class="nav-link" href="#geometry">Geometry</a></li>
+      <li><a class="nav-link" href="#decomposition">Decomposition</a></li>
+      <li><a class="nav-link" href="#variants">Variants</a></li>
+      <li><a class="nav-link" href="#tree">Tree</a></li>
+      <li><a class="nav-link" href="#grow">Grow</a></li>
+      <li><a class="nav-link" href="#presentation">Presentation</a></li>
+      <li><a class="nav-link" href="#contact">Contact</a></li>
     </ul>
   </nav>
 
   <main class="sections">
     <section data-section="home"          hidden><div class="section-inner"><h1>Home</h1><p class="muted">Placeholder — content lands in Session 2.</p></div></section>
-    <section data-section="oracle"        hidden><div class="section-inner"><h1>Element Oracle</h1><p class="muted">Placeholder.</p></div></section>
+    <section data-section="oracle" hidden>
+      <div class="oracle-wrap">
+        <div class="oracle-prog" data-oracle="progress"></div>
+        <div class="oracle-steps" data-oracle="steps"></div>
+        <div class="oracle-reveal" data-oracle="reveal" style="display:none">
+          <div class="oracle-solid-wrap">
+            <canvas data-oracle="canvas"></canvas>
+          </div>
+          <div class="oracle-element-name" data-oracle="element-name"></div>
+          <div class="oracle-solid-name"   data-oracle="solid-name"></div>
+          <div class="oracle-meaning"      data-oracle="meaning"></div>
+          <button class="btn-primary oracle-cta" onclick="window.location.hash='#geometry'">Explore the Geometry &#x2192;</button>
+        </div>
+      </div>
+    </section>
     <section data-section="geometry"      hidden><div class="section-inner"><h1>Sacred Geometry</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="decomposition" hidden><div class="section-inner"><h1>Decomposition</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="variants"      hidden><div class="section-inner"><h1>Variants</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="tree"          hidden><div class="section-inner"><h1>Tree of Life</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="grow"          hidden><div class="section-inner"><h1>Grow</h1><p class="muted">Placeholder.</p></div></section>
-    <section data-section="presentation"  hidden><div class="section-inner"><h1>Presentation</h1><p class="muted">Placeholder.</p></div></section>
+    <section data-section="presentation"  hidden></section>
     <section data-section="contact"       hidden><div class="section-inner"><h1>Contact</h1><p class="muted">Placeholder.</p></div></section>
   </main>
 
