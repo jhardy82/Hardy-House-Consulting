@@ -6,4 +6,6 @@ test-results/
 *.log
 .DS_Store
 .claude/
+tasks/tasks.db
+tasks/.current-session
 
