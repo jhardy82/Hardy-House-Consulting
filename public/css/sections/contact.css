@@ -116,27 +116,3 @@
   line-height: 1.65;
   white-space: pre-wrap;
 }
-
-#toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(12px);
-  background: rgba(14, 8, 32, 0.92);
-  border: 1px solid rgba(196, 154, 31, 0.35);
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  color: rgba(196, 154, 31, 0.9);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s, transform 0.2s;
-  z-index: 1000;
-}
-
-#toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
