@@ -183,6 +183,159 @@ export function animateConstruction(ctx, cx, cy, scale, onDone) {
   _animTimers.push(setTimeout(() => { if (onDone) onDone(); }, base + 280));
 }
 
+const PAOAL_FILLS = [
+  { color: '#9B7BE0', label: 'Learn (innermost)' },
+  { color: '#1E3FAA', label: 'Assess' },
+  { color: '#1E3FAA', label: 'Assess' },
+  { color: '#20A8C8', label: 'Observe' },
+  { color: '#20A8C8', label: 'Observe' },
+  { color: '#1B5E35', label: 'Act' },
+  { color: '#1B5E35', label: 'Act' },
+  { color: '#C49A1F', label: 'Plan' },
+  { color: '#C49A1F', label: 'Plan (outermost)' },
+];
+
+const ELEMENT_COLORS = {
+  fire:   '#C49A1F',
+  earth:  '#2D8050',
+  air:    '#3B5FC8',
+  water:  '#20A8C8',
+  aether: '#9B7BE0',
+};
+
+function _hexToRgb(hex) {
+  return [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ];
+}
+
+export function paintOverlay(ctx, cx, cy, scale, mode) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const element = document.documentElement.dataset.element || null;
+
+  TRIANGLES.forEach((t, i) => {
+    let hex, opacity;
+    if (mode === 'paoal') {
+      hex     = PAOAL_FILLS[i].color;
+      opacity = 0.35;
+    } else if (element) {
+      hex     = ELEMENT_COLORS[element] || '#C49A1F';
+      opacity = 0.40;
+    } else {
+      hex     = '#C49A1F';
+      opacity = 0.25;
+    }
+    const [r, g, b] = _hexToRgb(hex);
+    const pts = t.verts.map(([x, y]) => tikzToCanvas(x, y, cx, cy, scale));
+    ctx.beginPath();
+    ctx.moveTo(...pts[0]);
+    ctx.lineTo(...pts[1]);
+    ctx.lineTo(...pts[2]);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${r},${g},${b},${opacity})`;
+    ctx.fill();
+  });
+}
+
+function _paintLegend(legend, mode) {
+  while (legend.firstChild) legend.removeChild(legend.firstChild);
+
+  const element = document.documentElement.dataset.element || null;
+
+  let entries;
+  if (mode === 'paoal') {
+    const seen = new Set();
+    entries = PAOAL_FILLS
+      .map((p, i) => ({ label: `T${i + 1}: ${p.label}`, color: p.color }))
+      .filter(e => {
+        if (seen.has(e.label)) return false;
+        seen.add(e.label);
+        return true;
+      });
+  } else if (element) {
+    const name = element.charAt(0).toUpperCase() + element.slice(1);
+    entries = [{ label: name + ' -- your element', color: ELEMENT_COLORS[element] || '#C49A1F' }];
+  } else {
+    entries = [{ label: 'Complete the Oracle to unlock your element.', color: '#C49A1F' }];
+  }
+
+  entries.forEach(({ label, color }) => {
+    const row    = document.createElement('div');
+    row.className = 'yantra-legend-row';
+    const swatch = document.createElement('span');
+    swatch.className          = 'yantra-legend-swatch';
+    swatch.style.background   = color;
+    const text = document.createElement('span');
+    text.textContent = label;
+    row.appendChild(swatch);
+    row.appendChild(text);
+    legend.appendChild(row);
+  });
+}
+
 function _initOverlay(section) {
-  // Implemented in Task 4 -- stub so router can load without errors.
+  const overlayCanvas = section.querySelector('.yantra-overlay');
+  const overlayCtx    = overlayCanvas.getContext('2d');
+  const geo           = section.querySelector('.yantra-geo');
+  const legend        = section.querySelector('[data-yantra="legend"]');
+  const toggle        = section.querySelector('[data-yantra="toggle"]');
+  const replay        = section.querySelector('[data-yantra="replay"]');
+
+  let mode    = 'paoal';
+  let visible = false;
+
+  function repaint() {
+    if (!visible) {
+      overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      legend.hidden = true;
+      return;
+    }
+    const { cx, cy, scale } = _transform(geo);
+    paintOverlay(overlayCtx, cx, cy, scale, mode);
+    _paintLegend(legend, mode);
+    legend.hidden = false;
+  }
+
+  const paoalPill = section.querySelector('[data-yantra="paoal"]');
+  if (paoalPill) paoalPill.classList.add('yantra-pill--active');
+
+  section.querySelectorAll('.yantra-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      mode = pill.dataset.yantra;
+      section.querySelectorAll('.yantra-pill').forEach(p =>
+        p.classList.toggle('yantra-pill--active', p.dataset.yantra === mode)
+      );
+      repaint();
+    });
+  });
+
+  toggle.addEventListener('click', () => {
+    visible = !visible;
+    toggle.textContent = visible ? 'Hide overlay' : 'Show overlay';
+    repaint();
+  });
+
+  replay.addEventListener('click', () => {
+    _constructed = false;
+    visible      = false;
+    toggle.textContent = 'Show overlay';
+    toggle.disabled    = true;
+    const controls = section.querySelector('.yantra-controls');
+    controls.setAttribute('aria-disabled', 'true');
+
+    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    legend.hidden = true;
+
+    const geoCtx = geo.getContext('2d');
+    geoCtx.clearRect(0, 0, geo.width, geo.height);
+
+    const { cx, cy, scale } = _transform(geo);
+    animateConstruction(geoCtx, cx, cy, scale, () => {
+      _constructed = true;
+      controls.removeAttribute('aria-disabled');
+      toggle.disabled = false;
+    });
+  });
 }
