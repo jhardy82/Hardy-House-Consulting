@@ -6,7 +6,7 @@ export default defineConfig({
   globalSetup: './tests/e2e/global-setup.js',
   webServer: {
     command: 'node server.js',
-    url: 'http://localhost:3000/tasks/api',
+    url: 'http://localhost:3000/api/tasks/summary',
     reuseExistingServer: !process.env.CI,
     env: { SESSION_SECRET: process.env.SESSION_SECRET || 'e2e-test-secret' },
   },
