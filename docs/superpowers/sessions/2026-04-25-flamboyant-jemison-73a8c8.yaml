@@ -61,3 +61,34 @@ session:
     All 25/25 E2E tests pass.
     Committed 9e14960: feat(geometry) -- complete geometry section.
     Pushed 9e14960 to origin/claude/flamboyant-jemison-73a8c8.
+    Research fleet (3 parallel Explore agents): audited section quality, test coverage,
+      and architecture/DX. Produced 17-finding plan (4 CRITICAL, 6 HIGH, 4 MEDIUM, 3 LOW).
+    Wave 1 (3 parallel lanes -- critical bug fixes):
+      1A presentation.js: RAF self-cancels via section.hidden check; GSAP guard; 80ms delay.
+      1B dashboard.js: RAF self-cancels via section.hidden; _intervalId cleared on re-init.
+      1C server.js: session secret IIFE throws in prod; 4-param global error handler added;
+        unhandledRejection safety net added.
+      Linter fixed _rafId TypeScript 6133 in presentation.js + dashboard.js (dead code removed).
+      Linter fixed _req/_next underscore prefix in server.js error handler.
+    Committed 9f78a59: fix: Wave 1 critical bug fixes.
+    Wave 2 (3 parallel lanes -- test coverage + CSS architecture):
+      2A geometry-constants.test.js: 23 new unit tests -- PHI, FOL=19, Fruit=13, MET=78,
+        4-layer glow spec, Platonic=5, Extended=6.
+      2B element.test.js: 6 supertest API tests with session persistence.
+      2C CSS extraction: 7 new per-section CSS files (home, contact, decomposition, grow,
+        presentation, tree, variants). injectStyles() removed from home, variants, tree, grow.
+        Inline <style> block removed from decomposition._injectHTML(). 5 <link> tags added
+        to views/index.html.
+    All 49 unit+API tests pass.
+    Committed 8c77fd4: feat: Wave 2 -- tests + CSS architecture.
+    Wave 3 (2 parallel lanes -- E2E depth + architecture polish):
+      3A E2E depth: 4 new tests in sections.spec.js -- geometry mode-pill click (.geo-mpill
+        gains .on), geometry fullscreen open (.sc-btns .sc-btn:nth-child(2) -> #geo-fsOverlay),
+        geometry fullscreen close (#geo-fsClose -> overlay hidden), oracle persistence
+        (5-question flow -> html[data-element] is valid element).
+      3B Architecture: window.THREE guard added to all 9 section init() functions after
+        idempotency check. elementState.js silent catch replaced with console.warn.
+        .eslintrc.json: no-unused-vars/eqeqeq/no-var rules added.
+    All 29/29 E2E tests pass.
+    Committed 6579968: feat: Wave 3 -- E2E depth + architecture polish.
+    Pushed 9f78a59 + 8c77fd4 + 6579968 to origin/claude/flamboyant-jemison-73a8c8.
