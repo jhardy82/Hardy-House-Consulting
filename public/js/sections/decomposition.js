@@ -880,7 +880,6 @@ class Met3DScene {
 
     this.solidGroup  = new THREE.Group();
     this.scene.add(this.solidGroup);
-    this.currentSolid = null;
     this._tet2        = null;
   }
 
