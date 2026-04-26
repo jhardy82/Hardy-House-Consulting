@@ -1149,9 +1149,9 @@ function _initScenes() {
   _startTick();
 
   if (window.gsap) {
-    gsap.from('.dec-eyebrow',    { opacity: 0, y: -8,  duration: 0.7, ease: 'power2.out' });
-    gsap.from('.dec-title',      { opacity: 0, y:  24, duration: 0.9, ease: 'power3.out', delay: 0.1 });
-    gsap.from('.dec-sub',        { opacity: 0, y:  16, duration: 0.8, ease: 'power2.out', delay: 0.3 });
-    gsap.from('.dec-path-strip', { opacity: 0, y:  10, duration: 0.6, delay: 0.6 });
+    gsap.from('[data-section="decomposition"] .dec-eyebrow',    { opacity: 0, y: -8,  duration: 0.7, ease: 'power2.out' });
+    gsap.from('[data-section="decomposition"] .dec-title',      { opacity: 0, y:  24, duration: 0.9, ease: 'power3.out', delay: 0.1 });
+    gsap.from('[data-section="decomposition"] .dec-sub',        { opacity: 0, y:  16, duration: 0.8, ease: 'power2.out', delay: 0.3 });
+    gsap.from('[data-section="decomposition"] .dec-path-strip', { opacity: 0, y:  10, duration: 0.6, delay: 0.6 });
   }
 }
