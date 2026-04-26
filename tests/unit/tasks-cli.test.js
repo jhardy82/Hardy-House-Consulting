@@ -31,3 +31,21 @@ describe('CLI: no-args help', () => {
     expect(r.stdout).toMatch(/Hardy House Task Manager/i);
   });
 });
+
+describe('CLI: exit codes — happy paths and unknown commands', () => {
+  test('exit code 0: list command succeeds', () => {
+    const r = run(['list']);
+    expect(r.status).toBe(0);
+  });
+
+  test('exit code 0: add command succeeds with valid title', () => {
+    const r = run(['add', 'Exit-code regression test task']);
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/added/i);
+  });
+
+  test('exit code 1: unknown command fails with non-zero status', () => {
+    const r = run(['nonexistent-command']);
+    expect(r.status).toBe(1);
+  });
+});

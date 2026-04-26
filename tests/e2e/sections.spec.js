@@ -108,6 +108,38 @@ test.describe('#presentation — slide deck', () => {
   });
 });
 
+// -- dashboard ----------------------------------------------------------
+test.describe('#dashboard — agent constellation', () => {
+  test('.dashboard-constellation canvas is mounted and non-zero', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    const canvas = page.locator('.dashboard-constellation');
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box.width).toBeGreaterThan(0);
+    expect(box.height).toBeGreaterThan(0);
+  });
+
+  test('.dashboard-metrics container is present', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    await expect(page.locator('.dashboard-metrics')).toBeVisible();
+  });
+
+  test('GET /api/tasks/summary returns 200 with total field', async ({ page }) => {
+    const [response] = await Promise.all([
+      page.waitForResponse('**/api/tasks/summary'),
+      goTo(page, '#dashboard'),
+    ]);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body).toHaveProperty('total');
+  });
+
+  test('section title "Agent Constellation" is visible', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    await expect(page.locator('.dashboard-title')).toContainText('Agent Constellation');
+  });
+});
+
 // -- contact ------------------------------------------------------------
 test.describe('#contact — contact card', () => {
   test('renders #contactContainer with name and role', async ({ page }) => {
