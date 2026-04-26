@@ -30,6 +30,36 @@ test.describe('#oracle — element quiz', () => {
     await expect(steps).toBeVisible();
     await expect(steps).toContainText('How do you work best?');
   });
+
+  test('progress dots are rendered', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const prog = page.locator('[data-oracle="progress"]');
+    await expect(prog).toBeVisible();
+    await expect(prog.locator('.oracle-dot').first()).toBeVisible();
+  });
+
+  test('answer buttons are rendered in the active step', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+    await expect(steps.locator('.oracle-step.active .oracle-choice').first()).toBeVisible();
+  });
+
+  test('full quiz flow reveals the result panel', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+
+    for (let i = 0; i < 5; i++) {
+      const activeFirstChoice = page.locator(`#oracle-step-${i} .oracle-choice`).first();
+      await expect(activeFirstChoice).toBeVisible();
+      await activeFirstChoice.click();
+    }
+
+    const reveal = page.locator('[data-oracle="reveal"]');
+    await expect(reveal).toBeVisible();
+    await expect(reveal.locator('[data-oracle="element-name"]')).not.toBeEmpty();
+  });
 });
 
 // -- geometry -----------------------------------------------------------

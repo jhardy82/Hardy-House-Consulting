@@ -234,6 +234,12 @@ function buildRevealCanvas(canvas, data) {
     scene.add(group);
     _oRevealScene = {
       tick() {
+        const sec = document.querySelector('[data-section="oracle"]');
+        if (!sec || sec.hidden) {
+          _scenes.delete(_oRevealScene);
+          _oRevealScene = null;
+          return;
+        }
         group.rotation.y += 0.007;
         group.rotation.x += 0.003;
         renderer.render(scene, camera);
@@ -248,9 +254,9 @@ function buildRevealCanvas(canvas, data) {
 // -- Scoring ------------------------------------------------------------------
 
 function resolveWinner(scores) {
-  // Priority order used as tiebreaker
-  const ORDER = ['fire', 'earth', 'air', 'water', 'aether'];
-  return ORDER.reduce((best, el) => (scores[el] > scores[best] ? el : best));
+  const max = Math.max(...Object.values(scores));
+  const tied = Object.keys(scores).filter(el => scores[el] === max);
+  return tied[Math.floor(Math.random() * tied.length)];
 }
 
 // -- Reveal -------------------------------------------------------------------
