@@ -59,7 +59,7 @@ export function init() {
 
   const panelBody = document.createElement('div');
   panelBody.id = 'contactPanelBody';
-  panelBody.textContent = '📍 Denver, CO · Avanade (Microsoft/Accenture JV)\n\n💼 LinkedIn: linkedin.com/in/jameshardy\n✉ Tap to copy email';
+  panelBody.textContent = '📍 Denver, CO · Avanade (Microsoft/Accenture JV)\n\n💼 LinkedIn: linkedin.com/in/jameshardy82\n✉ Tap to copy email';
 
   panel.append(panelTitle, panelBody);
 
