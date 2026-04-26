@@ -18,6 +18,7 @@ const SECTIONS = {
 
 const loaded = new Set();
 let _activeTween = null;
+let _navSerial = 0;
 
 export function initRouter() {
   window.addEventListener('hashchange', navigate);
@@ -25,6 +26,7 @@ export function initRouter() {
 }
 
 async function navigate() {
+  const mySerial = ++_navSerial;
   const id   = location.hash.slice(1) || 'home';
   const all  = document.querySelectorAll('section[data-section]');
   const next = document.querySelector(`section[data-section="${id}"]`);
@@ -35,6 +37,7 @@ async function navigate() {
     if (_activeTween) { _activeTween.kill(); _activeTween = null; }
     _activeTween = window.gsap.to(curr, { opacity: 0, duration: 0.1, ease: 'power1.in' });
     await _activeTween;
+    if (_navSerial !== mySerial) return;
     _activeTween = null;
     all.forEach(el => { el.hidden = el.dataset.section !== id; });
     if (next) {
@@ -64,6 +67,7 @@ async function navigate() {
   if (!loaded.has(id) && SECTIONS[id]) {
     try {
       const mod = await SECTIONS[id]();
+      if (_navSerial !== mySerial) return;
       // 80ms delay: CSS layout must complete before any canvas reads dimensions.
       setTimeout(() => mod.init?.(), 80);
       loaded.add(id);
