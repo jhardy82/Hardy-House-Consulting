@@ -12,7 +12,7 @@ if (toggle && list) {
     list.classList.remove('open');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.textContent = '☰';
-    toggle.focus();
+    if (getComputedStyle(toggle).display !== 'none') toggle.focus();
   }
 
   toggle.addEventListener('click', () =>
