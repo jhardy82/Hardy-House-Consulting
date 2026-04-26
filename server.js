@@ -5,8 +5,9 @@ import { dirname, join } from 'path';
 import pagesRouter   from './routes/pages.js';
 import elementRouter from './routes/api/element.js';
 import exportRouter  from './routes/api/export.js';
-import agentsRouter  from './routes/api/agents.js';
-import tasksRouter   from './routes/tasks.js';
+import agentsRouter       from './routes/api/agents.js';
+import tasksSummaryRouter from './routes/api/tasks-summary.js';
+import tasksRouter        from './routes/tasks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app  = express();
@@ -24,6 +25,7 @@ app.use(session({
 app.use('/api/element',  elementRouter);
 app.use('/api/export',   exportRouter);
 app.use('/api/agents',   agentsRouter);
+app.use('/api/tasks',    tasksSummaryRouter);
 app.use('/tasks',        tasksRouter);
 app.use('/',             pagesRouter);
 

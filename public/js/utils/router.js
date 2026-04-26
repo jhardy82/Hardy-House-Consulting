@@ -6,6 +6,7 @@
 const SECTIONS = {
   home:          () => import('../sections/home.js'),
   oracle:        () => import('../sections/oracle.js'),
+  dashboard:     () => import('../sections/dashboard.js'),
   geometry:      () => import('../sections/geometry.js'),
   decomposition: () => import('../sections/decomposition.js'),
   variants:      () => import('../sections/variants.js'),

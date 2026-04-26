@@ -171,6 +171,7 @@ All interactive accents use `var(--accent)` — never hardcode element colours d
 |---|---|---|---|
 | `#home` | `home.js` | Build new | `_source/hardy-house-app-demo.html` hero |
 | `#oracle` | `oracle.js` | Build new | `_source/hardy-house-app-demo.html` oracle |
+| `#dashboard` | `dashboard.js` | Built | `docs/superpowers/plans/2026-04-25-dashboard.md` |
 | `#geometry` | `geometry.js` | Migrate | `_source/hardy-house-geometry.html` |
 | `#decomposition` | `decomposition.js` | Migrate | `_source/hardy-house-decomposition.html` |
 | `#variants` | `variants.js` | Migrate | `_source/hardy-house-variants.html` |
@@ -188,6 +189,7 @@ GET  /api/element     → { element: string|null }
 POST /api/element     → { element, ok: true }  body: { element: 'fire'|'earth'|'air'|'water'|'aether' }
 POST /api/export      → file download (PNG)    body: { dataUrl, filename }
 GET  /api/agents      → { nodes, links }       ContextForge agent graph data
+GET  /api/tasks/summary → { open, in_progress, blocked, done, total }  SQLite task counts
 ```
 
 Do not add routes speculatively. Add a route only when a section module requires it.
