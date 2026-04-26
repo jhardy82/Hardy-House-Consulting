@@ -1059,7 +1059,7 @@ function _init2D() {
 function _initGSAP() {
   if (!window.gsap) return;
   const gsap = window.gsap;
-  if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+  if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
   gsap.timeline({ defaults: { ease: 'power3.out' } })
     .from('#geometry .h-eyebrow', { opacity: 0, y: -8,  duration: .7 })
