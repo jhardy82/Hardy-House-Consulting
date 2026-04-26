@@ -1104,25 +1104,25 @@ function _initGSAP() {
   if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
   gsap.timeline({ defaults: { ease: 'power3.out' } })
-    .from('#geometry .h-eyebrow', { opacity: 0, y: -8,  duration: .7 })
-    .from('#geometry .h-title',   { opacity: 0, y: 28,  duration: 1.0 }, '-=.2')
-    .from('#geometry .h-sub',     { opacity: 0, y: 18,  duration:  .8 }, '-=.5')
-    .from('#geometry .h-scroll',  { opacity: 0,          duration:  .5 }, '-=.25');
+    .from('[data-section="geometry"] .h-eyebrow', { opacity: 0, y: -8,  duration: .7 })
+    .from('[data-section="geometry"] .h-title',   { opacity: 0, y: 28,  duration: 1.0 }, '-=.2')
+    .from('[data-section="geometry"] .h-sub',     { opacity: 0, y: 18,  duration:  .8 }, '-=.5')
+    .from('[data-section="geometry"] .h-scroll',  { opacity: 0,          duration:  .5 }, '-=.25');
 
   if (window.ScrollTrigger) {
-    gsap.from('#geometry .pm', {
+    gsap.from('[data-section="geometry"] .pm', {
       opacity: 0, y: 16, stagger: .08, duration: .6, ease: 'power2.out',
-      scrollTrigger: { trigger: '#geometry .plat-map', start: 'top 88%', once: true }
+      scrollTrigger: { trigger: '[data-section="geometry"] .plat-map', start: 'top 88%', once: true }
     });
 
-    document.querySelectorAll('#geometry .s-lbl, #geometry .s-title, #geometry .s-desc').forEach(el => {
+    document.querySelectorAll('[data-section="geometry"] .s-lbl, [data-section="geometry"] .s-title, [data-section="geometry"] .s-desc').forEach(el => {
       gsap.from(el, {
         opacity: 0, x: -12, duration: .65, ease: 'power2.out',
         scrollTrigger: { trigger: el, start: 'top 90%', once: true }
       });
     });
 
-    document.querySelectorAll('#geometry .shape-card').forEach((el, i) => {
+    document.querySelectorAll('[data-section="geometry"] .shape-card').forEach((el, i) => {
       gsap.to(el, {
         opacity: 1, y: 0, duration: .65, ease: 'power2.out',
         scrollTrigger: { trigger: el, start: 'top 90%', once: true },
@@ -1130,7 +1130,7 @@ function _initGSAP() {
       });
     });
 
-    document.querySelectorAll('#geometry .s2d-card').forEach((el, i) => {
+    document.querySelectorAll('[data-section="geometry"] .s2d-card').forEach((el, i) => {
       gsap.to(el, {
         opacity: 1, y: 0, duration: .7, ease: 'power2.out',
         scrollTrigger: { trigger: el, start: 'top 88%', once: true },
@@ -1138,7 +1138,7 @@ function _initGSAP() {
       });
     });
 
-    document.querySelectorAll('#geometry .phil-card').forEach((el, i) => {
+    document.querySelectorAll('[data-section="geometry"] .phil-card').forEach((el, i) => {
       gsap.from(el, {
         opacity: 0, y: 24, duration: .65, ease: 'power2.out',
         scrollTrigger: { trigger: el, start: 'top 90%', once: true },
@@ -1146,7 +1146,7 @@ function _initGSAP() {
       });
     });
   } else {
-    document.querySelectorAll('#geometry .shape-card, #geometry .s2d-card').forEach(el => {
+    document.querySelectorAll('[data-section="geometry"] .shape-card, [data-section="geometry"] .s2d-card').forEach(el => {
       el.classList.add('visible');
     });
   }

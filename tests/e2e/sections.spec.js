@@ -158,6 +158,24 @@ test.describe('#geometry — sacred geometry explorer', () => {
     // Overlay must be hidden — no zombie overlay
     await expect(page.locator('#geo-fsOverlay')).toBeHidden();
   });
+
+  test('GSAP entry animations target elements that exist in the DOM', async ({ page }) => {
+    // Collect GSAP warnings about zero-target selectors
+    const gsapWarnings = [];
+    page.on('console', msg => {
+      if (msg.type() === 'warning' && msg.text().includes('gsap')) {
+        gsapWarnings.push(msg.text());
+      }
+    });
+    await goTo(page, '#geometry');
+    await expect(page.locator('[data-section="geometry"]')).toBeVisible();
+    // Allow GSAP's 80ms animation init to run
+    await page.waitForTimeout(200);
+    // Assert: .h-eyebrow heading element is present (proves selectors resolve)
+    await expect(page.locator('[data-section="geometry"] .h-eyebrow')).toBeAttached();
+    // Assert: no GSAP warnings about missing targets
+    expect(gsapWarnings).toHaveLength(0);
+  });
 });
 
 // -- decomposition ------------------------------------------------------
