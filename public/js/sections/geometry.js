@@ -1122,7 +1122,7 @@ function _buildSectionDOM(container) {
   // Hero
   const hero = document.createElement('div');
   hero.className = 'hero';
-  hero.style.cssText = 'position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 110% 85% at 50% 38%,#1A0D3D 0%,#07040F 68%)';
+  hero.style.cssText = 'position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;';
 
   const heroCanvas = document.createElement('canvas');
   heroCanvas.id = 'geo-heroCanvas';

@@ -1,0 +1,116 @@
+/* geometry.css — Sacred Geometry section */
+
+/* Hero */
+.hero{position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 110% 85% at 50% 38%,#1A0D3D 0%,var(--hh-void) 68%);}
+#geo-heroCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero-content{position:relative;z-index:2;text-align:center;max-width:720px;padding:2rem;}
+.h-eyebrow{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(196,154,31,.72);margin-bottom:1.4rem;display:flex;align-items:center;justify-content:center;gap:.9rem;}
+.h-eyebrow::before,.h-eyebrow::after{content:'';width:40px;height:1px;background:var(--hh-gold);opacity:.35;}
+.h-title{font-family:var(--font-display);font-size:clamp(2.8rem,6vw,5rem);font-weight:300;color:#fff;line-height:1.05;}
+.h-title em{font-style:italic;color:var(--hh-gold);}
+.h-sub{font-size:1.05rem;color:rgba(244,240,235,.58);line-height:1.75;max-width:540px;margin:1.2rem auto 0;}
+.h-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);font-family:var(--font-mono);
+  font-size:.6rem;letter-spacing:.2em;color:rgba(196,154,31,.4);text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:geo-sp 2.5s ease-in-out infinite;}
+.h-scroll::after{content:'';width:1px;height:28px;background:linear-gradient(to bottom,rgba(196,154,31,.38),transparent);}
+@keyframes geo-sp{0%,100%{opacity:.32}50%{opacity:.85}}
+
+/* Platonic map */
+.plat-map{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;
+  max-width:1200px;margin:0 auto;padding:1.5rem 2rem;
+  background:rgba(255,255,255,.018);border:1px solid rgba(196,154,31,.1);border-radius:10px;}
+.pm{text-align:center;padding:.6rem .3rem;}
+.pm-el{font-family:var(--font-mono);font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.28rem;}
+.pm-sh{font-family:var(--font-display);font-size:1rem;font-weight:600;color:#F4F0EB;margin-bottom:.18rem;}
+.pm-n{font-family:var(--font-mono);font-size:.57rem;color:rgba(244,240,235,.28);}
+
+/* Inner sections built by _buildSectionDOM */
+[data-section="geometry"] section{padding:5rem 2rem;max-width:1200px;margin:0 auto;}
+
+/* Section scaffold */
+.s-lbl{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--hh-gold);margin-bottom:.7rem;}
+.s-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:600;color:#F4F0EB;margin-bottom:.7rem;}
+.s-div{width:56px;height:2px;background:linear-gradient(90deg,var(--hh-gold),var(--hh-royal));margin-bottom:1.5rem;}
+.s-desc{color:rgba(244,240,235,.56);max-width:560px;line-height:1.75;margin-bottom:3rem;font-size:.94rem;}
+
+/* Mode pills */
+.mode-pills{display:flex;gap:.4rem;margin-bottom:2rem;}
+.mpill,.geo-mpill{font-family:var(--font-mono);font-size:.61rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.3rem .75rem;border-radius:100px;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(244,240,235,.46);transition:all .2s;}
+.mpill:hover,.geo-mpill:hover{border-color:rgba(196,154,31,.3);color:rgba(196,154,31,.8);}
+.mpill.on,.geo-mpill.on{background:rgba(196,154,31,.1);border-color:rgba(196,154,31,.52);color:var(--hh-gold);}
+
+/* Shape grid */
+.shape-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.3rem;}
+.shape-card{background:rgba(255,255,255,.024);border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;overflow:hidden;transition:border-color .25s,box-shadow .25s,transform .25s;
+  opacity:0;transform:translateY(40px);}
+.shape-card.visible{opacity:1;transform:translateY(0);}
+.shape-card:hover{border-color:rgba(196,154,31,.32);box-shadow:0 10px 40px rgba(46,23,96,.32);transform:translateY(-4px);}
+
+.sc-wrap{position:relative;width:100%;aspect-ratio:1;background:var(--hh-void-3);overflow:hidden;
+  cursor:grab;user-select:none;-webkit-user-select:none;}
+.sc-wrap:active{cursor:grabbing;}
+.sc-wrap canvas,.sc-canvas{display:block;width:100%;height:100%;}
+
+.sc-hint{position:absolute;bottom:50%;left:50%;transform:translate(-50%,50%);
+  font-family:var(--font-mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(196,154,31,.5);opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap;
+  background:rgba(5,2,16,.65);padding:.2rem .6rem;border-radius:3px;backdrop-filter:blur(6px);}
+.sc-wrap:hover .sc-hint{opacity:1;}
+
+.sc-btns{position:absolute;top:.5rem;right:.5rem;z-index:2;display:flex;gap:.3rem;}
+.sc-btn{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.06em;
+  background:rgba(5,2,16,.75);border:1px solid rgba(196,154,31,.28);color:rgba(196,154,31,.72);
+  border-radius:3px;padding:.2rem .45rem;backdrop-filter:blur(6px);cursor:pointer;transition:all .2s;line-height:1.2;}
+.sc-btn:hover{border-color:var(--hh-gold);color:var(--hh-gold);}
+
+.sc-info{padding:.92rem 1rem 1.05rem;}
+.sc-el{font-family:var(--font-mono);font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;margin-bottom:.35rem;}
+.sc-name{font-family:var(--font-display);font-size:1.26rem;font-weight:600;color:#F4F0EB;margin-bottom:.18rem;}
+.sc-facts{font-family:var(--font-mono);font-size:.55rem;color:rgba(244,240,235,.3);letter-spacing:.05em;margin-bottom:.52rem;}
+.sc-meaning{font-size:.75rem;color:rgba(244,240,235,.5);line-height:1.6;}
+
+/* 2D forms */
+.s2d-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+.s2d-card{background:rgba(255,255,255,.024);border:1px solid rgba(196,154,31,.1);border-radius:10px;overflow:hidden;
+  opacity:0;transform:translateY(30px);}
+.s2d-card.visible{opacity:1;transform:translateY(0);}
+.s2d-wrap{position:relative;width:100%;aspect-ratio:1;background:var(--hh-void-3);overflow:hidden;}
+.s2d-wrap canvas{display:block;width:100%;height:100%;}
+
+/* Philosophy */
+.phil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.phil-card{background:rgba(255,255,255,.02);border:1px solid rgba(196,154,31,.1);border-radius:8px;padding:1.5rem;}
+.phil-icon{font-size:1.3rem;margin-bottom:.75rem;}
+.phil-title{font-family:var(--font-display);font-size:1.12rem;font-weight:600;color:#F4F0EB;margin-bottom:.5rem;}
+.phil-text{font-size:.77rem;color:rgba(244,240,235,.5);line-height:1.65;}
+
+/* Fullscreen overlay */
+#geo-fsOverlay{position:fixed;inset:0;background:rgba(4,2,10,.97);z-index:var(--z-overlay);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;
+  backdrop-filter:blur(8px);}
+
+#geo-fsClose{position:absolute;top:1.5rem;right:1.5rem;font-family:var(--font-mono);font-size:.68rem;
+  letter-spacing:.12em;background:transparent;border:1px solid rgba(196,154,31,.32);color:rgba(196,154,31,.72);
+  border-radius:3px;padding:.38rem .8rem;cursor:pointer;transition:all .2s;}
+#geo-fsClose:hover{border-color:var(--hh-gold);color:var(--hh-gold);}
+#geo-fsModeBar{display:flex;gap:.35rem;}
+.geo-fs-mpill{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.25rem .65rem;border-radius:100px;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(244,240,235,.45);transition:all .2s;}
+.geo-fs-mpill.on{background:rgba(196,154,31,.1);border-color:rgba(196,154,31,.52);color:var(--hh-gold);}
+#geo-fsInfo{text-align:center;}
+#geo-fsName{font-family:var(--font-display);font-size:1.75rem;color:#F4F0EB;margin-bottom:.22rem;}
+#geo-fsMeta{font-family:var(--font-mono);font-size:.64rem;color:rgba(196,154,31,.68);letter-spacing:.1em;}
+#geo-fsCanvas{border-radius:8px;display:block;cursor:grab;}
+#geo-fsCanvas:active{cursor:grabbing;}
+#geo-fsHint{font-family:var(--font-mono);font-size:.57rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,240,235,.22);}
+
+/* Breakpoints */
+@media(max-width:1050px){.s2d-grid,.phil-grid{grid-template-columns:1fr;}}
+@media(max-width:768px){.plat-map{grid-template-columns:repeat(3,1fr);}.pm-div{display:none;}}
+@media(max-width:480px){.plat-map{grid-template-columns:1fr 1fr;}}
