@@ -30,6 +30,25 @@ test.describe('#oracle — element quiz', () => {
     await expect(steps).toBeVisible();
     await expect(steps).toContainText('How do you work best?');
   });
+
+  test('completing all 5 questions shows the reveal panel', async ({ page }) => {
+    await goTo(page, '#oracle');
+    for (let i = 0; i < 5; i++) {
+      await page.locator('.oracle-step.active .oracle-choice').first().click();
+    }
+    await expect(page.locator('[data-oracle="reveal"]')).toBeVisible();
+    await expect(page.locator('[data-oracle="element-name"]')).not.toBeEmpty();
+  });
+
+  test('retake button resets the quiz to the first question', async ({ page }) => {
+    await goTo(page, '#oracle');
+    for (let i = 0; i < 5; i++) {
+      await page.locator('.oracle-step.active .oracle-choice').first().click();
+    }
+    await page.locator('[data-oracle="retake"]').click();
+    await expect(page.locator('[data-oracle="steps"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-oracle="steps"]')).toContainText('How do you work best?');
+  });
 });
 
 // -- geometry -----------------------------------------------------------
@@ -95,6 +114,16 @@ test.describe('#grow — phyllotaxis and fractal', () => {
   test('.grow-bg canvas is present', async ({ page }) => {
     await goTo(page, '#grow');
     await expect(page.locator('.grow-bg')).toBeVisible();
+  });
+
+  test('switching to fractal tab renders a non-zero canvas', async ({ page }) => {
+    await goTo(page, '#grow');
+    await page.locator('[data-tab="fractal"]').click();
+    const canvas = page.locator('.fractal-canvas');
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box.width).toBeGreaterThan(0);
+    expect(box.height).toBeGreaterThan(0);
   });
 });
 

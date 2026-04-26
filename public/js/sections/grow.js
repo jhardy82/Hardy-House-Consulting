@@ -648,6 +648,7 @@ function _initPhyllotaxis(section) {
   setTimeout(() => {
     resizeAndDraw();
     new ResizeObserver(resizeAndDraw).observe(canvas.parentElement);
+    canvas.addEventListener('grow:resize', resizeAndDraw);
   }, 80);
 }
 
@@ -819,6 +820,7 @@ function _initFractalTree(section) {
   setTimeout(() => {
     resizeAndDraw();
     new ResizeObserver(resizeAndDraw).observe(canvas.parentElement);
+    canvas.addEventListener('grow:resize', resizeAndDraw);
   }, 80);
 }
 
