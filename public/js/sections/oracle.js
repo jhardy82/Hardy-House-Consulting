@@ -322,6 +322,17 @@ export function init() {
   buildProgressDots(progEl, ORACLE_QUESTIONS.length);
   buildSteps(stepsEl, ORACLE_QUESTIONS, handleAnswer);
 
+  // Re-entry: reset quiz when navigating back to oracle mid-quiz or post-result
+  window.addEventListener('hashchange', () => {
+    if (section.hidden) return;
+    Object.keys(scores).forEach(k => { scores[k] = 0; });
+    progEl.style.display    = '';
+    stepsEl.style.display   = '';
+    revealDiv.style.display = 'none';
+    buildProgressDots(progEl, ORACLE_QUESTIONS.length);
+    buildSteps(stepsEl, ORACLE_QUESTIONS, handleAnswer);
+  });
+
   function handleAnswer(qIdx, aIdx) {
     const q = ORACLE_QUESTIONS[qIdx];
     scores[q.el[aIdx]]++;
