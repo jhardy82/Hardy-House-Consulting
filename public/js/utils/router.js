@@ -17,6 +17,7 @@ const SECTIONS = {
 };
 
 const loaded = new Set();
+let _activeTween = null;
 
 export function initRouter() {
   window.addEventListener('hashchange', navigate);
@@ -24,11 +25,32 @@ export function initRouter() {
 }
 
 async function navigate() {
-  const id  = location.hash.slice(1) || 'home';
-  const all = document.querySelectorAll('[data-section]');
-  all.forEach(el => {
-    if (el.tagName === 'SECTION') el.hidden = el.dataset.section !== id;
-  });
+  const id   = location.hash.slice(1) || 'home';
+  const all  = document.querySelectorAll('section[data-section]');
+  const next = document.querySelector(`section[data-section="${id}"]`);
+  const curr = document.querySelector('section[data-section]:not([hidden])');
+
+  if (window.gsap && curr && curr !== next) {
+    // Kill any in-flight tween so rapid navigation cannot leave opacity stuck.
+    if (_activeTween) { _activeTween.kill(); _activeTween = null; }
+    _activeTween = window.gsap.to(curr, { opacity: 0, duration: 0.1, ease: 'power1.in' });
+    await _activeTween;
+    _activeTween = null;
+    all.forEach(el => { el.hidden = el.dataset.section !== id; });
+    if (next) {
+      next.style.opacity = '0';
+      _activeTween = window.gsap.to(next, { opacity: 1, duration: 0.15, ease: 'power1.out' });
+      _activeTween.then(() => { _activeTween = null; });
+    }
+  } else {
+    // No GSAP or same section -- reset any lingering inline opacity first.
+    if (window.gsap && _activeTween) { _activeTween.kill(); _activeTween = null; }
+    all.forEach(el => {
+      el.hidden = el.dataset.section !== id;
+      if (!el.hidden) el.style.opacity = '';
+    });
+  }
+
   document.querySelectorAll('.nav-link').forEach(a => {
     const isCurrent = a.getAttribute('href') === '#' + id;
     a.classList.toggle('active', isCurrent);

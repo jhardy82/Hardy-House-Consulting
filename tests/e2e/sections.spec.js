@@ -302,6 +302,38 @@ test.describe('#dashboard — agent constellation', () => {
   });
 });
 
+// -- global chrome ------------------------------------------------------
+test.describe('global chrome', () => {
+  test('nav link for current section has class active', async ({ page }) => {
+    await goTo(page, '#oracle');
+    await expect(page.locator('.nav-link[href="#oracle"]')).toHaveClass(/active/);
+    await expect(page.locator('.nav-link[href="#home"]')).not.toHaveClass(/active/);
+  });
+
+  test('section transition does not leave opacity:0 on arriving section', async ({ page }) => {
+    await goTo(page, '#home');
+    await goTo(page, '#geometry');
+    const section = page.locator('section[data-section="geometry"]');
+    await expect(section).toBeVisible();
+    await page.waitForTimeout(300);
+    const opacity = await section.evaluate(el => getComputedStyle(el).opacity);
+    expect(parseFloat(opacity)).toBeGreaterThan(0.9);
+  });
+
+  test('mobile nav toggle shows and hides the nav list', async ({ page }) => {
+    await page.setViewportSize({ width: 480, height: 800 });
+    await goTo(page, '#home');
+    const toggle = page.locator('.nav-toggle');
+    const list   = page.locator('#nav-links-list');
+    await expect(toggle).toBeVisible();
+    await expect(list).toBeHidden();
+    await toggle.click();
+    await expect(list).toBeVisible();
+    await toggle.click();
+    await expect(list).toBeHidden();
+  });
+});
+
 // -- contact ------------------------------------------------------------
 test.describe('#contact — contact card', () => {
   test('renders #contactContainer with name and role', async ({ page }) => {
