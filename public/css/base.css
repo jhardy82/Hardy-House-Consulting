@@ -72,6 +72,8 @@ body {
   list-style: none;
   flex-wrap: nowrap;
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .nav-link {
