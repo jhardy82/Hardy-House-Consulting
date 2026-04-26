@@ -115,6 +115,8 @@ function _initConstellation(section) {
 
   let frame = 0;
   (function animate() {
+    const sec = document.querySelector('[data-section="dashboard"]');
+    if (!sec || sec.hidden) return;
     requestAnimationFrame(animate);
     frame += ROT_SPEED;
     _positionSolids(groups, element, frame);

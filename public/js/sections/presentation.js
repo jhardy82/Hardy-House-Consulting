@@ -233,32 +233,37 @@ function buildParticleField() {
 
 function transitionShape(newShape) {
   if (shapeGroup) {
-    gsap.to(shapeGroup.children[0].material, {
-      opacity: 0,
-      duration: 0.4,
-      onComplete: () => {
-        shapeGroup.clear();
-        shapeGroup.add(newShape);
+    if (window.gsap) {
+      gsap.to(shapeGroup.children[0].material, {
+        opacity: 0,
+        duration: 0.4,
+        onComplete: () => {
+          shapeGroup.clear();
+          shapeGroup.add(newShape);
 
-        newShape.scale.setScalar(0.5);
-        gsap.to(newShape.scale, {
-          x: 1,
-          y: 1,
-          z: 1,
-          duration: 0.6,
-          ease: 'back.out'
-        });
-
-        if (newShape.children[0]) {
-          newShape.children[0].material.opacity = 0;
-          gsap.to(newShape.children[0].material, {
-            opacity: 0.6,
-            duration: 0.4,
-            delay: 0.2
+          newShape.scale.setScalar(0.5);
+          gsap.to(newShape.scale, {
+            x: 1,
+            y: 1,
+            z: 1,
+            duration: 0.6,
+            ease: 'back.out'
           });
+
+          if (newShape.children[0]) {
+            newShape.children[0].material.opacity = 0;
+            gsap.to(newShape.children[0].material, {
+              opacity: 0.6,
+              duration: 0.4,
+              delay: 0.2
+            });
+          }
         }
-      }
-    });
+      });
+    } else {
+      shapeGroup.clear();
+      shapeGroup.add(newShape);
+    }
   } else {
     shapeGroup.add(newShape);
   }
@@ -270,10 +275,12 @@ function goTo(index) {
   currentSlide = index;
   const slide = SLIDES[currentSlide];
 
-  gsap.to(scene.fog, {
-    color: slide.fogCol,
-    duration: 0.8
-  });
+  if (window.gsap) {
+    gsap.to(scene.fog, {
+      color: slide.fogCol,
+      duration: 0.8
+    });
+  }
 
   const newShape = makeShape(slide.shape, slide.shapeSize, slide.col);
   newShape.position.copy(new THREE.Vector3(
@@ -443,7 +450,8 @@ function tick() {
   camera.lookAt(0, 0, 0);
 
   renderer.render(scene, camera);
-  requestAnimationFrame(tick);
+  const sec = document.querySelector('[data-section="presentation"]');
+  if (sec && !sec.hidden) requestAnimationFrame(tick);
 }
 
 export function init() {
@@ -458,63 +466,65 @@ export function init() {
   const canvas = section.querySelector('canvas');
   if (!canvas) return;
 
-  try {
-    renderer = createRenderer(canvas);
-  } catch (err) {
-    console.error('[presentation] Renderer error:', err);
-    return;
-  }
-
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(
-    75,
-    canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
-    0.1,
-    1000
-  );
-
-  camera.position.z = 12;
-
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  directionalLight.position.set(5, 10, 7);
-  scene.add(directionalLight);
-
-  scene.add(buildParticleField());
-
-  shapeGroup = new THREE.Group();
-  scene.add(shapeGroup);
-
-  scene.fog = new THREE.Fog(SLIDES[0].fogCol, 80, 100);
-
-  const handleMouseMove = (e) => {
-    const section = document.querySelector('[data-section="presentation"]');
-    const rect = section.getBoundingClientRect();
-    mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-  };
-
-  const handleKeydown = (e) => handleKeyDown(e);
-  const handleMouseClick = (e) => handleClick(e);
-
-  window.addEventListener('mousemove', handleMouseMove);
-  window.addEventListener('keydown', handleKeydown);
-  section.addEventListener('click', handleMouseClick);
-
-  goTo(0);
-
-  requestAnimationFrame(tick);
-
-  window.addEventListener('resize', () => {
-    if (renderer && canvas) {
-      const width = canvas.parentElement.clientWidth;
-      const height = canvas.parentElement.clientHeight;
-      renderer.setSize(width, height, false);
-      if (camera) {
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-      }
+  setTimeout(() => {
+    try {
+      renderer = createRenderer(canvas);
+    } catch (err) {
+      console.error('[presentation] Renderer error:', err);
+      return;
     }
-  });
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(
+      75,
+      canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
+      0.1,
+      1000
+    );
+
+    camera.position.z = 12;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 7);
+    scene.add(directionalLight);
+
+    scene.add(buildParticleField());
+
+    shapeGroup = new THREE.Group();
+    scene.add(shapeGroup);
+
+    scene.fog = new THREE.Fog(SLIDES[0].fogCol, 80, 100);
+
+    const handleMouseMove = (e) => {
+      const section = document.querySelector('[data-section="presentation"]');
+      const rect = section.getBoundingClientRect();
+      mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    };
+
+    const handleKeydown = (e) => handleKeyDown(e);
+    const handleMouseClick = (e) => handleClick(e);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('keydown', handleKeydown);
+    section.addEventListener('click', handleMouseClick);
+
+    goTo(0);
+
+    requestAnimationFrame(tick);
+
+    window.addEventListener('resize', () => {
+      if (renderer && canvas) {
+        const width = canvas.parentElement.clientWidth;
+        const height = canvas.parentElement.clientHeight;
+        renderer.setSize(width, height, false);
+        if (camera) {
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        }
+      }
+    });
+  }, 80);
 }

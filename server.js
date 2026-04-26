@@ -16,7 +16,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(join(__dirname, 'public')));
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-prod',
+  secret: (() => {
+    if (!process.env.SESSION_SECRET && process.env.NODE_ENV === 'production') {
+      throw new Error('SESSION_SECRET env var required in production');
+    }
+    return process.env.SESSION_SECRET || 'dev-secret-change-in-prod';
+  })(),
   resave: false,
   saveUninitialized: true,
   cookie: { secure: process.env.NODE_ENV === 'production' }
@@ -28,5 +33,15 @@ app.use('/api/agents',   agentsRouter);
 app.use('/api/tasks',    tasksSummaryRouter);
 app.use('/tasks',        tasksRouter);
 app.use('/',             pagesRouter);
+
+app.use((err, _req, res, _next) => {
+  console.error('[server error]', err.stack || err.message);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({ error: err.message || 'Internal server error' });
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason);
+});
 
 app.listen(PORT, () => console.log(`Hardy House running on http://localhost:${PORT}`));
