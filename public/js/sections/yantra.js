@@ -320,6 +320,10 @@ function _initOverlay(section) {
   replay.addEventListener('click', () => {
     _constructed = false;
     visible      = false;
+    mode         = 'paoal';
+    section.querySelectorAll('.yantra-pill').forEach(p =>
+      p.classList.toggle('yantra-pill--active', p.dataset.yantra === 'paoal')
+    );
     toggle.textContent = 'Show overlay';
     toggle.disabled    = true;
     const controls = section.querySelector('.yantra-controls');
@@ -338,4 +342,6 @@ function _initOverlay(section) {
       toggle.disabled = false;
     });
   });
+
+  repaint();
 }
