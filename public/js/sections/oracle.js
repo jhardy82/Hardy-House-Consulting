@@ -260,7 +260,7 @@ function resolveWinner(scores) {
 
 // -- Reveal -------------------------------------------------------------------
 
-function showReveal(revealDiv, winner) {
+function showReveal(revealDiv, winner, progEl, stepsEl) {
   const data = ELEMENT_DATA[winner];
 
   // Persist + propagate element to entire app via elementState
@@ -278,6 +278,18 @@ function showReveal(revealDiv, winner) {
 
   const ctaBtn = revealDiv.querySelector('.oracle-cta');
   if (ctaBtn) ctaBtn.addEventListener('click', () => { window.location.hash = '#geometry'; });
+
+  // Retake button -- { once: true } prevents double-binding on repeated completions
+  const retakeBtn = revealDiv.querySelector('[data-oracle="retake"]');
+  if (retakeBtn && progEl && stepsEl) {
+    retakeBtn.addEventListener('click', () => {
+      revealDiv.style.display = 'none';
+      progEl.style.display    = '';
+      stepsEl.style.display   = '';
+      initialised = false;
+      init();
+    }, { once: true });
+  }
 
   // 3D canvas -- 80ms delay lets CSS layout complete first
   const canvas = revealDiv.querySelector('[data-oracle="canvas"]');
@@ -349,7 +361,7 @@ export function init() {
       progEl.style.display  = 'none';
       stepsEl.style.display = 'none';
       const winner = resolveWinner(scores);
-      showReveal(revealDiv, winner);
+      showReveal(revealDiv, winner, progEl, stepsEl);
     }
   }
 }

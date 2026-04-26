@@ -100,6 +100,16 @@ test.describe('#oracle — element quiz', () => {
     await expect(page.locator('#oracle-step-0')).toHaveClass(/active/);
     await expect(page.locator('[data-oracle="reveal"]')).toBeHidden();
   });
+
+  test('retake button resets the quiz to the first question', async ({ page }) => {
+    await goTo(page, '#oracle');
+    for (let i = 0; i < 5; i++) {
+      await page.locator('.oracle-step.active .oracle-choice').first().click();
+    }
+    await page.locator('[data-oracle="retake"]').click();
+    await expect(page.locator('[data-oracle="steps"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-oracle="steps"]')).toContainText('How do you work best?');
+  });
 });
 
 // -- geometry -----------------------------------------------------------
