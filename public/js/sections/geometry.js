@@ -935,6 +935,7 @@ function _buildCard(cfg) {
 
   const canvas = document.createElement('canvas');
   canvas.className = 'sc-canvas';
+  canvas.setAttribute('aria-label', 'Three.js shape viewer — interactive canvas');
 
   const hint = document.createElement('div');
   hint.className = 'sc-hint';
@@ -1058,7 +1059,7 @@ function _init2D() {
 function _initGSAP() {
   if (!window.gsap) return;
   const gsap = window.gsap;
-  if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+  if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
 
   gsap.timeline({ defaults: { ease: 'power3.out' } })
     .from('#geometry .h-eyebrow', { opacity: 0, y: -8,  duration: .7 })
@@ -1122,10 +1123,11 @@ function _buildSectionDOM(container) {
   // Hero
   const hero = document.createElement('div');
   hero.className = 'hero';
-  hero.style.cssText = 'position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 110% 85% at 50% 38%,#1A0D3D 0%,#07040F 68%)';
+  hero.style.cssText = 'position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:center;justify-content:center;';
 
   const heroCanvas = document.createElement('canvas');
   heroCanvas.id = 'geo-heroCanvas';
+  heroCanvas.setAttribute('aria-label', 'Sacred geometry hero — interactive Three.js scene');
   heroCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
 
   const heroContent = document.createElement('div');
@@ -1233,6 +1235,7 @@ function _buildSectionDOM(container) {
     const wrap2 = document.createElement('div'); wrap2.className = 's2d-wrap';
     const cvs   = document.createElement('canvas');
     cvs.id = id.replace('Card', 'Canvas').replace('geo-fol','geo-fol').replace('geo-met','geo-met');
+    cvs.setAttribute('aria-label', id.startsWith('geo-fol') ? 'Flower of Life geometry canvas' : "Metatron's Cube geometry canvas");
     wrap2.appendChild(cvs);
     const info  = document.createElement('div'); info.className = 'sc-info';
     const elD   = document.createElement('div'); elD.className = 'sc-el'; elD.textContent = elLabel; elD.style.color = elColor;
@@ -1309,6 +1312,7 @@ function _buildSectionDOM(container) {
 
   const fsCvs = document.createElement('canvas');
   fsCvs.id = 'geo-fsCanvas';
+  fsCvs.setAttribute('aria-label', 'Sacred geometry explorer — fullscreen canvas');
   fsCvs.style.cssText = 'border-radius:8px;display:block;cursor:grab;';
 
   const fsHint = document.createElement('div');
@@ -1351,6 +1355,10 @@ function _startLoop() {
 ============================================================ */
 export function init() {
   if (initialised) return; // idempotency guard
+  if (!window.THREE) {
+    console.warn('[geometry] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   // Reset module state

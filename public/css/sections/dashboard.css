@@ -1,0 +1,99 @@
+/* dashboard.css -- #dashboard section styles */
+
+.dashboard-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--nav-h));
+  padding: var(--space-4) var(--section-pad-x);
+  gap: var(--space-4);
+  background: var(--surface-1);
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.dashboard-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--hh-fg);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.dashboard-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--hh-fg-3);
+  letter-spacing: var(--tracking-wider);
+}
+
+.dashboard-constellation {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-1);
+  background: var(--surface-0);
+  display: block;
+}
+
+.dashboard-legend {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--hh-fg-3);
+  text-align: center;
+  letter-spacing: var(--tracking-wide);
+  min-height: 1.4em;
+}
+
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.metric-cell {
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  transition: border-color var(--dur-base) var(--ease-out);
+}
+
+.metric-cell:hover {
+  border-color: var(--accent-border);
+}
+
+.metric-value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--hh-fg-3);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.metric-cell[data-status="open"]        .metric-value { color: #2D8050; }
+.metric-cell[data-status="in_progress"] .metric-value { color: #3B5FC8; }
+.metric-cell[data-status="blocked"]     .metric-value { color: #C49A1F; }
+.metric-cell[data-status="done"]        .metric-value { color: #9B7BE0; }
+
+@media (max-width: 768px) {
+  .dashboard-metrics { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-wrap    { padding: var(--space-3) var(--space-4); }
+}

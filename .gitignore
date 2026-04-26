@@ -8,4 +8,6 @@ test-results/
 .claude/
 tasks/tasks.db
 tasks/.current-session
+.playwright-mcp/
+*.png
 

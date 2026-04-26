@@ -1,0 +1,142 @@
+@keyframes symbolPulse {
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 0.85; }
+}
+
+#contactContainer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: max(env(safe-area-inset-top), 28px) 0 max(env(safe-area-inset-bottom), 20px);
+  z-index: 10;
+  pointer-events: all;
+}
+
+#contactLogo {
+  text-align: center;
+  padding: 0 24px;
+  flex: 0 0 auto;
+}
+
+#contactSymbol {
+  font-size: 1.5rem;
+  letter-spacing: 0.3em;
+  color: rgba(196, 154, 31, 0.45);
+  margin-bottom: 0.3rem;
+  animation: symbolPulse 4s ease-in-out infinite;
+}
+
+#contactWord {
+  font-family: 'Cormorant', serif;
+  font-size: 1.0rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(196, 154, 31, 0.55);
+}
+
+#contactDivider {
+  width: 36px;
+  height: 1px;
+  background: rgba(196, 154, 31, 0.22);
+  margin: 0.7rem auto;
+}
+
+#contactCentre {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+#contactName {
+  font-size: clamp(2.6rem, 10vw, 4.2rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 0 60px rgba(155, 123, 224, 0.28);
+}
+
+#contactName span:first-child {
+  display: block;
+  font-weight: 600;
+}
+
+#contactName span:last-child {
+  display: block;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(244, 240, 235, 0.72);
+}
+
+#contactRole {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(196, 154, 31, 0.68);
+  text-align: center;
+  line-height: 1.8;
+}
+
+#contactPanel {
+  flex: 0 0 auto;
+  margin: 0 20px;
+  background: rgba(14, 8, 32, 0.85);
+  border: 1px solid rgba(196, 154, 31, 0.14);
+  border-radius: 12px;
+  padding: 16px 20px 20px;
+  backdrop-filter: blur(12px);
+  min-height: 90px;
+  transition: opacity 0.25s;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+#contactPanelTitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(196, 154, 31, 0.55);
+  margin-bottom: 0.55rem;
+}
+
+#contactPanelBody {
+  font-size: 0.82rem;
+  color: rgba(244, 240, 235, 0.7);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: rgba(14, 8, 32, 0.92);
+  border: 1px solid rgba(196, 154, 31, 0.35);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: rgba(196, 154, 31, 0.9);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 1000;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

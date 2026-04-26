@@ -183,6 +183,7 @@ function buildHTML(section) {
   const canvas = document.createElement('canvas');
   canvas.className = 'home-hero-canvas';
   canvas.id = 'heroCanvas';
+  canvas.setAttribute('aria-label', 'Hardy House hero — interactive Three.js animation');
   section.appendChild(canvas);
 
   // Content wrapper
@@ -245,134 +246,6 @@ function buildHTML(section) {
   });
 }
 
-// -- injectStyles ----------------------------------------------------
-// Scoped styles for home section. No hardcoded hex values -- all colours
-// via CSS custom properties from tokens.css.
-function injectStyles() {
-  if (document.getElementById('home-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'home-styles';
-
-  // Build style text as a plain string -- no dynamic interpolation
-  const css = [
-    '[data-section="home"] {',
-    '  height: 100vh;',
-    '  display: flex;',
-    '  flex-direction: column;',
-    '  align-items: center;',
-    '  justify-content: center;',
-    '  text-align: center;',
-    '  position: relative;',
-    '  overflow: hidden;',
-    '}',
-    '',
-    '.home-hero-canvas {',
-    '  position: absolute;',
-    '  inset: 0;',
-    '  width: 100%;',
-    '  height: 100%;',
-    '}',
-    '',
-    '.hero-content {',
-    '  position: relative;',
-    '  z-index: 2;',
-    '  padding: 2rem;',
-    '}',
-    '',
-    '.hero-eye {',
-    '  font-family: var(--font-mono);',
-    '  font-size: .62rem;',
-    '  letter-spacing: .25em;',
-    '  text-transform: uppercase;',
-    '  color: var(--accent-border);',
-    '  margin-bottom: 1.2rem;',
-    '  display: flex;',
-    '  align-items: center;',
-    '  justify-content: center;',
-    '  gap: .8rem;',
-    '}',
-    '',
-    '.hero-eye::before,',
-    '.hero-eye::after {',
-    '  content: "";',
-    '  width: 32px;',
-    '  height: 1px;',
-    '  background: var(--accent);',
-    '  opacity: .45;',
-    '}',
-    '',
-    '.hero-title {',
-    '  font-family: var(--font-display);',
-    '  font-size: clamp(2.6rem, 6vw, 5rem);',
-    '  font-weight: 300;',
-    '  color: var(--fg);',
-    '  margin-bottom: .8rem;',
-    '  line-height: 1.05;',
-    '}',
-    '',
-    '.hero-title em {',
-    '  font-style: italic;',
-    '  color: var(--accent-fg);',
-    '}',
-    '',
-    '.hero-sub {',
-    '  font-size: clamp(.88rem, 1.6vw, 1.08rem);',
-    '  color: var(--fg2);',
-    '  max-width: 560px;',
-    '  margin: 0 auto 2.2rem;',
-    '  line-height: 1.72;',
-    '}',
-    '',
-    '.hero-cta {',
-    '  display: flex;',
-    '  gap: .75rem;',
-    '  justify-content: center;',
-    '  flex-wrap: wrap;',
-    '}',
-    '',
-    '.btn-primary {',
-    '  font-family: var(--font-mono);',
-    '  font-size: .62rem;',
-    '  letter-spacing: .12em;',
-    '  text-transform: uppercase;',
-    '  padding: .5rem 1.3rem;',
-    '  border-radius: 3px;',
-    '  border: 1px solid var(--accent);',
-    '  color: var(--accent);',
-    '  background: var(--accent-muted);',
-    '  cursor: pointer;',
-    '  transition: background var(--dur-base);',
-    '}',
-    '',
-    '.btn-primary:hover {',
-    '  background: var(--accent-glow);',
-    '}',
-    '',
-    '.btn-ghost {',
-    '  font-family: var(--font-mono);',
-    '  font-size: .62rem;',
-    '  letter-spacing: .12em;',
-    '  text-transform: uppercase;',
-    '  padding: .5rem 1.3rem;',
-    '  border-radius: 3px;',
-    '  border: 1px solid var(--border-1);',
-    '  color: var(--fg3);',
-    '  background: transparent;',
-    '  cursor: pointer;',
-    '  transition: all var(--dur-base);',
-    '}',
-    '',
-    '.btn-ghost:hover {',
-    '  border-color: var(--border-2);',
-    '  color: var(--fg2);',
-    '}'
-  ].join('\n');
-
-  style.textContent = css;
-  document.head.appendChild(style);
-}
-
 // -- startLoop -------------------------------------------------------
 function startLoop(tickFn) {
   if (_animId !== null) return; // already running
@@ -407,6 +280,10 @@ function runEntrance(section) {
 // -- init (exported) -------------------------------------------------
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[home] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   const section = document.querySelector('[data-section="home"]');
@@ -415,7 +292,6 @@ export function init() {
     return;
   }
 
-  injectStyles();
   buildHTML(section);
 
   // 80 ms defer so CSS layout settles before reading dimensions (CLAUDE.md rule)

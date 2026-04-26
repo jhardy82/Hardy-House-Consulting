@@ -6,6 +6,15 @@ async function goTo(page, hash) {
 
 // -- home ---------------------------------------------------------------
 test.describe('#home — hero section', () => {
+  test('active nav link has aria-current="page"; inactive links do not', async ({ page }) => {
+    await page.goto('http://localhost:3000/#home');
+    await expect(page.locator('a.nav-link[href="#home"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('a.nav-link[href="#oracle"]')).not.toHaveAttribute('aria-current');
+    await page.goto('http://localhost:3000/#oracle');
+    await expect(page.locator('a.nav-link[href="#oracle"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('a.nav-link[href="#home"]')).not.toHaveAttribute('aria-current');
+  });
+
   test('injects .hero-content with heading text', async ({ page }) => {
     await goTo(page, '#home');
     const content = page.locator('.hero-content');
@@ -30,6 +39,49 @@ test.describe('#oracle — element quiz', () => {
     await expect(steps).toBeVisible();
     await expect(steps).toContainText('How do you work best?');
   });
+
+  test('progress dots are rendered', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const prog = page.locator('[data-oracle="progress"]');
+    await expect(prog).toBeVisible();
+    await expect(prog.locator('.oracle-dot').first()).toBeVisible();
+  });
+
+  test('answer buttons are rendered in the active step', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+    await expect(steps.locator('.oracle-step.active .oracle-choice').first()).toBeVisible();
+  });
+
+  test('full quiz flow reveals the result panel', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+
+    for (let i = 0; i < 5; i++) {
+      const activeFirstChoice = page.locator(`#oracle-step-${i} .oracle-choice`).first();
+      await expect(activeFirstChoice).toBeVisible();
+      await activeFirstChoice.click();
+    }
+
+    const reveal = page.locator('[data-oracle="reveal"]');
+    await expect(reveal).toBeVisible();
+    await expect(reveal.locator('[data-oracle="element-name"]')).not.toBeEmpty();
+  });
+
+  test('completed quiz sets data-element on html element', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+    for (let i = 0; i < 5; i++) {
+      const choice = page.locator(`#oracle-step-${i} .oracle-choice`).first();
+      await expect(choice).toBeVisible();
+      await choice.click();
+    }
+    const attr = await page.locator('html').getAttribute('data-element');
+    expect(['fire', 'earth', 'air', 'water', 'aether']).toContain(attr);
+  });
 });
 
 // -- geometry -----------------------------------------------------------
@@ -42,6 +94,35 @@ test.describe('#geometry — sacred geometry explorer', () => {
   test('at least one .sc-canvas is present', async ({ page }) => {
     await goTo(page, '#geometry');
     await expect(page.locator('.sc-canvas').first()).toBeVisible();
+  });
+
+  test('clicking a mode pill activates it', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // geo-mpill: three pills rendered (both/edges/faces); first is active by default
+    const pills = page.locator('.geo-mpill');
+    await expect(pills.first()).toBeVisible();
+    const secondPill = pills.nth(1);
+    await secondPill.click();
+    await expect(secondPill).toHaveClass(/on/);
+  });
+
+  test('expand button opens fullscreen overlay', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // Each shape card has 3 .sc-btn buttons: [0] mode toggle, [1] fullscreen (⛶), [2] export (↓)
+    // The fullscreen button is index 1 within each card's .sc-btns group
+    const fsBtn = page.locator('.sc-btns .sc-btn:nth-child(2)').first();
+    await expect(fsBtn).toBeVisible();
+    await fsBtn.click();
+    await expect(page.locator('#geo-fsOverlay')).toBeVisible();
+  });
+
+  test('close button dismisses fullscreen overlay', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // Open overlay via the fullscreen (2nd) button in the first card's button group
+    await page.locator('.sc-btns .sc-btn:nth-child(2)').first().click();
+    await expect(page.locator('#geo-fsOverlay')).toBeVisible();
+    await page.locator('#geo-fsClose').click();
+    await expect(page.locator('#geo-fsOverlay')).toBeHidden();
   });
 });
 
@@ -96,6 +177,14 @@ test.describe('#grow — phyllotaxis and fractal', () => {
     await goTo(page, '#grow');
     await expect(page.locator('.grow-bg')).toBeVisible();
   });
+
+  test('switching tabs changes active canvas', async ({ page }) => {
+    await goTo(page, '#grow');
+    const fractalTab = page.locator('[data-tab="fractal"]');
+    await expect(fractalTab).toBeVisible();
+    await fractalTab.click();
+    await expect(page.locator('.fractal-canvas')).toBeVisible();
+  });
 });
 
 // -- presentation -------------------------------------------------------
@@ -105,6 +194,38 @@ test.describe('#presentation — slide deck', () => {
     const section = page.locator('section[data-section="presentation"]');
     await expect(section).toBeVisible();
     await expect(section.locator('canvas')).toBeVisible();
+  });
+});
+
+// -- dashboard ----------------------------------------------------------
+test.describe('#dashboard — agent constellation', () => {
+  test('.dashboard-constellation canvas is mounted and non-zero', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    const canvas = page.locator('.dashboard-constellation');
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box.width).toBeGreaterThan(0);
+    expect(box.height).toBeGreaterThan(0);
+  });
+
+  test('.dashboard-metrics container is present', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    await expect(page.locator('.dashboard-metrics')).toBeVisible();
+  });
+
+  test('GET /api/tasks/summary returns 200 with total field', async ({ page }) => {
+    const [response] = await Promise.all([
+      page.waitForResponse('**/api/tasks/summary'),
+      goTo(page, '#dashboard'),
+    ]);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body).toHaveProperty('total');
+  });
+
+  test('section title "Agent Constellation" is visible', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    await expect(page.locator('.dashboard-title')).toContainText('Agent Constellation');
   });
 });
 
@@ -120,5 +241,11 @@ test.describe('#contact — contact card', () => {
   test('"Get in touch" panel is visible', async ({ page }) => {
     await goTo(page, '#contact');
     await expect(page.locator('#contactPanelTitle')).toContainText('Get in touch');
+  });
+
+  test('clicking the contact panel triggers a toast notification', async ({ page }) => {
+    await goTo(page, '#contact');
+    await page.locator('#contactPanel').click();
+    await expect(page.locator('#toast')).toBeVisible({ timeout: 3000 });
   });
 });

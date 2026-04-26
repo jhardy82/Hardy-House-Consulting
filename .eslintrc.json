@@ -4,9 +4,18 @@
     "es2022": true,
     "node": true
   },
+  "globals": {
+    "THREE": "readonly",
+    "gsap": "readonly",
+    "ScrollTrigger": "readonly"
+  },
   "parserOptions": {
     "ecmaVersion": 2022,
     "sourceType": "module"
   },
-  "rules": {}
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "eqeqeq": ["error", "always"],
+    "no-var": "error"
+  }
 }
