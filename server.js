@@ -1,4 +1,5 @@
 import express from 'express';
+import compression from 'compression';
 import helmet from 'helmet';
 import session from 'express-session';
 import { fileURLToPath } from 'url';
@@ -14,6 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(compression());
 app.use(express.json({ limit: '100kb' }));
 app.use(helmet({
   contentSecurityPolicy: {
@@ -30,7 +32,11 @@ app.use(helmet({
   },
   crossOriginEmbedderPolicy: false,
 }));
-app.use(express.static(join(__dirname, 'public')));
+app.use('/vendor', express.static(join(__dirname, 'public/vendor'), {
+  maxAge: '1y',
+  immutable: true,
+}));
+app.use(express.static(join(__dirname, 'public'), { maxAge: '1h' }));
 app.use(session({
   secret: (() => {
     if (!process.env.SESSION_SECRET) {
