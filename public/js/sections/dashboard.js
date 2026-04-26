@@ -60,7 +60,7 @@ function _buildMarkup(section) {
     _el('span', { className: 'dashboard-label' }, 'ContextForge · Live'),
   );
 
-  const canvas = _el('canvas', { className: 'dashboard-constellation' });
+  const canvas = _el('canvas', { className: 'dashboard-constellation', 'aria-label': 'Agent constellation — orbital animation' });
   const legend = _el('div',   { className: 'dashboard-legend' });
 
   const metrics = _el('div', { className: 'dashboard-metrics' });

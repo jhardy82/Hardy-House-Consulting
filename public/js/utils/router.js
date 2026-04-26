@@ -29,8 +29,15 @@ async function navigate() {
   all.forEach(el => {
     if (el.tagName === 'SECTION') el.hidden = el.dataset.section !== id;
   });
-  document.querySelectorAll('.nav-link')
-    .forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+  document.querySelectorAll('.nav-link').forEach(a => {
+    const isCurrent = a.getAttribute('href') === '#' + id;
+    a.classList.toggle('active', isCurrent);
+    if (isCurrent) {
+      a.setAttribute('aria-current', 'page');
+    } else {
+      a.removeAttribute('aria-current');
+    }
+  });
 
   if (!loaded.has(id) && SECTIONS[id]) {
     try {

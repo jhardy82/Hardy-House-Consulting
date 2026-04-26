@@ -749,6 +749,7 @@ function buildDOM(section) {
   const treeCanvas = document.createElement('canvas');
   treeCanvas.className = 'tree-canvas';
   treeCanvas.id = 'tree-canvas';
+  treeCanvas.setAttribute('aria-label', 'Tree of Life — interactive canvas');
   canvasWrapTree.appendChild(treeCanvas);
   layoutTree.appendChild(canvasWrapTree);
 
@@ -796,6 +797,7 @@ function buildDOM(section) {
   const graphCanvas = document.createElement('canvas');
   graphCanvas.className = 'tree-canvas';
   graphCanvas.id = 'graph-canvas';
+  graphCanvas.setAttribute('aria-label', 'Tree of Life — interactive canvas');
   canvasWrapGraph.appendChild(graphCanvas);
   layoutGraph.appendChild(canvasWrapGraph);
 

@@ -183,6 +183,7 @@ function buildHTML(section) {
   const canvas = document.createElement('canvas');
   canvas.className = 'home-hero-canvas';
   canvas.id = 'heroCanvas';
+  canvas.setAttribute('aria-label', 'Hardy House hero — interactive Three.js animation');
   section.appendChild(canvas);
 
   // Content wrapper

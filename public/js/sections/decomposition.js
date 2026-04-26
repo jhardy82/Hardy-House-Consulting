@@ -1050,7 +1050,6 @@ function buildSolidButtons() {
 }
 
 function selectSolid(key) {
-  currentSolid = key;
   document.querySelectorAll('#dec-solidButtons .dec-solid-btn').forEach(b => {
     const on = b.dataset.key === key;
     b.classList.toggle('on', on);
@@ -1128,16 +1127,24 @@ function _initScenes() {
   buildSolidButtons();
   updatePathStrip('dec-pn-fol');
 
-  try { fol2D = new FOL2DScene(document.getElementById('dec-fol2D')); _scenes.add(fol2D); }
+  const _decFol2D = document.getElementById('dec-fol2D');
+  if (_decFol2D) _decFol2D.setAttribute('aria-label', 'Sacred geometry decomposition canvas');
+  try { fol2D = new FOL2DScene(_decFol2D); _scenes.add(fol2D); }
   catch (e) { console.warn('[decomposition] fol2D init failed:', e.message); }
 
-  try { fol3D = new FOL3DScene(document.getElementById('dec-fol3D')); _scenes.add(fol3D); }
+  const _decFol3D = document.getElementById('dec-fol3D');
+  if (_decFol3D) _decFol3D.setAttribute('aria-label', 'Sacred geometry decomposition canvas');
+  try { fol3D = new FOL3DScene(_decFol3D); _scenes.add(fol3D); }
   catch (e) { console.warn('[decomposition] fol3D init failed:', e.message); }
 
-  try { met2D = new Met2DScene(document.getElementById('dec-met2D')); _scenes.add(met2D); }
+  const _decMet2D = document.getElementById('dec-met2D');
+  if (_decMet2D) _decMet2D.setAttribute('aria-label', 'Sacred geometry decomposition canvas');
+  try { met2D = new Met2DScene(_decMet2D); _scenes.add(met2D); }
   catch (e) { console.warn('[decomposition] met2D init failed:', e.message); }
 
-  try { met3D = new Met3DScene(document.getElementById('dec-met3D')); _scenes.add(met3D); }
+  const _decMet3D = document.getElementById('dec-met3D');
+  if (_decMet3D) _decMet3D.setAttribute('aria-label', 'Sacred geometry decomposition canvas');
+  try { met3D = new Met3DScene(_decMet3D); _scenes.add(met3D); }
   catch (e) { console.warn('[decomposition] met3D init failed:', e.message); }
 
   _startTick();

@@ -23,11 +23,13 @@ export function createRenderer(canvas, {
   renderer.setSize(W, H);
   renderer.setClearColor(clearColor, clearAlpha);
 
-  new ResizeObserver(() => {
+  const ro = new ResizeObserver(() => {
+    if (!wrap.isConnected) { ro.disconnect(); return; }
     const w = wrap.clientWidth;
     const h = wrap.clientHeight;
     if (w && h) renderer.setSize(w, h);
-  }).observe(wrap);
+  });
+  ro.observe(wrap);
 
   return renderer;
 }

@@ -280,6 +280,7 @@ function showReveal(revealDiv, winner) {
   // 3D canvas -- 80ms delay lets CSS layout complete first
   const canvas = revealDiv.querySelector('[data-oracle="canvas"]');
   if (canvas) {
+    canvas.setAttribute('aria-label', 'Element oracle animation');
     setTimeout(() => {
       buildRevealCanvas(canvas, data);
       if (window.gsap) {
