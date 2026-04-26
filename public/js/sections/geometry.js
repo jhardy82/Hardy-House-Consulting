@@ -935,7 +935,7 @@ function _buildCard(cfg) {
 
   const canvas = document.createElement('canvas');
   canvas.className = 'sc-canvas';
-  canvas.setAttribute('aria-label', 'Sacred geometry explorer canvas');
+  canvas.setAttribute('aria-label', 'Three.js shape viewer — interactive canvas');
 
   const hint = document.createElement('div');
   hint.className = 'sc-hint';
@@ -1127,7 +1127,7 @@ function _buildSectionDOM(container) {
 
   const heroCanvas = document.createElement('canvas');
   heroCanvas.id = 'geo-heroCanvas';
-  heroCanvas.setAttribute('aria-label', 'Sacred geometry explorer canvas');
+  heroCanvas.setAttribute('aria-label', 'Sacred geometry hero — interactive Three.js scene');
   heroCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
 
   const heroContent = document.createElement('div');
@@ -1235,7 +1235,7 @@ function _buildSectionDOM(container) {
     const wrap2 = document.createElement('div'); wrap2.className = 's2d-wrap';
     const cvs   = document.createElement('canvas');
     cvs.id = id.replace('Card', 'Canvas').replace('geo-fol','geo-fol').replace('geo-met','geo-met');
-    cvs.setAttribute('aria-label', 'Sacred geometry explorer canvas');
+    cvs.setAttribute('aria-label', id.startsWith('geo-fol') ? 'Flower of Life geometry canvas' : "Metatron's Cube geometry canvas");
     wrap2.appendChild(cvs);
     const info  = document.createElement('div'); info.className = 'sc-info';
     const elD   = document.createElement('div'); elD.className = 'sc-el'; elD.textContent = elLabel; elD.style.color = elColor;
@@ -1312,7 +1312,7 @@ function _buildSectionDOM(container) {
 
   const fsCvs = document.createElement('canvas');
   fsCvs.id = 'geo-fsCanvas';
-  fsCvs.setAttribute('aria-label', 'Sacred geometry explorer canvas');
+  fsCvs.setAttribute('aria-label', 'Sacred geometry explorer — fullscreen canvas');
   fsCvs.style.cssText = 'border-radius:8px;display:block;cursor:grab;';
 
   const fsHint = document.createElement('div');

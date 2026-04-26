@@ -14,7 +14,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '100kb' }));
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -33,14 +33,20 @@ app.use(helmet({
 app.use(express.static(join(__dirname, 'public')));
 app.use(session({
   secret: (() => {
-    if (!process.env.SESSION_SECRET && process.env.NODE_ENV === 'production') {
-      throw new Error('SESSION_SECRET env var required in production');
+    if (!process.env.SESSION_SECRET) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('SESSION_SECRET env var required in production');
+      }
+      console.warn('[server] SESSION_SECRET not set — using insecure dev secret');
     }
     return process.env.SESSION_SECRET || 'dev-secret-change-in-prod';
   })(),
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  }
 }));
 
 app.use('/api/element',  elementRouter);

@@ -797,7 +797,7 @@ function buildDOM(section) {
   const graphCanvas = document.createElement('canvas');
   graphCanvas.className = 'tree-canvas';
   graphCanvas.id = 'graph-canvas';
-  graphCanvas.setAttribute('aria-label', 'Tree of Life — interactive canvas');
+  graphCanvas.setAttribute('aria-label', 'Agent relationship graph — interactive canvas');
   canvasWrapGraph.appendChild(graphCanvas);
   layoutGraph.appendChild(canvasWrapGraph);
 

@@ -6,6 +6,15 @@ async function goTo(page, hash) {
 
 // -- home ---------------------------------------------------------------
 test.describe('#home — hero section', () => {
+  test('active nav link has aria-current="page"; inactive links do not', async ({ page }) => {
+    await page.goto('http://localhost:3000/#home');
+    await expect(page.locator('a.nav-link[href="#home"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('a.nav-link[href="#oracle"]')).not.toHaveAttribute('aria-current');
+    await page.goto('http://localhost:3000/#oracle');
+    await expect(page.locator('a.nav-link[href="#oracle"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('a.nav-link[href="#home"]')).not.toHaveAttribute('aria-current');
+  });
+
   test('injects .hero-content with heading text', async ({ page }) => {
     await goTo(page, '#home');
     const content = page.locator('.hero-content');
@@ -168,6 +177,14 @@ test.describe('#grow — phyllotaxis and fractal', () => {
     await goTo(page, '#grow');
     await expect(page.locator('.grow-bg')).toBeVisible();
   });
+
+  test('switching tabs changes active canvas', async ({ page }) => {
+    await goTo(page, '#grow');
+    const fractalTab = page.locator('[data-tab="fractal"]');
+    await expect(fractalTab).toBeVisible();
+    await fractalTab.click();
+    await expect(page.locator('.fractal-canvas')).toBeVisible();
+  });
 });
 
 // -- presentation -------------------------------------------------------
@@ -224,5 +241,11 @@ test.describe('#contact — contact card', () => {
   test('"Get in touch" panel is visible', async ({ page }) => {
     await goTo(page, '#contact');
     await expect(page.locator('#contactPanelTitle')).toContainText('Get in touch');
+  });
+
+  test('clicking the contact panel triggers a toast notification', async ({ page }) => {
+    await goTo(page, '#contact');
+    await page.locator('#contactPanel').click();
+    await expect(page.locator('#toast')).toBeVisible({ timeout: 3000 });
   });
 });
