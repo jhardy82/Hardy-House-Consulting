@@ -1,5 +1,5 @@
 // tests/unit/yantraCoords.test.js
-import { TRIANGLES, OUTER_RINGS, tikzToCanvas }
+import { TRIANGLES, OUTER_RINGS, LOTUS_8, LOTUS_16, BHUPURA, tikzToCanvas }
   from '../../public/js/geometry/yantraCoords.js';
 
 const EPSILON = 1e-6;
@@ -47,6 +47,26 @@ describe('yantraCoords', () => {
     const [px, py] = tikzToCanvas(0.5, -0.3, cx, cy, scale);
     expect(px).toBeCloseTo(cx + 0.5 * scale, 10);
     expect(py).toBeCloseTo(cy - (-0.3) * scale, 10);
+  });
+
+  test('LOTUS_8 has r, petalW, petalH', () => {
+    expect(typeof LOTUS_8.r).toBe('number');
+    expect(typeof LOTUS_8.petalW).toBe('number');
+    expect(typeof LOTUS_8.petalH).toBe('number');
+    expect(LOTUS_8.r).toBeGreaterThan(0);
+  });
+
+  test('LOTUS_16 has r, petalW, petalH', () => {
+    expect(typeof LOTUS_16.r).toBe('number');
+    expect(typeof LOTUS_16.petalW).toBe('number');
+    expect(typeof LOTUS_16.petalH).toBe('number');
+    expect(LOTUS_16.r).toBeGreaterThan(LOTUS_8.r);
+  });
+
+  test('BHUPURA has halfSize, gateWidth', () => {
+    expect(typeof BHUPURA.halfSize).toBe('number');
+    expect(typeof BHUPURA.gateWidth).toBe('number');
+    expect(BHUPURA.halfSize).toBeGreaterThan(1);
   });
 
   test('Huet coordinates satisfy concurrency constraint', () => {
