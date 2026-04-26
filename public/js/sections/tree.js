@@ -695,50 +695,6 @@ function switchTab(tabId, tabBtns, tabPanels) {
    DOM CONSTRUCTION -- safe DOM methods only, no innerHTML with dynamic data
 ============================================================ */
 
-function injectStyles() {
-  if (document.getElementById('tree-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'tree-styles';
-
-  // textContent assignment is safe for hardcoded CSS strings
-  style.textContent = [
-    '.tree-wrap{padding:3rem 2.4rem;max-width:1200px;margin:0 auto}',
-    '.tree-header{text-align:center;margin-bottom:2rem}',
-    '.tree-eyebrow{font-family:"JetBrains Mono",monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--hh-gold,#C49A1F);margin-bottom:.4rem}',
-    '.tree-title{font-family:"Cormorant",Georgia,serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:300;color:#fff;margin-bottom:.6rem}',
-    '.tree-lead{font-size:.88rem;color:rgba(244,240,235,.62);max-width:600px;margin:0 auto}',
-    '.tree-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid rgba(196,154,31,.15);padding-bottom:.75rem}',
-    '.tree-tab-btn{font-family:"JetBrains Mono",monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;background:none;border:1px solid rgba(196,154,31,.2);color:rgba(244,240,235,.5);padding:.35rem .9rem;border-radius:3px;cursor:pointer;transition:all .2s}',
-    '.tree-tab-btn:hover{color:var(--hh-gold,#C49A1F);border-color:rgba(196,154,31,.5)}',
-    '.tree-tab-btn.active{color:var(--hh-gold,#C49A1F);background:rgba(196,154,31,.1);border-color:rgba(196,154,31,.5)}',
-    '.tree-layout{display:grid;grid-template-columns:1fr 280px;gap:1.5rem;align-items:start}',
-    '@media(max-width:768px){.tree-layout{grid-template-columns:1fr}}',
-    '.tree-canvas-wrap{width:100%;aspect-ratio:1/1.1;max-height:600px;border-radius:8px;background:rgba(7,4,15,.8);border:1px solid rgba(196,154,31,.12);overflow:hidden;position:relative}',
-    '.tree-canvas{width:100%;height:100%;display:block}',
-    '.tree-sidebar{display:flex;flex-direction:column;gap:1rem}',
-    '.tree-info-panel{background:rgba(255,255,255,.025);border:1px solid rgba(196,154,31,.15);border-radius:8px;padding:1rem 1.1rem;min-height:120px}',
-    '.tree-info-placeholder{font-size:.76rem;color:rgba(244,240,235,.35);font-style:italic;line-height:1.6}',
-    '.tree-info-name{font-family:"Cormorant",serif;font-size:1.4rem;font-weight:600;color:#fff;margin-bottom:.15rem}',
-    '.tree-info-hebrew{font-family:"JetBrains Mono",monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hh-gold,#C49A1F);margin-bottom:.5rem}',
-    '.tree-info-pillar{font-size:.74rem;color:rgba(244,240,235,.5);margin-bottom:.5rem}',
-    '.tree-info-cf-label{font-family:"JetBrains Mono",monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(196,154,31,.6);margin-bottom:.2rem}',
-    '.tree-info-cf{font-size:.82rem;color:var(--accent,#C49A1F);font-weight:500}',
-    '.tree-controls{display:flex;flex-direction:column;gap:.5rem}',
-    '.tree-ctrl-btn{font-family:"JetBrains Mono",monospace;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(196,154,31,.06);border:1px solid rgba(196,154,31,.22);color:rgba(244,240,235,.65);padding:.45rem .8rem;border-radius:4px;cursor:pointer;transition:all .18s;text-align:left}',
-    '.tree-ctrl-btn:hover{background:rgba(196,154,31,.14);color:var(--hh-gold,#C49A1F)}',
-    '.tree-ctrl-btn.active{background:rgba(196,154,31,.18);color:var(--hh-gold,#C49A1F);border-color:rgba(196,154,31,.5)}',
-    '.tree-pillar-legend{margin-top:.3rem;display:flex;flex-direction:column;gap:.35rem}',
-    '.tree-legend-item{display:flex;align-items:center;gap:.45rem;font-size:.72rem;color:rgba(244,240,235,.5)}',
-    '.tree-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}',
-    '.tree-graph-desc{font-size:.76rem;color:rgba(244,240,235,.55);line-height:1.65;margin-bottom:.8rem}',
-    '.tree-agent-list{display:flex;flex-direction:column;gap:.3rem}',
-    '.tree-agent-item{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:rgba(244,240,235,.6)}',
-    '.tree-agent-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}',
-  ].join('\n');
-
-  document.head.appendChild(style);
-}
-
 /** Create a labelled button element. */
 function makeBtn(text, cls, dataset) {
   const btn = document.createElement('button');
@@ -894,7 +850,6 @@ export function init() {
   const section = document.querySelector('[data-section="tree"]');
   if (!section) return;
 
-  injectStyles();
   buildDOM(section);
 
   // 80ms delay -- CSS layout must settle before reading canvas dimensions
