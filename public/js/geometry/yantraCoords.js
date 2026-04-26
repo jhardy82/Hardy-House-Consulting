@@ -119,7 +119,7 @@ export const LOTUS_16 = { r: 0.80, petalW: 0.12, petalH: 0.15 };
 // ---------------------------------------------------------------------------
 // Bhupura -- outer square frame with four gate openings
 // ---------------------------------------------------------------------------
-export const BHUPURA = { halfSize: 1.10, gateWidth: 0.20 };
+export const BHUPURA = { halfSize: 1.10, gateWidth: 0.20 }; // gateWidth = full opening width per gate
 
 // ---------------------------------------------------------------------------
 // TikZ space (center 0,0, y-up) -> Canvas 2D pixel space (y-down).

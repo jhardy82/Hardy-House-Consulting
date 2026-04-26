@@ -88,6 +88,22 @@ describe('yantraCoords', () => {
     }
     expect(intersections).toBeGreaterThanOrEqual(8);
 
+    // Spot-check non-adjacent pair: T2 (up, index 1) vs T7 (down, index 6).
+    // In the Huet construction, T2's apex [0, 0.46878] lies on T7's top edge
+    // (both share y=0.46878) -- a classic triple-point. These indices differ by 5,
+    // confirming the intersection constraint extends beyond adjacent pairs.
+    let nonAdjIntersections = 0;
+    const tA = TRIANGLES[1], tB = TRIANGLES[6];
+    for (let e1 = 0; e1 < 3; e1++) {
+      for (let e2 = 0; e2 < 3; e2++) {
+        const a = tA.verts[e1], b = tA.verts[(e1 + 1) % 3];
+        const c = tB.verts[e2], d = tB.verts[(e2 + 1) % 3];
+        const pt = lineIntersect(a, b, c, d);
+        if (pt && onSegment(a, b, pt) && onSegment(c, d, pt)) nonAdjIntersections++;
+      }
+    }
+    expect(nonAdjIntersections).toBeGreaterThanOrEqual(1);
+
     // Bindu (innermost triangle centroid) near origin
     const [bx, by] = TRIANGLES[0].verts.reduce(
       ([sx, sy], [x, y]) => [sx + x / 3, sy + y / 3], [0, 0]
