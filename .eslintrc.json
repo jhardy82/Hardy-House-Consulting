@@ -1,21 +1,17 @@
 {
-  "env": {
-    "browser": true,
-    "es2022": true,
-    "node": true
-  },
+  "env": { "browser": true, "es2022": true, "node": true },
   "globals": {
     "THREE": "readonly",
     "gsap": "readonly",
     "ScrollTrigger": "readonly"
   },
-  "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "module"
-  },
+  "parserOptions": { "ecmaVersion": 2022, "sourceType": "module" },
+  "extends": ["eslint:recommended"],
   "rules": {
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "eqeqeq": ["error", "always"],
-    "no-var": "error"
+    "no-var": "error",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-unreachable": "warn"
   }
 }

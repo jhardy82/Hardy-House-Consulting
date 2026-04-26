@@ -772,6 +772,10 @@ function _openFS(cfg) {
   canvas.width  = sz; canvas.height  = sz;
   canvas.style.width  = sz + 'px';
   canvas.style.height = sz + 'px';
+  // Sync FS mode pills to current _globalMode before creating the shape
+  document.querySelectorAll('.geo-fs-mpill').forEach(p => {
+    p.classList.toggle('on', p.dataset.mode === _globalMode);
+  });
   try {
     _fsShape = new SacredShape(canvas, cfg, [sz, sz]);
     _fsShape.setDisplayMode(_globalMode);
@@ -1354,6 +1358,7 @@ function _startLoop() {
    EXPORTED INIT
 ============================================================ */
 export function init() {
+  _closeFS(); // clear any orphaned FS overlay from a previous visit
   if (initialised) return; // idempotency guard
   if (!window.THREE) {
     console.warn('[geometry] Three.js not loaded');
