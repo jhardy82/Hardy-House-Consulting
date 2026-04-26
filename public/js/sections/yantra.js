@@ -9,7 +9,7 @@ let _bgObserver  = null;
 let _constructed = false;
 let _animTimers  = [];
 
-export async function init() {
+export function init() {
   if (initialised) return;
   initialised = true;
 
@@ -59,6 +59,12 @@ function _initBackground(section) {
       else if (!raf) tick();
     }, { threshold: 0.1 });
     _bgObserver.observe(section);
+
+    new ResizeObserver(() => {
+      const w = bg.parentElement.clientWidth;
+      const h = bg.parentElement.clientHeight;
+      if (w && h) { camera.aspect = w / h; camera.updateProjectionMatrix(); }
+    }).observe(bg.parentElement);
   } catch (err) {
     console.error('[yantra] background init failed:', err);
   }
@@ -82,7 +88,9 @@ function _transform(canvas) {
 function _initGeoCanvas(section) {
   const stage  = section.querySelector('.yantra-stage');
   const geo    = section.querySelector('.yantra-geo');
+  if (!stage || !geo) { console.error('[yantra] geo canvas or stage missing'); return; }
   const geoCtx = geo.getContext('2d');
+  if (!geoCtx) { console.error('[yantra] could not get 2D context'); return; }
 
   const obs = new IntersectionObserver(([entry]) => {
     if (entry.isIntersecting && !_constructed) {
@@ -154,6 +162,8 @@ export function animateConstruction(ctx, cx, cy, scale, onDone) {
     ctx.strokeStyle = 'rgba(196, 154, 31, 0.7)';
     ctx.lineWidth   = 2;
     ctx.strokeRect(cx - hs, cy - hs, hs * 2, hs * 2);
+    // clearRect cuts gate openings in all four sides -- intentional; erases any
+    // overlapping triangle strokes to produce traditional Sri Yantra gate breaks.
     const half = gw / 2;
     ctx.clearRect(cx - half, cy - hs - 1, gw, 3);
     ctx.clearRect(cx - half, cy + hs - 1, gw, 3);
