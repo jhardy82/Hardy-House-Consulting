@@ -23,9 +23,10 @@ let _globalT      = 0;
 let _scrollVel    = 0;
 let _lastSY       = 0;
 let _globalMode   = 'both';
-let _fsShape      = null;
-let _scrollHandler = null;
-let _keyHandler    = null;
+let _fsShape        = null;
+let _fsHashListener = null; // one-shot hashchange listener registered on _openFS
+let _scrollHandler  = null;
+let _keyHandler     = null;
 
 /* ============================================================
    HELPERS
@@ -780,9 +781,46 @@ function _openFS(cfg) {
     _fsShape = new SacredShape(canvas, cfg, [sz, sz]);
     _fsShape.setDisplayMode(_globalMode);
   } catch (err) { console.warn('[geometry] FS shape failed:', err.message); }
+
+  const expBtn = document.getElementById('geo-fsExport');
+  if (expBtn) {
+    expBtn.onclick = async () => {
+      const cvs = document.getElementById('geo-fsCanvas');
+      if (!cvs) return;
+      try {
+        const dataUrl = cvs.toDataURL('image/png');
+        const res = await fetch('/api/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl, filename: 'hardy-house-geometry-fs.png' }),
+        });
+        if (!res.ok) { console.warn('[geometry] Export failed:', res.status); return; }
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = 'hardy-house-geometry-fs.png'; a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) { console.warn('[geometry] Export error:', err.message); }
+    };
+  }
+
+  // One-shot guard: close overlay on ANY subsequent hash navigation.
+  // Registered on open so it fires even when Playwright batches two rapid page.goto()
+  // calls -- both hashchange events will try to fire this, first one wins.
+  if (_fsHashListener) window.removeEventListener('hashchange', _fsHashListener);
+  _fsHashListener = () => {
+    window.removeEventListener('hashchange', _fsHashListener);
+    _fsHashListener = null;
+    _closeFS();
+  };
+  window.addEventListener('hashchange', _fsHashListener);
 }
 
 function _closeFS() {
+  if (_fsHashListener) {
+    window.removeEventListener('hashchange', _fsHashListener);
+    _fsHashListener = null;
+  }
   const ol = document.getElementById('geo-fsOverlay');
   if (ol) ol.style.display = 'none';
   if (_fsShape) { _fsShape.dispose(); _fsShape = null; }
@@ -1323,11 +1361,17 @@ function _buildSectionDOM(container) {
   fsHint.id = 'geo-fsHint';
   fsHint.textContent = 'Drag to orbit -- Release for inertia';
 
+  const fsExp = document.createElement('button');
+  fsExp.id = 'geo-fsExport';
+  fsExp.style.cssText = 'font-family:JetBrains Mono,monospace;font-size:.68rem;letter-spacing:.12em;background:transparent;border:1px solid rgba(196,154,31,.32);color:rgba(196,154,31,.72);border-radius:3px;padding:.38rem .8rem;cursor:pointer;';
+  fsExp.textContent = '↓  Export PNG';
+
   fsOl.appendChild(fsClose);
   fsOl.appendChild(fsModeBar);
   fsOl.appendChild(fsInfo);
   fsOl.appendChild(fsCvs);
   fsOl.appendChild(fsHint);
+  fsOl.appendChild(fsExp);
 
   // Assemble into container
   container.appendChild(hero);
@@ -1336,7 +1380,9 @@ function _buildSectionDOM(container) {
   container.appendChild(s02);
   container.appendChild(s03);
   container.appendChild(s04);
-  container.appendChild(fsOl);
+  // Overlay is position:fixed so it works identically outside the section container.
+  // Appending to body means its visibility is NOT reset by the section's hidden state.
+  document.body.appendChild(fsOl);
 }
 
 /* ============================================================
@@ -1418,6 +1464,7 @@ export function init() {
 
   // Start render loop
   _startLoop();
+
 
   // Boot sequence -- 80ms satisfies CLAUDE.md "read dimensions after CSS layout" rule
   setTimeout(() => {

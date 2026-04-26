@@ -1,0 +1,29 @@
+session:
+  date: 2026-04-26
+  worktree: cranky-cohen-7e4630
+  organic: true
+  rule_fired: R3
+  r0_fired: false
+  skills_invoked:
+    - superpowers:superpowers-orchestrator
+    - superpowers:executing-plans
+    - superpowers:test-driven-development
+  predicates_true:
+    - resume_work
+    - has_plan
+    - code_exists
+  signal_1_pass: true
+  signal_2_pass: true
+  signal_3_pass: true
+  notes: |
+    Fleet 12 — 3 E2E coverage gaps (T1/T2/T3) + geometry export wire-up (T4).
+    T1 (oracle quiz reset): oracle.js hashchange listener resets quiz on re-entry. PASS.
+    T2 (geometry FS overlay re-entry): Required extensive debugging — root cause was
+    Playwright batching two rapid page.goto() calls before any hashchange events fire.
+    All event-listener and MutationObserver approaches failed. Fix: register a one-shot
+    hashchange listener inside _openFS() itself so ANY subsequent hash change closes
+    the overlay — independent of location.hash at callback time. Overlay moved to
+    document.body to eliminate CSS cascade re-show issue.
+    T3 (grow RAF guard): existing production code already correct — test just passed.
+    T4 (export wire-up): fsExp button added to FS overlay DOM, handler POSTs to /api/export.
+    Final: 64/64 Jest + 32/32 Playwright. diag.spec.js deleted.

@@ -82,6 +82,24 @@ test.describe('#oracle — element quiz', () => {
     const attr = await page.locator('html').getAttribute('data-element');
     expect(['fire', 'earth', 'air', 'water', 'aether']).toContain(attr);
   });
+
+  test('quiz resets to step 0 on re-entry after mid-quiz navigation', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+
+    // Answer question 0 — advances to step 1
+    await page.locator('#oracle-step-0 .oracle-choice').first().click();
+
+    // Navigate away mid-quiz then return
+    await goTo(page, '#home');
+    await goTo(page, '#oracle');
+    await expect(steps).toBeVisible();
+
+    // Step 0 must be the active step; result panel must be hidden
+    await expect(page.locator('#oracle-step-0')).toHaveClass(/active/);
+    await expect(page.locator('[data-oracle="reveal"]')).toBeHidden();
+  });
 });
 
 // -- geometry -----------------------------------------------------------
@@ -122,6 +140,22 @@ test.describe('#geometry — sacred geometry explorer', () => {
     await page.locator('.sc-btns .sc-btn:nth-child(2)').first().click();
     await expect(page.locator('#geo-fsOverlay')).toBeVisible();
     await page.locator('#geo-fsClose').click();
+    await expect(page.locator('#geo-fsOverlay')).toBeHidden();
+  });
+
+  test('FS overlay is hidden on re-entry after navigating away with overlay open', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // Open fullscreen overlay via second button in first card's button group
+    await page.locator('.sc-btns .sc-btn:nth-child(2)').first().click();
+    await expect(page.locator('#geo-fsOverlay')).toBeVisible();
+
+    // Navigate away without closing FS overlay
+    await goTo(page, '#home');
+    // Return — _closeFS() is called at the top of init() (geometry.js line 361)
+    await goTo(page, '#geometry');
+    await expect(page.locator('section[data-section="geometry"]')).toBeVisible();
+
+    // Overlay must be hidden — no zombie overlay
     await expect(page.locator('#geo-fsOverlay')).toBeHidden();
   });
 });
@@ -184,6 +218,27 @@ test.describe('#grow — phyllotaxis and fractal', () => {
     await expect(fractalTab).toBeVisible();
     await fractalTab.click();
     await expect(page.locator('.fractal-canvas')).toBeVisible();
+  });
+
+  test('rapid section re-entry does not leave stale RAF or crash', async ({ page }) => {
+    const errors = [];
+    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+
+    await goTo(page, '#grow');
+    // 4 rapid away/back cycles — exercises IntersectionObserver pause/resume
+    for (let i = 0; i < 4; i++) {
+      await goTo(page, '#home');
+      await goTo(page, '#grow');
+    }
+
+    await expect(page.locator('.grow-bg')).toBeVisible();
+
+    // Tab switching still functions after rapid cycles
+    const fractalTab = page.locator('[data-tab="fractal"]');
+    await fractalTab.click();
+    await expect(page.locator('.fractal-canvas')).toBeVisible();
+
+    expect(errors).toHaveLength(0);
   });
 });
 
