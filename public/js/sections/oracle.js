@@ -13,7 +13,6 @@ import { createRenderer } from '../utils/createRenderer.js';
 
 // -- Module-level state -------------------------------------------------------
 
-let initialised = false;
 let _oRevealScene = null; // registered into _scenes; cleared on re-init
 
 // -- Questions ----------------------------------------------------------------
@@ -293,12 +292,10 @@ function showReveal(revealDiv, winner) {
 // -- init() -------------------------------------------------------------------
 
 export function init() {
-  if (initialised) return;
   if (!window.THREE) {
     console.warn('[oracle] Three.js not loaded');
     return;
   }
-  initialised = true;
 
   const section = document.querySelector('[data-section="oracle"]');
   if (!section) return;
@@ -314,12 +311,16 @@ export function init() {
     return;
   }
 
+  // Reset quiz DOM to initial state (handles mid-quiz re-entry after navigation)
+  progEl.style.display  = '';
+  stepsEl.style.display = '';
+  revealDiv.style.display = 'none';
+
   // Fresh per-quiz scores
   const scores = { fire: 0, earth: 0, air: 0, water: 0, aether: 0 };
 
   buildProgressDots(progEl, ORACLE_QUESTIONS.length);
   buildSteps(stepsEl, ORACLE_QUESTIONS, handleAnswer);
-  revealDiv.style.display = 'none';
 
   function handleAnswer(qIdx, aIdx) {
     const q = ORACLE_QUESTIONS[qIdx];

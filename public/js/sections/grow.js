@@ -781,6 +781,8 @@ function _initTabs(section) {
       requestAnimationFrame(() => {
         const pnl = section.querySelector(`.grow-panel[data-panel="${target}"]`);
         if (!pnl) return;
+        // Guard: abort if this panel is no longer the active one (rapid tab switch)
+        if (!pnl.classList.contains('grow-panel--active')) return;
         const c = pnl.querySelector('canvas');
         if (c) {
           const parent = c.parentElement;

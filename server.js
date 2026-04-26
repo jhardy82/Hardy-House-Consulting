@@ -50,7 +50,7 @@ app.use(session({
 }));
 
 app.use('/api/element',  elementRouter);
-app.use('/api/export',   exportRouter);
+app.use('/api/export',   express.json({ limit: '2mb' }), exportRouter);
 app.use('/api/agents',   agentsRouter);
 app.use('/api/tasks',    tasksSummaryRouter);
 app.use('/tasks',        tasksRouter);
