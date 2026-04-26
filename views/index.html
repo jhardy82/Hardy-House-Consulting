@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="/css/sections/tree.css">
   <link rel="stylesheet" href="/css/sections/contact.css">
   <link rel="stylesheet" href="/css/sections/grow.css">
+  <link rel="stylesheet" href="/css/sections/yantra.css">
   <link rel="stylesheet" href="/css/presentation.css">
 
   <link rel="modulepreload" href="/js/sections/geometry.js">
@@ -46,6 +47,7 @@
       <li><a class="nav-link" href="#decomposition">Decomposition</a></li>
       <li><a class="nav-link" href="#variants">Variants</a></li>
       <li><a class="nav-link" href="#tree">Tree</a></li>
+      <li><a class="nav-link" href="#yantra">Yantra</a></li>
       <li><a class="nav-link" href="#grow">Grow</a></li>
       <li><a class="nav-link" href="#presentation">Presentation</a></li>
       <li><a class="nav-link" href="#contact">Contact</a></li>
@@ -74,6 +76,24 @@
     <section data-section="decomposition" hidden><div class="section-inner"><h1>Decomposition</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="variants"      hidden><div class="section-inner"><h1>Variants</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="tree"          hidden><div class="section-inner"><h1>Tree of Life</h1><p class="muted">Placeholder.</p></div></section>
+    <section data-section="yantra" hidden>
+      <div class="yantra-wrap">
+        <canvas class="yantra-bg" aria-hidden="true"></canvas>
+        <div class="yantra-stage">
+          <canvas class="yantra-geo" aria-label="Sri Yantra geometry"></canvas>
+          <canvas class="yantra-overlay" aria-hidden="true"></canvas>
+        </div>
+        <div class="yantra-controls" aria-disabled="true">
+          <div class="yantra-mode-pills">
+            <button class="yantra-pill" data-yantra="paoal">PAOAL</button>
+            <button class="yantra-pill" data-yantra="element">Element</button>
+          </div>
+          <button class="yantra-toggle" data-yantra="toggle" disabled>Show overlay</button>
+          <button class="yantra-replay" data-yantra="replay">Replay</button>
+        </div>
+        <div class="yantra-legend" data-yantra="legend" hidden></div>
+      </div>
+    </section>
     <section data-section="grow"          hidden><div class="section-inner"><h1>Grow</h1><p class="muted">Placeholder.</p></div></section>
     <section data-section="presentation"  hidden></section>
     <section data-section="contact"       hidden><div class="section-inner"><h1>Contact</h1><p class="muted">Placeholder.</p></div></section>

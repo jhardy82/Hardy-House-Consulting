@@ -11,6 +11,7 @@ const SECTIONS = {
   decomposition: () => import('../sections/decomposition.js'),
   variants:      () => import('../sections/variants.js'),
   tree:          () => import('../sections/tree.js'),
+  yantra:        () => import('../sections/yantra.js'),
   grow:          () => import('../sections/grow.js'),
   presentation:  () => import('../sections/presentation.js'),
   contact:       () => import('../sections/contact.js'),

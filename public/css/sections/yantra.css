@@ -1,0 +1,159 @@
+/* public/css/sections/yantra.css */
+.yantra-wrap {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 500px;
+  overflow: hidden;
+  background: var(--hh-void);
+}
+
+.yantra-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.yantra-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.yantra-geo,
+.yantra-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.yantra-geo     { z-index: 1; }
+.yantra-overlay { z-index: 2; pointer-events: none; }
+
+.yantra-controls {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.yantra-controls:not([aria-disabled]) {
+  opacity: 1;
+}
+
+.yantra-mode-pills {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.yantra-pill {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--hh-gold);
+  background: transparent;
+  color: var(--hh-gold);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.yantra-pill--active,
+.yantra-pill:hover {
+  background: var(--hh-gold);
+  color: var(--hh-void);
+}
+
+.yantra-toggle,
+.yantra-replay {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--hh-aether);
+  background: transparent;
+  color: var(--hh-aether);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.yantra-toggle:hover,
+.yantra-replay:hover {
+  background: var(--hh-aether);
+  color: var(--hh-void);
+}
+
+.yantra-toggle:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.yantra-legend {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  background: rgba(7, 4, 15, 0.85);
+  border: 1px solid rgba(155, 123, 224, 0.3);
+  border-radius: 4px;
+  padding: 0.75rem;
+  min-width: 14rem;
+}
+
+.yantra-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.35rem;
+}
+
+.yantra-legend-row:last-child { margin-bottom: 0; }
+
+.yantra-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .yantra-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    bottom: 1rem;
+  }
+  .yantra-legend {
+    top: auto;
+    bottom: 6rem;
+    right: 0.75rem;
+    min-width: 11rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .yantra-controls {
+    gap: 0.4rem;
+  }
+  .yantra-pill,
+  .yantra-toggle,
+  .yantra-replay {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
