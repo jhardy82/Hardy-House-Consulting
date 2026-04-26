@@ -32,9 +32,11 @@
   /* Extended palette — derived, not primary */
   --hh-void-2:     #0D0820;   /* Slightly lighter than void — card backgrounds */
   --hh-void-3:     #050210;   /* Canvas background — deepest */
-  --hh-gold-dim:   rgba(196, 154, 31, 0.22);  /* Borders at rest */
-  --hh-gold-mid:   rgba(196, 154, 31, 0.45);  /* Borders on hover */
-  --hh-gold-hi:    rgba(196, 154, 31, 0.80);  /* Borders active / selected */
+  --hh-gold-dim:      rgba(196, 154, 31, 0.22);   /* Borders at rest */
+  --hh-gold-mid:      rgba(196, 154, 31, 0.45);   /* Borders on hover */
+  --hh-gold-hi:       rgba(196, 154, 31, 0.80);   /* Borders active / selected */
+  --hh-void-overlay:  rgba(7, 4, 15, 0.85);       /* Semi-transparent void bg (panels, legends) */
+  --hh-aether-dim:    rgba(155, 123, 224, 0.30);  /* Subtle aether border */
 
   /* Foreground scale */
   --hh-fg:         #F4F0EB;   /* Primary text */
