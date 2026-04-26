@@ -845,6 +845,10 @@ function buildDOM(section) {
 ============================================================ */
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[tree] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   const section = document.querySelector('[data-section="tree"]');

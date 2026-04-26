@@ -670,8 +670,11 @@ function buildShell() {
 
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[variants] Three.js not loaded');
+    return;
+  }
   initialised = true;
-
 
   // Find the section mount point created by the router
   let container = document.getElementById('section-variants')

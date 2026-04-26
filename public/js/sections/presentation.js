@@ -456,6 +456,10 @@ function tick() {
 
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[presentation] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   const section = document.querySelector('[data-section="presentation"]');

@@ -20,6 +20,10 @@ let _initialized = false;
 
 export function init() {
   if (_initialized) return;
+  if (!window.THREE) {
+    console.warn('[dashboard] Three.js not loaded');
+    return;
+  }
   _initialized = true;
 
   const section = document.querySelector('[data-section="dashboard"]');

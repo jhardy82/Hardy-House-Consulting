@@ -60,6 +60,19 @@ test.describe('#oracle — element quiz', () => {
     await expect(reveal).toBeVisible();
     await expect(reveal.locator('[data-oracle="element-name"]')).not.toBeEmpty();
   });
+
+  test('completed quiz sets data-element on html element', async ({ page }) => {
+    await goTo(page, '#oracle');
+    const steps = page.locator('[data-oracle="steps"]');
+    await expect(steps).toBeVisible();
+    for (let i = 0; i < 5; i++) {
+      const choice = page.locator(`#oracle-step-${i} .oracle-choice`).first();
+      await expect(choice).toBeVisible();
+      await choice.click();
+    }
+    const attr = await page.locator('html').getAttribute('data-element');
+    expect(['fire', 'earth', 'air', 'water', 'aether']).toContain(attr);
+  });
 });
 
 // -- geometry -----------------------------------------------------------
@@ -72,6 +85,35 @@ test.describe('#geometry — sacred geometry explorer', () => {
   test('at least one .sc-canvas is present', async ({ page }) => {
     await goTo(page, '#geometry');
     await expect(page.locator('.sc-canvas').first()).toBeVisible();
+  });
+
+  test('clicking a mode pill activates it', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // geo-mpill: three pills rendered (both/edges/faces); first is active by default
+    const pills = page.locator('.geo-mpill');
+    await expect(pills.first()).toBeVisible();
+    const secondPill = pills.nth(1);
+    await secondPill.click();
+    await expect(secondPill).toHaveClass(/on/);
+  });
+
+  test('expand button opens fullscreen overlay', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // Each shape card has 3 .sc-btn buttons: [0] mode toggle, [1] fullscreen (⛶), [2] export (↓)
+    // The fullscreen button is index 1 within each card's .sc-btns group
+    const fsBtn = page.locator('.sc-btns .sc-btn:nth-child(2)').first();
+    await expect(fsBtn).toBeVisible();
+    await fsBtn.click();
+    await expect(page.locator('#geo-fsOverlay')).toBeVisible();
+  });
+
+  test('close button dismisses fullscreen overlay', async ({ page }) => {
+    await goTo(page, '#geometry');
+    // Open overlay via the fullscreen (2nd) button in the first card's button group
+    await page.locator('.sc-btns .sc-btn:nth-child(2)').first().click();
+    await expect(page.locator('#geo-fsOverlay')).toBeVisible();
+    await page.locator('#geo-fsClose').click();
+    await expect(page.locator('#geo-fsOverlay')).toBeHidden();
   });
 });
 

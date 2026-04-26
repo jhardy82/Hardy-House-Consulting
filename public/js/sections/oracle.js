@@ -293,6 +293,10 @@ function showReveal(revealDiv, winner) {
 
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[oracle] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   const section = document.querySelector('[data-section="oracle"]');

@@ -1351,6 +1351,10 @@ function _startLoop() {
 ============================================================ */
 export function init() {
   if (initialised) return; // idempotency guard
+  if (!window.THREE) {
+    console.warn('[geometry] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   // Reset module state

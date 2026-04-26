@@ -21,7 +21,9 @@ export async function setElement(element) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ element })
     });
-  } catch { /* offline: localStorage still has the value */ }
+  } catch (err) {
+    console.warn('[elementState] Failed to sync element to server:', err.message);
+  }
 }
 
 function applyElement(element) {

@@ -91,6 +91,10 @@ function el(tag, attrs, ...children) {
 
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[grow] Three.js not loaded');
+    return;
+  }
 
   const section = document.querySelector('[data-section="grow"]');
   if (!section) return;

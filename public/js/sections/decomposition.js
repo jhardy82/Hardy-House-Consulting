@@ -27,6 +27,10 @@ let initialised = false;
 
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[decomposition] Three.js not loaded');
+    return;
+  }
   initialised = true;
   // 80ms delay: CSS layout must complete before reading parentElement dimensions
   setTimeout(_boot, 80);

@@ -279,6 +279,10 @@ function runEntrance(section) {
 // -- init (exported) -------------------------------------------------
 export function init() {
   if (initialised) return;
+  if (!window.THREE) {
+    console.warn('[home] Three.js not loaded');
+    return;
+  }
   initialised = true;
 
   const section = document.querySelector('[data-section="home"]');
