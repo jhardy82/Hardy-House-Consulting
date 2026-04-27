@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: 'Hardy House Consulting <onboarding@resend.dev>',
-      to: 'james@hardyhouseconsulting.com',
+      to: 'james.hardy1124@gmail.com',
       replyTo: email,
       subject: `Hardy House — message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
