@@ -11,6 +11,7 @@ import exportRouter  from './routes/api/export.js';
 import agentsRouter       from './routes/api/agents.js';
 import tasksSummaryRouter from './routes/api/tasks-summary.js';
 import analyticsRouter    from './routes/api/analytics.js';
+import contactRouter    from './routes/api/contact.js';
 import tasksRouter        from './routes/tasks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -63,6 +64,8 @@ app.use('/api/export',     express.json({ limit: '2mb' }), exportRouter);
 app.use('/api/agents',     agentsRouter);
 app.use('/api/tasks',      tasksSummaryRouter);
 app.use('/api/analytics',  analyticsRouter);
+app.use('/api/contact', rateLimit({ windowMs: 10 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production', handler: (_req, res) => res.status(429).json({ error: 'Too many requests — try again later' }) }));
+app.use('/api/contact',    contactRouter);
 app.use('/tasks',          tasksRouter);
 app.use('/',             pagesRouter);
 
