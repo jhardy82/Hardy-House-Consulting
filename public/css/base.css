@@ -84,7 +84,7 @@ body {
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--hh-fg-3);
+  color: var(--hh-fg-2);
   text-decoration: none;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
@@ -135,7 +135,7 @@ body {
 
 /* ── Typography helpers ──────────────────────────────────── */
 .muted {
-  color: var(--hh-fg-3);
+  color: var(--hh-fg-2);
   font-size: var(--text-sm);
 }
 
@@ -159,7 +159,7 @@ a:hover { text-decoration: underline; }
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-wide);
-  color: var(--hh-fg-4);
+  color: var(--hh-fg-2);
 }
 
 /* ── Toast ──────────────────────────────────────────────── */
