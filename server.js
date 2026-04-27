@@ -57,7 +57,7 @@ app.use(session({
   }
 }));
 
-app.use('/api/element', rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false }));
+app.use('/api/element', rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production' }));
 app.use('/api/element',    elementRouter);
 app.use('/api/export',     express.json({ limit: '2mb' }), exportRouter);
 app.use('/api/agents',     agentsRouter);
