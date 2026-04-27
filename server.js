@@ -60,9 +60,12 @@ app.use(session({
 
 app.use('/api/element', rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production' }));
 app.use('/api/element',    elementRouter);
+app.use('/api/export',    rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production' }));
 app.use('/api/export',     express.json({ limit: '2mb' }), exportRouter);
 app.use('/api/agents',     agentsRouter);
+app.use('/api/tasks',     rateLimit({ windowMs: 60_000, max: 30, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production' }));
 app.use('/api/tasks',      tasksSummaryRouter);
+app.use('/api/analytics', rateLimit({ windowMs: 60_000, max: 30, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production' }));
 app.use('/api/analytics',  analyticsRouter);
 app.use('/api/contact', rateLimit({ windowMs: 10 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, skip: () => process.env.NODE_ENV !== 'production', handler: (_req, res) => res.status(429).json({ error: 'Too many requests — try again later' }) }));
 app.use('/api/contact',    contactRouter);
