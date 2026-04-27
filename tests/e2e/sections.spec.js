@@ -176,6 +176,29 @@ test.describe('#geometry — sacred geometry explorer', () => {
     // Assert: no GSAP warnings about missing targets
     expect(gsapWarnings).toHaveLength(0);
   });
+
+  test('3D Metatron canvas is mounted and non-zero', async ({ page }) => {
+    await goTo(page, '#geometry');
+    const canvas = page.locator('#geo-met3dCanvas');
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box.width).toBeGreaterThan(0);
+    expect(box.height).toBeGreaterThan(0);
+  });
+
+  test('Tesseract card is present in the extended grid', async ({ page }) => {
+    await goTo(page, '#geometry');
+    const card = page.locator('.shape-card[data-id="tesseract"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText('Tesseract');
+  });
+
+  test('Stellated Dodecahedron card is present in the extended grid', async ({ page }) => {
+    await goTo(page, '#geometry');
+    const card = page.locator('.shape-card[data-id="steldodeca"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText('Stellated Dodecahedron');
+  });
 });
 
 // -- decomposition ------------------------------------------------------
