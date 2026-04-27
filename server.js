@@ -9,6 +9,7 @@ import elementRouter from './routes/api/element.js';
 import exportRouter  from './routes/api/export.js';
 import agentsRouter       from './routes/api/agents.js';
 import tasksSummaryRouter from './routes/api/tasks-summary.js';
+import analyticsRouter    from './routes/api/analytics.js';
 import tasksRouter        from './routes/tasks.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -55,11 +56,12 @@ app.use(session({
   }
 }));
 
-app.use('/api/element',  elementRouter);
-app.use('/api/export',   express.json({ limit: '2mb' }), exportRouter);
-app.use('/api/agents',   agentsRouter);
-app.use('/api/tasks',    tasksSummaryRouter);
-app.use('/tasks',        tasksRouter);
+app.use('/api/element',    elementRouter);
+app.use('/api/export',     express.json({ limit: '2mb' }), exportRouter);
+app.use('/api/agents',     agentsRouter);
+app.use('/api/tasks',      tasksSummaryRouter);
+app.use('/api/analytics',  analyticsRouter);
+app.use('/tasks',          tasksRouter);
 app.use('/',             pagesRouter);
 
 app.use((err, _req, res, _next) => {
