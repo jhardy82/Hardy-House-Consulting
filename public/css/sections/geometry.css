@@ -75,12 +75,19 @@
 .sc-meaning{font-size:.75rem;color:rgba(244,240,235,.5);line-height:1.6;}
 
 /* 2D forms */
-.s2d-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+.s2d-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;}
 .s2d-card{background:rgba(255,255,255,.024);border:1px solid rgba(196,154,31,.1);border-radius:10px;overflow:hidden;
   opacity:0;transform:translateY(30px);}
 .s2d-card.visible{opacity:1;transform:translateY(0);}
 .s2d-wrap{position:relative;width:100%;aspect-ratio:1;background:var(--hh-void-3);overflow:hidden;}
 .s2d-wrap canvas{display:block;width:100%;height:100%;}
+.geo-3d-mode-pills{position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%);
+  display:flex;gap:.3rem;z-index:2;}
+.geo-3d-mpill{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.09em;text-transform:uppercase;
+  padding:.22rem .6rem;border-radius:100px;cursor:pointer;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(244,240,235,.5);transition:all .2s;}
+.geo-3d-mpill:hover{border-color:rgba(196,154,31,.3);color:rgba(196,154,31,.8);}
+.geo-3d-mpill.on{background:rgba(196,154,31,.12);border-color:rgba(196,154,31,.52);color:var(--hh-gold);}
 
 /* Philosophy */
 .phil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}

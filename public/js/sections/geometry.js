@@ -752,6 +752,162 @@ class MetatronScene {
 }
 
 /* ============================================================
+   METATRON 3D SCENE -- Vector Equilibrium: 13 sphere-nodes + 78 lines in 3D
+   13 VE_POSITIONS matches FRUIT_IDX invariant (CLAUDE.md)
+   78 connecting lines: C(13,2) = MET_EDGES invariant (CLAUDE.md)
+============================================================ */
+class Metatron3DScene {
+  constructor(canvas) {
+    this.running = true; this.drawn = 0; this.totalV = 0;
+    this.lGeo = null; this.gGeo = null; this._nodeMeshes = []; this._lineSeg = null;
+    this._displayMode = 'both';
+
+    const wrap = canvas.parentElement;
+    const W = wrap.clientWidth  || 400;
+    const H = wrap.clientHeight || 400;
+
+    try {
+      this.scene  = new THREE.Scene();
+      this.camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+    } catch (err) { console.warn('[geometry] Metatron3D camera failed:', err.message); return; }
+
+    this.orbit = new OrbitControl(this.camera, 5.5);
+    this.orbit.update(false);
+
+    try {
+      this.renderer = createRenderer(canvas);
+      this.renderer.setSize(W, H);
+      this.camera.aspect = W / H;
+      this.camera.updateProjectionMatrix();
+    } catch (err) { console.warn('[geometry] Metatron3D renderer failed:', err.message); return; }
+
+    try {
+      const al  = new THREE.AmbientLight(0x1A0D3D, 0.65);
+      const pl1 = new THREE.PointLight(0xC49A1F, 1.45, 14); pl1.position.set(2.5, 2, 3.5);
+      const pl2 = new THREE.PointLight(0x1E3FAA,  .50, 10); pl2.position.set(-2, -1, 2);
+      this.scene.add(al, pl1, pl2);
+    } catch (err) { console.warn('[geometry] Metatron3D lights failed:', err.message); }
+
+    this.group = new THREE.Group();
+    this.scene.add(this.group);
+
+    // Vector Equilibrium: 1 centre + 12 cuboctahedron vertices
+    const R = 1.1;
+    const VE_POSITIONS = [
+      [0,  0,  0],
+      [ 0, R, R], [ 0, R,-R], [ 0,-R, R], [ 0,-R,-R],
+      [ R, 0, R], [ R, 0,-R], [-R, 0, R], [-R, 0,-R],
+      [ R, R, 0], [ R,-R, 0], [-R, R, 0], [-R,-R, 0],
+    ];
+    if (VE_POSITIONS.length !== 13) {
+      console.error('[geometry] Metatron3D VE position count violated:', VE_POSITIONS.length, '!== 13');
+    }
+
+    try {
+      VE_POSITIONS.forEach(([x, y, z], idx) => {
+        const radius = idx === 0 ? 0.10 : 0.07;
+        const geo  = new THREE.SphereGeometry(radius, 12, 12);
+        const col  = idx === 0 ? 0xC49A1F : 0x9B7BE0;
+        const mesh = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({
+          color: col, emissive: col, emissiveIntensity: .32, transparent: true, opacity: .92
+        }));
+        mesh.position.set(x, y, z);
+        this.group.add(mesh);
+        this._nodeMeshes.push(mesh);
+      });
+    } catch (err) { console.warn('[geometry] Metatron3D nodes failed:', err.message); }
+
+    const verts = [];
+    for (let i = 0; i < 13; i++) {
+      for (let j = i + 1; j < 13; j++) {
+        const a = VE_POSITIONS[i], b = VE_POSITIONS[j];
+        verts.push(a[0], a[1], a[2], b[0], b[1], b[2]);
+      }
+    }
+    const edgeCount = verts.length / 6;
+    if (edgeCount !== 78) {
+      console.error('[geometry] Metatron3D edge count violated:', edgeCount, '!== 78');
+    }
+    this.totalV = verts.length / 3; // 156 draw vertices
+
+    try {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geo.setDrawRange(0, 0);
+      const lMat = new THREE.LineBasicMaterial({
+        color: 0xC49A1F, transparent: true, opacity: .55,
+        blending: THREE.AdditiveBlending
+      });
+      this._lineSeg = new THREE.LineSegments(geo, lMat);
+      this.group.add(this._lineSeg);
+      this.lGeo = geo;
+
+      const geo2 = new THREE.BufferGeometry();
+      geo2.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geo2.setDrawRange(0, 0);
+      const gls = new THREE.LineSegments(geo2, new THREE.LineBasicMaterial({
+        color: 0xC49A1F, transparent: true, opacity: .08,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      gls.scale.setScalar(1.04);
+      this.group.add(gls);
+      this.gGeo = geo2;
+    } catch (err) { console.warn('[geometry] Metatron3D line geo failed:', err.message); }
+
+    new ResizeObserver(() => {
+      if (!this.camera || !this.renderer) return;
+      const w = wrap.clientWidth, h = wrap.clientHeight;
+      if (w && h) {
+        this.camera.aspect = w / h;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(w, h);
+      }
+    }).observe(wrap);
+
+    this.orbit.bind(canvas);
+    setTimeout(() => this._draw(), 600);
+    _allShapes.add(this);
+  }
+
+  _draw() {
+    const step = () => {
+      if (!this.running || this.drawn >= this.totalV) return;
+      this.drawn = Math.min(this.drawn + 4, this.totalV);
+      if (this.lGeo) this.lGeo.setDrawRange(0, this.drawn);
+      if (this.gGeo) this.gGeo.setDrawRange(0, this.drawn);
+      setTimeout(step, 22);
+    };
+    step();
+  }
+
+  setDisplayMode(mode) {
+    this._displayMode = mode;
+    const showLines = mode !== 'faces';
+    const showNodes = mode !== 'edges';
+    if (this._lineSeg) this._lineSeg.visible = showLines;
+    if (this.gGeo) {
+      const glowSeg = this.group.children.find(
+        c => c !== this._lineSeg && (c.isLineSegments || c.isLine)
+      );
+      if (glowSeg) glowSeg.visible = showLines;
+    }
+    this._nodeMeshes.forEach(m => { m.visible = showNodes; });
+  }
+
+  tick(t, boost = 1) {
+    if (!this.running || !this.renderer) return;
+    this.orbit.update(!this.orbit.dn);
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  dispose() {
+    this.running = false;
+    _allShapes.delete(this);
+    if (this.renderer) this.renderer.dispose();
+  }
+}
+
+/* ============================================================
    HERO SCENE -- nested solids + fog + parallax
 ============================================================ */
 function _initHero() {
@@ -1225,8 +1381,9 @@ function _initGrid(shapes, containerId) {
 }
 
 function _init2D() {
-  const folC = document.getElementById('geo-folCanvas');
-  const metC = document.getElementById('geo-metCanvas');
+  const folC   = document.getElementById('geo-folCanvas');
+  const metC   = document.getElementById('geo-metCanvas');
+  const met3dC = document.getElementById('geo-met3dCanvas');
   if (!folC || !metC) return;
 
   new IntersectionObserver((entries, obs) => {
@@ -1242,6 +1399,19 @@ function _init2D() {
       obs.disconnect();
     }
   }, { threshold: .1 }).observe(metC);
+
+  if (met3dC) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries[0].isIntersecting) {
+        try {
+          const scene = new Metatron3DScene(met3dC);
+          const card  = document.getElementById('geo-met3dCard');
+          if (card) card._scene = scene;
+        } catch (err) { console.warn('[geometry] Metatron3D init failed:', err.message); }
+        obs.disconnect();
+      }
+    }, { threshold: .1 }).observe(met3dC);
+  }
 }
 
 /* ============================================================
@@ -1414,8 +1584,8 @@ function _buildSectionDOM(container) {
     'geo-extendedGrid');
 
   // 2D section
-  const s03 = mkSection('03 -- Two-Dimensional Sacred Forms', 'Pattern & Structure',
-    "The Flower of Life and Metatron's Cube are foundational 2D sacred geometry forms. The Flower generates all five Platonic solids within its structure. Metatron's Cube is drawn progressively -- 78 lines connecting 13 circle centres.",
+  const s03 = mkSection('03 -- Sacred Forms: 2D + 3D', 'Pattern & Structure',
+    "The Flower of Life and Metatron's Cube in 2D, plus the full 3D Vector Equilibrium: 13 sphere-nodes at cuboctahedron positions connected by all 78 Metatron lines. Drag to orbit.",
     null);
   const s2dGrid = document.createElement('div');
   s2dGrid.className = 's2d-grid';
@@ -1447,6 +1617,37 @@ function _buildSectionDOM(container) {
     '13 circles -- 78 connecting lines -- All 5 Platonic solids encoded within',
     'All five Platonic solids can be found within Metatron\'s Cube. In ContextForge it represents the unified field from which all agent architectures and team topologies derive. Lines are drawn progressively on entry.'
   ));
+
+  // 3D Metatron card -- separate from mk2DCard: needs mode pills
+  const met3dCard = document.createElement('div');
+  met3dCard.className = 's2d-card'; met3dCard.id = 'geo-met3dCard';
+  const wrap3d = document.createElement('div'); wrap3d.className = 's2d-wrap';
+  const cvs3d  = document.createElement('canvas');
+  cvs3d.id = 'geo-met3dCanvas';
+  cvs3d.setAttribute('aria-label', "Metatron's Cube 3D geometry canvas -- drag to orbit");
+  wrap3d.appendChild(cvs3d);
+  const pills3d = document.createElement('div'); pills3d.className = 'geo-3d-mode-pills';
+  [['both','Both'],['edges','Lines'],['faces','Nodes']].forEach(([mode, lbl], i) => {
+    const btn = document.createElement('button');
+    btn.className = 'geo-3d-mpill' + (i === 0 ? ' on' : '');
+    btn.dataset.mode = mode; btn.textContent = lbl;
+    btn.addEventListener('click', () => {
+      pills3d.querySelectorAll('.geo-3d-mpill').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      if (met3dCard._scene) met3dCard._scene.setDisplayMode(mode);
+    });
+    pills3d.appendChild(btn);
+  });
+  wrap3d.appendChild(pills3d);
+  const info3d = document.createElement('div'); info3d.className = 'sc-info';
+  const el3d   = document.createElement('div'); el3d.className = 'sc-el'; el3d.textContent = 'Structure'; el3d.style.color = '#C49A1F';
+  const nm3d   = document.createElement('div'); nm3d.className = 'sc-name'; nm3d.textContent = "Metatron's Cube (3D)";
+  const ft3d   = document.createElement('div'); ft3d.className = 'sc-facts'; ft3d.textContent = '13 nodes -- 78 lines -- Vector Equilibrium';
+  const mn3d   = document.createElement('div'); mn3d.className = 'sc-meaning'; mn3d.textContent = 'The 13 Fruit of Life centres lifted into three dimensions -- 1 centre node plus 12 cuboctahedron vertices connected by all 78 Metatron lines. Drag to orbit. Toggle Lines / Nodes / Both with the pills above.';
+  info3d.appendChild(el3d); info3d.appendChild(nm3d); info3d.appendChild(ft3d); info3d.appendChild(mn3d);
+  met3dCard.appendChild(wrap3d); met3dCard.appendChild(info3d);
+  s2dGrid.appendChild(met3dCard);
+
   s03.appendChild(s2dGrid);
 
   // Fix canvas IDs (mk2DCard uses card id logic -- correct here)
