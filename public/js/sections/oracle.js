@@ -34,7 +34,7 @@ const ORACLE_QUESTIONS = [
     q:   'Motion or stillness?',
     ctx: 'Where does your best thinking happen.',
     a:   ['In motion -- walking, driving', 'In stillness -- quiet focus'],
-    el:  ['air', 'water'],
+    el:  ['water', 'air'],
   },
   {
     q:   'Detail or vision?',
