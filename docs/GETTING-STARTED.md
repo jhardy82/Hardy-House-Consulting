@@ -93,6 +93,8 @@ npm run dev
 
 `nodemon` watches for file changes and restarts the server automatically. The `--env-file=.env` flag loads your `.env` without a separate dotenv library.
 
+> **Note:** On first start, the server automatically creates `tasks/tasks.db` (a SQLite database used by `/api/tasks` and `/api/analytics`). No manual setup is needed — the file is gitignored and will appear in the `tasks/` directory after the server has initialised.
+
 Expected output:
 
 ```
