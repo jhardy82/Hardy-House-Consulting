@@ -739,8 +739,10 @@ function _initHero() {
 
   let ht = 0;
   (function heroAnimate() {
-    if (!initialised) return; // stop if section was torn down
+    if (!initialised) return;
     requestAnimationFrame(heroAnimate);
+    const _sec = document.querySelector('[data-section="geometry"]');
+    if (_sec && _sec.hidden) return; // skip GPU work when section is hidden
     ht += .005;
     const sb = 1 + _scrollVel * .55;
     heroOrbit.update(true);
@@ -1419,11 +1421,13 @@ function _buildSectionDOM(container) {
 function _startLoop() {
   function tick() {
     if (!initialised) return;
+    requestAnimationFrame(tick);
+    const _sec = document.querySelector('[data-section="geometry"]');
+    if (_sec && _sec.hidden) return; // skip GPU work when section is hidden
     _globalT  += 0.005;
     _scrollVel *= 0.90;
     const boost = 1 + _scrollVel;
     _allShapes.forEach(s => s.tick(_globalT, boost));
-    requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 }
