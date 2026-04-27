@@ -48,6 +48,25 @@ describe('metatron3d helpers', () => {
     });
   });
 
+  test('Each face has exactly 2 base vertices from the dodecahedron set', () => {
+    const BASE_RADIUS_SQ = 3; // all 20 dodec verts at sqrt(3)
+    const EPSILON = 0.01;
+    buildStelFaces().forEach((tri, fi) => {
+      const baseCount = tri.filter(v => {
+        const r2 = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+        return Math.abs(r2 - BASE_RADIUS_SQ) < EPSILON;
+      }).length;
+      expect(baseCount).toBe(2); // tri[0], tri[1] are base; tri[2] is spike tip
+    });
+  });
+
+  test('4D projection scales with non-zero w (perspective divide activates)', () => {
+    // w=0.5: s=2.5/(2.5-0.5)=1.25; w=1.5: s=2.5/(2.5-1.5)=2.5
+    const [x05] = project4D([1, 0, 0, 0.5], 0, 0, 2.5);
+    const [x15] = project4D([1, 0, 0, 1.5], 0, 0, 2.5);
+    expect(x15).toBeGreaterThan(x05); // larger w → stronger perspective magnification
+  });
+
   // --- 4D projection ---
   test('4D projection: (1,0,0,0) at zero rotation projects to (1,0,0)', () => {
     const [x, y, z] = project4D([1, 0, 0, 0], 0, 0, 2.5);
