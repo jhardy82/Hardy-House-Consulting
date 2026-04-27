@@ -8,6 +8,14 @@ const ELEMENTS = [
   { id: 'aether', solidFn: 'Dodecahedron', angle: 198, color: 0x9B7BE0 },
 ];
 
+const ELEMENT_COLORS = {
+  fire:   '#F4C842',
+  earth:  '#4ADE80',
+  air:    '#93C5FD',
+  water:  '#67E8F9',
+  aether: '#C4B5FD',
+};
+
 // Glow edge spec from CLAUDE.md -- exact values
 const GLOW_LAYERS        = [[1.000, 0.88], [1.022, 0.27], [1.058, 0.10], [1.105, 0.04]];
 const GLOW_LAYERS_ACTIVE = [[1.000, 0.88], [1.022, 0.54], [1.058, 0.20], [1.105, 0.08]];
@@ -35,6 +43,7 @@ export function init() {
   setTimeout(() => {
     _initConstellation(section);
     _initMetrics(section);
+    _initElementDist(section);
   }, 80);
 }
 
@@ -79,8 +88,29 @@ function _buildMarkup(section) {
   wrap.appendChild(canvas);
   wrap.appendChild(legend);
   wrap.appendChild(metrics);
+  _buildElementDistMarkup(wrap);
 
   section.appendChild(wrap);
+}
+
+function _buildElementDistMarkup(wrap) {
+  const dist = _el('div', { className: 'dash-element-dist' },
+    _el('div', { className: 'dash-element-dist-title' }, 'Element Distribution'),
+  );
+  for (const name of ['fire', 'earth', 'air', 'water', 'aether']) {
+    const row     = _el('div', { className: 'dash-element-row' });
+    row.dataset.element = name;
+    const label   = _el('span', { className: 'dash-element-name' }, name);
+    const barWrap = _el('div', { className: 'dash-element-bar-wrap' });
+    const bar     = _el('div', { className: 'dash-element-bar' });
+    bar.style.width           = '0%';
+    bar.style.backgroundColor = ELEMENT_COLORS[name];
+    barWrap.appendChild(bar);
+    const count = _el('span', { className: 'dash-element-count' }, '0');
+    row.append(label, barWrap, count);
+    dist.appendChild(row);
+  }
+  wrap.appendChild(dist);
 }
 
 // -- Three.js constellation --
@@ -213,4 +243,28 @@ function _initMetrics(section) {
   _fetchAndRender(section);
   if (_intervalId) clearInterval(_intervalId);
   _intervalId = setInterval(() => _fetchAndRender(section), 30_000);
+}
+
+// -- Element distribution --
+async function _fetchAndRenderElementDist(section) {
+  try {
+    const res    = await fetch('/api/analytics/elements');
+    const data   = await res.json();
+    const total  = Math.max(data.total, 1);
+    for (const name of ['fire', 'earth', 'air', 'water', 'aether']) {
+      const row   = section.querySelector(`.dash-element-row[data-element="${name}"]`);
+      if (!row) continue;
+      const count = data[name] ?? 0;
+      const bar   = row.querySelector('.dash-element-bar');
+      const label = row.querySelector('.dash-element-count');
+      if (bar)   bar.style.width    = `${(count / total) * 100}%`;
+      if (label) label.textContent  = String(count);
+    }
+  } catch (err) {
+    console.error('[dashboard] element dist fetch failed:', err);
+  }
+}
+
+function _initElementDist(section) {
+  _fetchAndRenderElementDist(section);
 }

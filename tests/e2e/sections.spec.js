@@ -300,6 +300,23 @@ test.describe('#dashboard — agent constellation', () => {
     await goTo(page, '#dashboard');
     await expect(page.locator('.dashboard-title')).toContainText('Agent Constellation');
   });
+
+  test('element distribution block is present with 5 rows', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    await expect(page.locator('.dash-element-dist')).toBeVisible();
+    const rows = page.locator('.dash-element-row');
+    await expect(rows).toHaveCount(5);
+  });
+
+  test('GET /api/analytics/elements returns 200 with total field', async ({ page }) => {
+    const [response] = await Promise.all([
+      page.waitForResponse('**/api/analytics/elements'),
+      goTo(page, '#dashboard'),
+    ]);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body).toHaveProperty('total');
+  });
 });
 
 // -- global chrome ------------------------------------------------------
