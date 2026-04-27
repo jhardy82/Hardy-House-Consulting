@@ -58,7 +58,7 @@ export function buildStelFaces() {
     [6,13,12, 2,10], [6,10,11, 7,19], [6,19,18, 4,13],
   ];
 
-  const spikeH = 0.8;
+  const spikeH = 0.8; // spike protrusion as a fraction of the face-centroid radius
   const triangles = [];
 
   pentagons.forEach(fi => {
@@ -67,6 +67,7 @@ export function buildStelFaces() {
     const cy = fv.reduce((s, v) => s + v[1], 0) / 5;
     const cz = fv.reduce((s, v) => s + v[2], 0) / 5;
     const len = Math.sqrt(cx * cx + cy * cy + cz * cz);
+    if (len === 0) return; // degenerate face -- skip (cannot happen for a regular dodecahedron)
     const tip = [cx + (cx / len) * spikeH, cy + (cy / len) * spikeH, cz + (cz / len) * spikeH];
     for (let k = 0; k < 5; k++) {
       triangles.push([fv[k], fv[(k + 1) % 5], tip]);
