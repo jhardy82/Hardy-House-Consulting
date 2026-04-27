@@ -6,24 +6,20 @@ session:
   r0_fired: false
   skills_invoked:
     - superpowers:superpowers-orchestrator
-    - superpowers:executing-plans
-    - superpowers:test-driven-development
+    - superpowers:writing-plans
+    - superpowers:subagent-driven-development
   predicates_true:
-    - resume_work
+    - has_spec
     - has_plan
-    - code_exists
   signal_1_pass: true
   signal_2_pass: true
   signal_3_pass: true
   notes: |
-    Fleet 12 — 3 E2E coverage gaps (T1/T2/T3) + geometry export wire-up (T4).
-    T1 (oracle quiz reset): oracle.js hashchange listener resets quiz on re-entry. PASS.
-    T2 (geometry FS overlay re-entry): Required extensive debugging — root cause was
-    Playwright batching two rapid page.goto() calls before any hashchange events fire.
-    All event-listener and MutationObserver approaches failed. Fix: register a one-shot
-    hashchange listener inside _openFS() itself so ANY subsequent hash change closes
-    the overlay — independent of location.hash at callback time. Overlay moved to
-    document.body to eliminate CSS cascade re-show issue.
-    T3 (grow RAF guard): existing production code already correct — test just passed.
-    T4 (export wire-up): fsExp button added to FS overlay DOM, handler POSTs to /api/export.
-    Final: 64/64 Jest + 32/32 Playwright. diag.spec.js deleted.
+    Fleet 20 Oracle analytics — 6 tasks, Haiku triads, TDD enforced throughout.
+    T1: express-rate-limit installed. T2: element_assignments schema added.
+    T3: GET /api/analytics/elements route + server wiring + 3 API tests.
+    T4: POST /api/element writes analytics row (fire-and-forget per spec).
+    T5: rate-limit at 10 req/min in production; skip added for dev/test after
+        E2E suite triggered 429s across the 60s window.
+    T6: dashboard element distribution block — 5 rows, bar chart, inline counts.
+    Final: 81/81 Jest · 45/45 Playwright. Pushed a723be5.
