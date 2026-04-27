@@ -8,9 +8,11 @@ session:
     - superpowers:superpowers-orchestrator
     - superpowers:writing-plans
     - superpowers:subagent-driven-development
+    - superpowers:finishing-a-development-branch
   predicates_true:
     - has_spec
     - has_plan
+    - code_exists
   signal_1_pass: true
   signal_2_pass: true
   signal_3_pass: true
@@ -22,4 +24,18 @@ session:
     T5: rate-limit at 10 req/min in production; skip added for dev/test after
         E2E suite triggered 429s across the 60s window.
     T6: dashboard element distribution block — 5 rows, bar chart, inline counts.
-    Final: 81/81 Jest · 45/45 Playwright. Pushed a723be5.
+    Fleet 20 final: 81/81 Jest · 45/45 Playwright. Pushed a723be5.
+
+    Fleet 21 3D Metatron's Cube — 4 tasks, Haiku triads, same worktree reused.
+    T1: metatron3d.js pure math helpers (buildTesseractVerts/Edges, buildStelFaces,
+        project4D) + 11 unit tests including face vertex provenance and perspective
+        scaling assertions.
+    T2: geometry.js — Tesseract 4D projection (2 glow layers, live XW/YZ rotation)
+        + Stellated Dodecahedron (60 triangular faces, 4 glow layers) as SacredShape
+        special dispatch entries.
+    T3: Metatron3DScene class (13 sphere-nodes at VE positions, 78 edges, progressive
+        draw, mode pills) + 3-column CSS grid + third card in Section 03.
+    T4: 3 new E2E tests — 3D canvas non-zero, Tesseract card visible, Steldodeca card.
+    Key fix: _init2D() restructured to three independent IntersectionObserver guards
+        so 3D scene initialises regardless of 2D canvas presence.
+    Fleet 21 final: 92/92 Jest · 48/48 Playwright.
