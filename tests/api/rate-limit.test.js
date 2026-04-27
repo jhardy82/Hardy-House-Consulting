@@ -12,7 +12,7 @@ app.use(session({ secret: 'test', resave: false, saveUninitialized: true, cookie
 app.use('/api/test', limiter);
 
 // Simple test route that just returns 200 without writing to database
-app.post('/api/test', (req, res) => {
+app.post('/api/test', (_req, res) => {
   res.json({ ok: true });
 });
 
