@@ -51,7 +51,7 @@ describe('metatron3d helpers', () => {
   test('Each face has exactly 2 base vertices from the dodecahedron set', () => {
     const BASE_RADIUS_SQ = 3; // all 20 dodec verts at sqrt(3)
     const EPSILON = 0.01;
-    buildStelFaces().forEach((tri, fi) => {
+    buildStelFaces().forEach(tri => {
       const baseCount = tri.filter(v => {
         const r2 = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
         return Math.abs(r2 - BASE_RADIUS_SQ) < EPSILON;
