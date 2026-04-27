@@ -17,6 +17,10 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Message is required and must be 2000 characters or fewer' });
 
   if (!process.env.RESEND_API_KEY) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[contact] RESEND_API_KEY not configured in production');
+      return res.status(503).json({ error: 'Service temporarily unavailable' });
+    }
     console.warn('[contact] RESEND_API_KEY not set — skipping send in dev/test');
     return res.json({ ok: true, dev: true });
   }
