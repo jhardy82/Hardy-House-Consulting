@@ -21,7 +21,8 @@ router.get('/elements', (_req, res) => {
     }
     counts.total = Object.values(counts).reduce((a, b) => a + b, 0);
     res.json(counts);
-  } catch {
+  } catch (err) {
+    console.error('[analytics] elements read failed:', err?.message);
     res.json({ fire: 0, earth: 0, air: 0, water: 0, aether: 0, total: 0 });
   } finally {
     db?.close();
