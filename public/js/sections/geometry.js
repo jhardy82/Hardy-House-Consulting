@@ -814,6 +814,24 @@ function _openFS(cfg) {
     _closeFS();
   };
   window.addEventListener('hashchange', _fsHashListener);
+
+  // Focus trap: keep Tab/Shift+Tab within the overlay while it is open.
+  ol._prevFocus = document.activeElement;
+  if (ol._trapFn) ol.removeEventListener('keydown', ol._trapFn);
+  ol._trapFn = e => {
+    if (e.key !== 'Tab') return;
+    const els = [...ol.querySelectorAll('button:not([disabled])')];
+    if (!els.length) return;
+    const first = els[0], last = els[els.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  };
+  ol.addEventListener('keydown', ol._trapFn);
+  const closeBtnEl = document.getElementById('geo-fsClose');
+  if (closeBtnEl) setTimeout(() => closeBtnEl.focus(), 0);
 }
 
 function _closeFS() {
@@ -822,7 +840,14 @@ function _closeFS() {
     _fsHashListener = null;
   }
   const ol = document.getElementById('geo-fsOverlay');
-  if (ol) ol.style.display = 'none';
+  if (ol) {
+    if (ol._trapFn) { ol.removeEventListener('keydown', ol._trapFn); ol._trapFn = null; }
+    if (ol._prevFocus && typeof ol._prevFocus.focus === 'function') {
+      ol._prevFocus.focus();
+      ol._prevFocus = null;
+    }
+    ol.style.display = 'none';
+  }
   if (_fsShape) { _fsShape.dispose(); _fsShape = null; }
 }
 
@@ -1327,6 +1352,9 @@ function _buildSectionDOM(container) {
   // Fullscreen overlay
   const fsOl = document.createElement('div');
   fsOl.id = 'geo-fsOverlay';
+  fsOl.setAttribute('role', 'dialog');
+  fsOl.setAttribute('aria-modal', 'true');
+  fsOl.setAttribute('aria-label', 'Sacred geometry fullscreen view');
   fsOl.style.cssText = 'position:fixed;inset:0;background:rgba(4,2,10,.97);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;backdrop-filter:blur(8px);';
 
   const fsClose = document.createElement('button');
