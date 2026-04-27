@@ -6,6 +6,9 @@
 /* ── Reset ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Enforce hidden attribute over any author display property */
+[hidden] { display: none !important; }
+
 /* ── Body ──────────────────────────────────────────────── */
 html { scroll-behavior: smooth; }
 
