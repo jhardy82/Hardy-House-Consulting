@@ -1,7 +1,7 @@
 /**
  * Hash router for the Hardy House SPA.
- * Each section exports a single idempotent `init()` function.
- * `loaded` Set guarantees init is called at most once per section.
+ * Each section exports a single `init()` function called on every navigation.
+ * Modules guard first-time setup internally with an `initialised` flag.
  */
 const SECTIONS = {
   home:          () => import('../sections/home.js'),
@@ -17,7 +17,7 @@ const SECTIONS = {
   contact:       () => import('../sections/contact.js'),
 };
 
-const loaded = new Set();
+const loaded = new Map();
 let _activeTween = null;
 let _navSerial = 0;
 
@@ -65,13 +65,16 @@ async function navigate() {
     }
   });
 
-  if (!loaded.has(id) && SECTIONS[id]) {
+  if (SECTIONS[id]) {
     try {
-      const mod = await SECTIONS[id]();
-      if (_navSerial !== mySerial) return;
+      if (!loaded.has(id)) {
+        const mod = await SECTIONS[id]();
+        if (_navSerial !== mySerial) return;
+        loaded.set(id, mod);
+      }
       // 80ms delay: CSS layout must complete before any canvas reads dimensions.
-      setTimeout(() => mod.init?.(), 80);
-      loaded.add(id);
+      // init() is called on every navigation; modules guard first-time setup internally.
+      setTimeout(() => loaded.get(id)?.init?.(), 80);
     } catch (err) {
       console.error(`[router] failed to load section "${id}":`, err);
     }

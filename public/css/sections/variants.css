@@ -379,3 +379,18 @@
   .vt-cmp-wrap { grid-template-columns: 1fr; }
   .vt-cmp-analysis { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 480px) {
+  .vt-dock {
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .vt-dock::-webkit-scrollbar { display: none; }
+  .vt-dock-tab {
+    min-width: 64px;
+    padding: 0.28rem 0.45rem;
+  }
+  .vt-tab-name { font-size: 0.5rem; }
+}

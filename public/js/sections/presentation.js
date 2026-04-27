@@ -5,6 +5,7 @@
 import { createRenderer } from '../utils/createRenderer.js';
 
 let initialised = false;
+let _ticking = false;
 let renderer, scene, camera, canvas;
 let currentSlide = 0;
 let shapeGroup;
@@ -440,7 +441,7 @@ function handleClick(e) {
 }
 
 function tick() {
-  if (!renderer || !scene || !camera) return;
+  if (!renderer || !scene || !camera) { _ticking = false; return; }
 
   if (shapeGroup && shapeGroup.children[0]) {
     shapeGroup.children[0].rotation.x += 0.003;
@@ -453,11 +454,21 @@ function tick() {
 
   renderer.render(scene, camera);
   const sec = document.querySelector('[data-section="presentation"]');
-  if (sec && !sec.hidden) requestAnimationFrame(tick);
+  if (sec && !sec.hidden) {
+    requestAnimationFrame(tick);
+  } else {
+    _ticking = false;
+  }
 }
 
 export function init() {
-  if (initialised) return;
+  if (initialised) {
+    if (!_ticking && renderer && scene && camera) {
+      const sec = document.querySelector('[data-section="presentation"]');
+      if (sec && !sec.hidden) { _ticking = true; requestAnimationFrame(tick); }
+    }
+    return;
+  }
   if (!window.THREE) {
     console.warn('[presentation] Three.js not loaded');
     return;
@@ -519,6 +530,7 @@ export function init() {
 
     goTo(0);
 
+    _ticking = true;
     requestAnimationFrame(tick);
 
     window.addEventListener('resize', () => {
