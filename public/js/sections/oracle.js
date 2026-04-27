@@ -14,6 +14,7 @@ import { createRenderer } from '../utils/createRenderer.js';
 // -- Module-level state -------------------------------------------------------
 
 let _oRevealScene = null; // registered into _scenes; cleared on re-init
+let initialised   = false;
 
 // -- Questions ----------------------------------------------------------------
 
@@ -307,6 +308,9 @@ function showReveal(revealDiv, winner, progEl, stepsEl) {
 // -- init() -------------------------------------------------------------------
 
 export function init() {
+  if (initialised) return;
+  initialised = true;
+
   if (!window.THREE) {
     console.warn('[oracle] Three.js not loaded');
     return;
