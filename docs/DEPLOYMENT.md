@@ -20,9 +20,7 @@ No `Dockerfile`, `docker-compose.yml`, `vercel.json`, `netlify.toml`, or `fly.to
 
 ### First-time deployment
 
-<!-- VERIFY: Render dashboard navigation steps and UI labels below reflect the current Render.com interface -->
-
-1. Log in to [https://render.com](https://render.com) and click **New +** → **Web Service**.
+1. Log in to [https://render.com](https://render.com) and click **+ New** → **Web Service**.
 2. Connect your GitHub account and select the `Hardy-House-Consulting` repository.
 3. Configure the service:
 
@@ -128,11 +126,12 @@ PRs from feature branches must pass CI (Jest + Playwright) before merge. Direct 
 
 Render stores previous deploy artifacts. To roll back:
 
-<!-- VERIFY: Render dashboard rollback UI — confirm "Deploys" tab name and "Rollback" button label in current Render interface -->
-
 1. Open the Render dashboard and navigate to the service.
-2. Click the **Deploys** tab.
-3. Find the last known-good deploy and click **Rollback to this deploy**.
+2. Click the **Events** tab.
+3. Find the last known-good deploy and click **Rollback**.
+4. Confirm by clicking **Rollback to this deploy** on the confirmation page.
+
+> **Free tier limitation:** Render only retains the two most recent previous deploys for rollback on the free tier.
 
 Alternatively, revert the offending commit on `main` and push — Render will auto-deploy the reverted state.
 
@@ -147,8 +146,6 @@ The revert approach is preferred: it creates an auditable commit and keeps the d
 
 ## Free Tier Behaviour
 
-<!-- VERIFY: Render free-tier spin-down timeout, monthly hour limit, and Starter tier pricing below — these are subject to change at https://render.com/pricing -->
-
 - Free tier instances **spin down after 15 minutes of inactivity**. The first request after a spin-down incurs a cold-start delay of approximately 30–60 seconds.
 - Free tier includes approximately 750 compute hours per month.
 - To keep the service always-on, upgrade to the **Starter** paid tier (approximately $7/month as of last check).
@@ -160,7 +157,6 @@ The revert approach is preferred: it creates an auditable commit and keeps the d
 No third-party monitoring library (`@sentry/*`, `dd-trace`, `newrelic`, `@opentelemetry/*`) is present in `package.json`.
 
 Runtime errors are written to stdout/stderr via `console.error` in the global error handler and `unhandledRejection` listener. Render captures all stdout/stderr output and makes it available in the **Logs** tab of the service dashboard.
-
-<!-- VERIFY: Render log retention period and alerting options on current free and Starter tiers -->
+Log retention is **7 days** on the free tier and **14 days** on Starter and above. For log streaming to external providers (Datadog, Better Stack, Papertrail), configure a log drain from the service **Settings** tab.
 
 For production alerting, Render's built-in notification settings (email on deploy failure, service crash) can be configured from the service **Settings** tab.
