@@ -1,5 +1,7 @@
 import { createRenderer } from '../utils/createRenderer.js';
 
+const SECTIONS_ORDER = ['home','oracle','dashboard','geometry','decomposition','variants','tree','yantra','grow','presentation','contact'];
+
 const ELEMENTS = [
   { id: 'fire',   solidFn: 'Tetrahedron',  angle: 270, color: 0xC49A1F },
   { id: 'earth',  solidFn: 'Hexahedron',   angle: 342, color: 0x2D8050 },
@@ -44,6 +46,7 @@ export function init() {
     _initConstellation(section);
     _initMetrics(section);
     _initElementDist(section);
+    _initPageViews(section);
   }, 80);
 }
 
@@ -84,16 +87,20 @@ function _buildMarkup(section) {
     metrics.appendChild(cell);
   }
 
+  const analyticsRow = _el('div', { className: 'dash-analytics-row' });
+  _buildElementDistMarkup(analyticsRow);
+  _buildPageViewsMarkup(analyticsRow);
+
   wrap.appendChild(header);
   wrap.appendChild(canvas);
   wrap.appendChild(legend);
   wrap.appendChild(metrics);
-  _buildElementDistMarkup(wrap);
+  wrap.appendChild(analyticsRow);
 
   section.appendChild(wrap);
 }
 
-function _buildElementDistMarkup(wrap) {
+function _buildElementDistMarkup(container) {
   const dist = _el('div', { className: 'dash-element-dist' },
     _el('div', { className: 'dash-element-dist-title' }, 'Element Distribution'),
   );
@@ -110,7 +117,26 @@ function _buildElementDistMarkup(wrap) {
     row.append(label, barWrap, count);
     dist.appendChild(row);
   }
-  wrap.appendChild(dist);
+  container.appendChild(dist);
+}
+
+function _buildPageViewsMarkup(container) {
+  const pv = _el('div', { className: 'dash-pageviews' },
+    _el('div', { className: 'dash-pageviews-title' }, 'Section Visits'),
+  );
+  for (const name of SECTIONS_ORDER) {
+    const row     = _el('div', { className: 'dash-pv-row' });
+    row.dataset.pvSection = name;
+    const label   = _el('span', { className: 'dash-pv-name' }, name);
+    const barWrap = _el('div', { className: 'dash-pv-bar-wrap' });
+    const bar     = _el('div', { className: 'dash-pv-bar' });
+    bar.style.width = '0%';
+    barWrap.appendChild(bar);
+    const count = _el('span', { className: 'dash-pv-count' }, '0');
+    row.append(label, barWrap, count);
+    pv.appendChild(row);
+  }
+  container.appendChild(pv);
 }
 
 // -- Three.js constellation --
@@ -267,4 +293,28 @@ async function _fetchAndRenderElementDist(section) {
 
 function _initElementDist(section) {
   _fetchAndRenderElementDist(section);
+}
+
+// -- Section page views --
+async function _fetchAndRenderPageViews(section) {
+  try {
+    const res  = await fetch('/api/analytics/pageviews');
+    const data = await res.json();
+    const maxCount = Math.max(1, ...SECTIONS_ORDER.map(s => data[s] ?? 0));
+    for (const name of SECTIONS_ORDER) {
+      const row = section.querySelector(`.dash-pv-row[data-pv-section="${name}"]`);
+      if (!row) continue;
+      const count = data[name] ?? 0;
+      const bar   = row.querySelector('.dash-pv-bar');
+      const lbl   = row.querySelector('.dash-pv-count');
+      if (bar) bar.style.width   = `${(count / maxCount) * 100}%`;
+      if (lbl) lbl.textContent   = String(count);
+    }
+  } catch (err) {
+    console.error('[dashboard] pageviews fetch failed:', err);
+  }
+}
+
+function _initPageViews(section) {
+  _fetchAndRenderPageViews(section);
 }

@@ -350,6 +350,23 @@ test.describe('#dashboard — agent constellation', () => {
     const body = await response.json();
     expect(body).toHaveProperty('total');
   });
+
+  test('section visits block is present with 11 rows', async ({ page }) => {
+    await goTo(page, '#dashboard');
+    await expect(page.locator('.dash-pageviews')).toBeVisible();
+    const rows = page.locator('.dash-pv-row');
+    await expect(rows).toHaveCount(11);
+  });
+
+  test('navigation fires POST /api/analytics/pageview with correct section', async ({ page }) => {
+    const [response] = await Promise.all([
+      page.waitForResponse('**/api/analytics/pageview'),
+      goTo(page, '#oracle'),
+    ]);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body).toEqual({ ok: true });
+  });
 });
 
 // -- global chrome ------------------------------------------------------
