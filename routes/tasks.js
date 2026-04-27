@@ -29,6 +29,11 @@ try {
     updated_at        TEXT NOT NULL DEFAULT (datetime('now')),
     notes             TEXT
   )`).run();
+  db.prepare(`CREATE TABLE IF NOT EXISTS element_assignments (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    element     TEXT    NOT NULL CHECK(element IN ('fire','earth','air','water','aether')),
+    assigned_at TEXT    NOT NULL DEFAULT (datetime('now'))
+  )`).run();
 } catch (err) {
   console.error('tasks: failed to open tasks.db:', err.message);
   process.exit(1);
