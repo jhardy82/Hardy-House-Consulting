@@ -354,3 +354,63 @@ test.describe('#contact — contact card', () => {
     await expect(page.locator('#toast')).toBeVisible({ timeout: 3000 });
   });
 });
+
+// -- yantra ---------------------------------------------------------------
+test.describe('#yantra — Sri Yantra', () => {
+  test('section renders', async ({ page }) => {
+    await goTo(page, '#yantra');
+    const section = page.locator('[data-section="yantra"]');
+    await expect(section).toBeVisible();
+  });
+
+  test('yantra-geo canvas is non-zero after construction', async ({ page }) => {
+    await goTo(page, '#yantra');
+    const canvas = page.locator('.yantra-geo');
+    // Scroll into view to ensure IntersectionObserver triggers
+    await canvas.scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => {
+      const w = document.querySelector('.yantra-geo')?.width;
+      const h = document.querySelector('.yantra-geo')?.height;
+      return w > 0 && h > 0;
+    }, { timeout: 20000 });
+    const width = await canvas.evaluate(el => el.width);
+    const height = await canvas.evaluate(el => el.height);
+    expect(width).toBeGreaterThan(0);
+    expect(height).toBeGreaterThan(0);
+  });
+
+  test('toggle becomes enabled after construction', async ({ page }) => {
+    await goTo(page, '#yantra');
+    const section = page.locator('[data-section="yantra"]');
+    // Scroll into view to ensure IntersectionObserver triggers construction
+    await section.scrollIntoViewIfNeeded();
+    // Wait for construction to complete: aria-disabled removed and toggle enabled
+    await page.waitForFunction(() => {
+      const ctrl = document.querySelector('.yantra-controls');
+      const toggle = document.querySelector('[data-yantra="toggle"]');
+      return ctrl && !ctrl.hasAttribute('aria-disabled') && !toggle.disabled;
+    }, { timeout: 20000 });
+    const toggle = page.locator('[data-yantra="toggle"]');
+    await expect(toggle).not.toBeDisabled();
+  });
+
+  test('PAOAL mode: overlay shows at least 4 legend rows', async ({ page }) => {
+    await goTo(page, '#yantra');
+    const section = page.locator('[data-section="yantra"]');
+    // Scroll into view to ensure IntersectionObserver triggers construction
+    await section.scrollIntoViewIfNeeded();
+    // Wait for construction to complete
+    await page.waitForFunction(() => {
+      const ctrl = document.querySelector('.yantra-controls');
+      const toggle = document.querySelector('[data-yantra="toggle"]');
+      return ctrl && !ctrl.hasAttribute('aria-disabled') && !toggle.disabled;
+    }, { timeout: 20000 });
+    await page.locator('[data-yantra="paoal"]').click();
+    await page.locator('[data-yantra="toggle"]').click();
+    const legend = page.locator('[data-yantra="legend"]');
+    await expect(legend).toBeVisible();
+    const rows = legend.locator('.yantra-legend-row');
+    const count = await rows.count();
+    expect(count).toBeGreaterThanOrEqual(4);
+  });
+});
