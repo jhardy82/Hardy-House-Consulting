@@ -1384,21 +1384,24 @@ function _init2D() {
   const folC   = document.getElementById('geo-folCanvas');
   const metC   = document.getElementById('geo-metCanvas');
   const met3dC = document.getElementById('geo-met3dCanvas');
-  if (!folC || !metC) return;
 
-  new IntersectionObserver((entries, obs) => {
-    if (entries[0].isIntersecting) {
-      try { new FOLScene(folC); } catch (err) { console.warn('[geometry] FOL init failed:', err.message); }
-      obs.disconnect();
-    }
-  }, { threshold: .1 }).observe(folC);
+  if (folC) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries[0].isIntersecting) {
+        try { new FOLScene(folC); } catch (err) { console.warn('[geometry] FOL init failed:', err.message); }
+        obs.disconnect();
+      }
+    }, { threshold: .1 }).observe(folC);
+  }
 
-  new IntersectionObserver((entries, obs) => {
-    if (entries[0].isIntersecting) {
-      try { new MetatronScene(metC); } catch (err) { console.warn('[geometry] Metatron init failed:', err.message); }
-      obs.disconnect();
-    }
-  }, { threshold: .1 }).observe(metC);
+  if (metC) {
+    new IntersectionObserver((entries, obs) => {
+      if (entries[0].isIntersecting) {
+        try { new MetatronScene(metC); } catch (err) { console.warn('[geometry] Metatron init failed:', err.message); }
+        obs.disconnect();
+      }
+    }, { threshold: .1 }).observe(metC);
+  }
 
   if (met3dC) {
     new IntersectionObserver((entries, obs) => {
