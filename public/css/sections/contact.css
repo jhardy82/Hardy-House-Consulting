@@ -134,7 +134,7 @@
 #contactForm textarea {
   background: var(--hh-void);
   color: var(--hh-fg-2, rgba(244, 240, 235, 0.85));
-  border: 1px solid rgba(196, 154, 31, 0.18);
+  border: 1px solid var(--hh-gold-dim);
   border-radius: 4px;
   padding: 0.55rem 0.75rem;
   font-family: inherit;
@@ -165,7 +165,7 @@
 }
 
 #contactFormError {
-  color: #e07070;
+  color: var(--hh-error);
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }

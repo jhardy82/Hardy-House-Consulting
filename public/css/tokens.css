@@ -37,6 +37,7 @@
   --hh-gold-hi:       rgba(196, 154, 31, 0.80);   /* Borders active / selected */
   --hh-void-overlay:  rgba(7, 4, 15, 0.85);       /* Semi-transparent void bg (panels, legends) */
   --hh-aether-dim:    rgba(155, 123, 224, 0.30);  /* Subtle aether border */
+  --hh-error:         #e07070;                    /* Error / validation failure text */
 
   /* Foreground scale */
   --hh-fg:         #F4F0EB;   /* Primary text */
