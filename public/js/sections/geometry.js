@@ -8,6 +8,8 @@
 
 import { createRenderer } from '../utils/createRenderer.js';
 import { PHI, SQ3H, FOL_R } from '../geometry/constants.js';
+import { buildTesseractVerts, buildTesseractEdges, buildStelFaces, project4D }
+  from '../geometry/metatron3d.js';
 
 /* ============================================================
    IDEMPOTENCY GUARD
@@ -144,10 +146,12 @@ class SacredShape {
     this.scene.add(this.group);
 
     try {
-      if      (cfg.special === 'merkaba')       this._buildMerkaba();
-      else if (cfg.special === 'cuboctahedron') this._buildCuboctahedron();
-      else if (cfg.special === 'golden')        this._buildGoldenSpiral();
-      else                                       this._buildStandard();
+      if      (cfg.special === 'merkaba')          this._buildMerkaba();
+      else if (cfg.special === 'cuboctahedron')    this._buildCuboctahedron();
+      else if (cfg.special === 'golden')           this._buildGoldenSpiral();
+      else if (cfg.special === 'tesseract')        this._buildTesseract();
+      else if (cfg.special === 'stellateddodeca') this._buildStellatedDodecahedron();
+      else                                          this._buildStandard();
     } catch (err) { console.warn('[geometry] Shape build failed:', cfg.id, err.message); }
 
     try { this._addParticles(); }
@@ -297,6 +301,109 @@ class SacredShape {
     } catch (err) { console.warn('[geometry] Spiral guides failed:', err.message); }
   }
 
+  _buildTesseract() {
+    const verts = buildTesseractVerts();
+    const edges = buildTesseractEdges();
+    if (verts.length !== 16) console.error('[geometry] Tesseract vertex count violated:', verts.length, '!== 16');
+    if (edges.length !== 32) console.error('[geometry] Tesseract edge count violated:', edges.length, '!== 32');
+
+    this._tet4verts   = verts;
+    this._tet4edges   = edges;
+    this._tet4angleXW = 0;
+    this._tet4angleYZ = 0;
+
+    // 32 edges × 2 endpoints × 3 floats = 192 floats
+    this._tet4pos = new Float32Array(edges.length * 6);
+    try {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(this._tet4pos, 3));
+      this._tet4geo = geo;
+
+      const col = hexInt(this.cfg.edgeHex);
+      // 2 glow layers only -- dynamic update makes extra static layers redundant
+      [[1.000, 0.55], [1.022, 0.12]].forEach(([scale, opacity]) => {
+        try {
+          const mat = new THREE.LineBasicMaterial({
+            color: col, transparent: true, opacity,
+            blending: THREE.AdditiveBlending, depthWrite: false
+          });
+          const ls = new THREE.LineSegments(geo, mat);
+          ls.scale.setScalar(scale);
+          this.group.add(ls);
+          this.glowMats.push(mat);
+          this.baseOps.push(opacity);
+        } catch (err) { console.warn('[geometry] Tesseract glow layer failed:', err.message); }
+      });
+    } catch (err) { console.warn('[geometry] Tesseract build failed:', err.message); }
+  }
+
+  _updateTesseract4D(boost) {
+    if (!this._tet4geo) return;
+    this._tet4angleXW += 0.007 * boost;
+    this._tet4angleYZ += 0.011 * boost;
+    const projected = this._tet4verts.map(v =>
+      project4D(v, this._tet4angleXW, this._tet4angleYZ, 2.5)
+    );
+    const pos = this._tet4pos;
+    this._tet4edges.forEach(([i, j], k) => {
+      const a = projected[i], b = projected[j];
+      pos[k * 6]     = a[0]; pos[k * 6 + 1] = a[1]; pos[k * 6 + 2] = a[2];
+      pos[k * 6 + 3] = b[0]; pos[k * 6 + 4] = b[1]; pos[k * 6 + 5] = b[2];
+    });
+    this._tet4geo.attributes.position.needsUpdate = true;
+  }
+
+  _buildStellatedDodecahedron() {
+    const faces = buildStelFaces();
+    if (faces.length !== 60) console.error('[geometry] Stellated Dodecahedron face count violated:', faces.length, '!== 60');
+
+    // Build all 60 spike triangles as a single merged face mesh
+    const posArr = [];
+    faces.forEach(([a, b, tip]) => {
+      posArr.push(a[0], a[1], a[2], b[0], b[1], b[2], tip[0], tip[1], tip[2]);
+    });
+    try {
+      const faceGeo = new THREE.BufferGeometry();
+      faceGeo.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
+      faceGeo.computeVertexNormals();
+      const fc = hexInt(this.cfg.faceHex);
+      const mesh = new THREE.Mesh(faceGeo, new THREE.MeshPhongMaterial({
+        color: fc, emissive: fc, emissiveIntensity: .12,
+        transparent: true, opacity: this.cfg.faceOpacity,
+        side: THREE.DoubleSide
+      }));
+      this.group.add(mesh);
+      this.faceMeshes.push(mesh);
+    } catch (err) { console.warn('[geometry] StelDodec face mesh failed:', err.message); }
+
+    // Build spike + base edges in a single buffer
+    const edgeArr = [];
+    faces.forEach(([a, b, tip]) => {
+      edgeArr.push(a[0], a[1], a[2], tip[0], tip[1], tip[2]);
+      edgeArr.push(b[0], b[1], b[2], tip[0], tip[1], tip[2]);
+      edgeArr.push(a[0], a[1], a[2], b[0], b[1], b[2]);
+    });
+    try {
+      const edgeGeo = new THREE.BufferGeometry();
+      edgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(edgeArr, 3));
+      const col = hexInt(this.cfg.edgeHex);
+      // 4-layer glow spec (CLAUDE.md invariant -- static geometry)
+      [[1.000, 0.88], [1.022, 0.27], [1.058, 0.10], [1.105, 0.04]].forEach(([scale, opacity]) => {
+        try {
+          const mat = new THREE.LineBasicMaterial({
+            color: col, transparent: true, opacity,
+            blending: THREE.AdditiveBlending, depthWrite: false
+          });
+          const ls = new THREE.LineSegments(edgeGeo, mat);
+          ls.scale.setScalar(scale);
+          this.group.add(ls);
+          this.glowMats.push(mat);
+          this.baseOps.push(opacity);
+        } catch (err) { console.warn('[geometry] StelDodec glow layer failed:', err.message); }
+      });
+    } catch (err) { console.warn('[geometry] StelDodec edge build failed:', err.message); }
+  }
+
   _addParticles() {
     const n = 36;
     const pos = new Float32Array(n * 3);
@@ -329,6 +436,7 @@ class SacredShape {
     this.group.rotation.y += this.cfg.rotY * boost;
     this.group.rotation.z += (this.cfg.rotZ || 0) * boost;
     if (this.cfg.special === 'merkaba' && this.tet2) this.tet2.rotation.y += .013;
+    if (this.cfg.special === 'tesseract') this._updateTesseract4D(boost);
     const pulse = .84 + .16 * Math.sin(t * this.pulseSpd + this.phase);
     this.glowMats.forEach((m, i) => { m.opacity = this.baseOps[i] * pulse; });
     const ts = (this.hovered && !this.orbit.dn) ? 1.06 : 1.0;
@@ -981,6 +1089,20 @@ const EXTENDED_CATALOGUE = [
     meaning: 'The only growth curve self-similar at every scale. phi saturates the icosahedron and dodecahedron. It defines Hardy House brand proportional spacing and the fundamental rhythm of all organic growth.',
     edgeHex: '#C49A1F', faceHex: '#C49A1F', faceOpacity: .05,
     rotX: .003, rotY: .006, rotZ: .001, special: 'golden'
+  },
+  {
+    id: 'tesseract', name: 'Tesseract', element: 'Time', elementColor: '#C4B0E8',
+    facts: 'Vertices: 16 -- Edges: 32 -- 4D Hypercube',
+    meaning: 'The 4D hypercube -- a cube rotating through a dimension beyond direct perception. In GCMT it is the Tesseract topology: current-state to target-state evolution across time. Every edge of the 3D cube is doubled here into a fourth axis.',
+    edgeHex: '#C4B0E8', faceHex: '#6A60A0', faceOpacity: 0,
+    rotX: 0, rotY: 0, rotZ: 0, special: 'tesseract'
+  },
+  {
+    id: 'steldodeca', name: 'Stellated Dodecahedron', element: 'Cosmos', elementColor: '#9B7BE0',
+    facts: 'Base faces: 12 -- Spike faces: 60 -- Spike edges: 90',
+    meaning: "The dodecahedron elevated -- each pentagonal face becomes a pentagram pyramid. Plato's cosmic solid given its complete sacred expression. The 12 pentagram spikes encode the zodiac dimensions. In ContextForge this represents the system-of-systems fully articulated.",
+    edgeHex: '#9B7BE0', faceHex: '#4A2D90', faceOpacity: .12,
+    rotX: .002, rotY: .005, rotZ: .002, special: 'stellateddodeca'
   }
 ];
 
