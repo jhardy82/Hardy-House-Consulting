@@ -72,9 +72,13 @@ function _initBackground(section) {
 
 function _sizeCanvases(section) {
   const stage = section.querySelector('.yantra-stage');
-  const size  = Math.min(stage.clientWidth, stage.clientHeight) * 0.9;
+  if (!stage) return;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (!w || !h) return;
+  const size = Math.min(w, h) * 0.9;
   ['.yantra-geo', '.yantra-overlay'].forEach(sel => {
-    const c  = section.querySelector(sel);
+    const c = section.querySelector(sel);
+    if (!c) return;
     c.width  = size;
     c.height = size;
   });
@@ -248,12 +252,12 @@ function _paintLegend(legend, mode) {
   if (mode === 'paoal') {
     const seen = new Set();
     entries = PAOAL_FILLS
-      .map((p, i) => ({ label: `T${i + 1}: ${p.label}`, color: p.color }))
-      .filter(e => {
-        if (seen.has(e.label)) return false;
-        seen.add(e.label);
+      .filter(p => {
+        if (seen.has(p.label)) return false;
+        seen.add(p.label);
         return true;
-      });
+      })
+      .map(p => ({ label: p.label, color: p.color }));
   } else if (element) {
     const name = element.charAt(0).toUpperCase() + element.slice(1);
     entries = [{ label: name + ' -- your element', color: ELEMENT_COLORS[element] || '#C49A1F' }];
@@ -277,11 +281,17 @@ function _paintLegend(legend, mode) {
 
 function _initOverlay(section) {
   const overlayCanvas = section.querySelector('.yantra-overlay');
-  const overlayCtx    = overlayCanvas.getContext('2d');
   const geo           = section.querySelector('.yantra-geo');
   const legend        = section.querySelector('[data-yantra="legend"]');
   const toggle        = section.querySelector('[data-yantra="toggle"]');
   const replay        = section.querySelector('[data-yantra="replay"]');
+
+  if (!overlayCanvas || !geo || !legend || !toggle || !replay) {
+    console.error('[yantra] overlay init: missing DOM elements');
+    return;
+  }
+  const overlayCtx = overlayCanvas.getContext('2d');
+  if (!overlayCtx) { console.error('[yantra] overlay: no 2D context'); return; }
 
   let mode    = 'paoal';
   let visible = false;
