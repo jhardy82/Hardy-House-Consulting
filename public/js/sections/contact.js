@@ -59,7 +59,23 @@ export function init() {
 
   const panelBody = document.createElement('div');
   panelBody.id = 'contactPanelBody';
-  panelBody.textContent = '📍 Denver, CO · Avanade (Microsoft/Accenture JV)\n\n💼 LinkedIn: linkedin.com/in/jameshardy82\n✉ Tap to copy email';
+
+  const locLine = document.createElement('div');
+  locLine.textContent = '📍 Denver, CO · Avanade (Microsoft/Accenture JV)';
+
+  const liLine = document.createElement('div');
+  const liLink = document.createElement('a');
+  liLink.href = 'https://www.linkedin.com/in/jameshardy82';
+  liLink.target = '_blank';
+  liLink.rel = 'noopener noreferrer';
+  liLink.textContent = 'linkedin.com/in/jameshardy82';
+  liLink.addEventListener('click', e => e.stopPropagation());
+  liLine.append(document.createTextNode('💼 LinkedIn: '), liLink);
+
+  const emLine = document.createElement('div');
+  emLine.textContent = '✉ Tap to copy email';
+
+  panelBody.append(locLine, liLine, emLine);
 
   panel.append(panelTitle, panelBody);
 

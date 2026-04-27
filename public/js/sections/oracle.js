@@ -276,6 +276,9 @@ function showReveal(revealDiv, winner) {
 
   revealDiv.style.display = 'block';
 
+  const ctaBtn = revealDiv.querySelector('.oracle-cta');
+  if (ctaBtn) ctaBtn.addEventListener('click', () => { window.location.hash = '#geometry'; });
+
   // 3D canvas -- 80ms delay lets CSS layout complete first
   const canvas = revealDiv.querySelector('[data-oracle="canvas"]');
   if (canvas) {

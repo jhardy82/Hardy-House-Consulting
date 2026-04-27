@@ -232,7 +232,7 @@ function buildParticleField() {
 }
 
 function transitionShape(newShape) {
-  if (shapeGroup) {
+  if (shapeGroup && shapeGroup.children.length > 0) {
     if (window.gsap) {
       gsap.to(shapeGroup.children[0].material, {
         opacity: 0,
@@ -398,6 +398,8 @@ function buildDOM() {
 }
 
 function handleKeyDown(e) {
+  const sec = document.querySelector('[data-section="presentation"]');
+  if (!sec || sec.hidden) return;
   switch (e.key) {
     case 'ArrowRight':
     case ' ':
