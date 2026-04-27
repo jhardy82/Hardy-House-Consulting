@@ -276,11 +276,13 @@ function goTo(index) {
   currentSlide = index;
   const slide = SLIDES[currentSlide];
 
-  if (window.gsap) {
-    gsap.to(scene.fog, {
-      color: slide.fogCol,
-      duration: 0.8
-    });
+  if (scene.fog) {
+    const target = new THREE.Color(slide.fogCol);
+    if (window.gsap) {
+      gsap.to(scene.fog.color, { r: target.r, g: target.g, b: target.b, duration: 0.8 });
+    } else {
+      scene.fog.color.set(slide.fogCol);
+    }
   }
 
   const newShape = makeShape(slide.shape, slide.shapeSize, slide.col);

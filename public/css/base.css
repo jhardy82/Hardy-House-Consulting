@@ -192,6 +192,15 @@ a:hover { text-decoration: underline; }
 /* ── Focus ring (global) ────────────────────────────────── */
 :focus-visible { outline: none; box-shadow: var(--ring); }
 
+/* ── Nav density: 11 items need compression at ≤1280px ─── */
+@media (max-width: 1280px) and (min-width: 769px) {
+  .nav-links { gap: 0; }
+  .nav-link {
+    padding: var(--space-1) var(--space-2);
+    letter-spacing: 0;
+  }
+}
+
 /* ── Mobile nav (≤768px) ────────────────────────────────── */
 @media (max-width: 768px) {
   .nav-toggle { display: flex; align-items: center; }
