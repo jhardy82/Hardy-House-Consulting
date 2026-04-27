@@ -2,7 +2,11 @@ import express from 'express';
 import helmet from 'helmet';
 import session from 'express-session';
 import request from 'supertest';
+import Database from 'better-sqlite3';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import elementRouter from '../../routes/api/element.js';
+import '../../routes/tasks.js';
 
 const app = express();
 app.use(express.json());
@@ -88,5 +92,46 @@ describe('Security headers', () => {
     const res = await request(app).get('/api/element');
     expect(res.headers['content-security-policy']).toBeDefined();
     expect(res.headers['content-security-policy']).toContain("default-src 'self'");
+  });
+});
+
+const __testDirname = dirname(fileURLToPath(import.meta.url));
+const DB_PATH_TEST  = join(__testDirname, '..', '..', 'tasks', 'tasks.db');
+
+describe('POST /api/element — analytics write', () => {
+  test('valid POST increments element_assignments count for that element', async () => {
+    const dbBefore = new Database(DB_PATH_TEST, { readonly: true });
+    const before   = dbBefore.prepare(
+      "SELECT COUNT(*) as count FROM element_assignments WHERE element = 'earth'"
+    ).get().count;
+    dbBefore.close();
+
+    await request(app).post('/api/element').send({ element: 'earth' }).expect(200);
+
+    const dbAfter = new Database(DB_PATH_TEST, { readonly: true });
+    const after   = dbAfter.prepare(
+      "SELECT COUNT(*) as count FROM element_assignments WHERE element = 'earth'"
+    ).get().count;
+    dbAfter.close();
+
+    expect(after).toBe(before + 1);
+  });
+
+  test('invalid element POST returns 400 and does not write analytics row', async () => {
+    const dbBefore = new Database(DB_PATH_TEST, { readonly: true });
+    const before   = dbBefore.prepare(
+      "SELECT COUNT(*) as count FROM element_assignments"
+    ).get().count;
+    dbBefore.close();
+
+    await request(app).post('/api/element').send({ element: 'invalid' }).expect(400);
+
+    const dbAfter = new Database(DB_PATH_TEST, { readonly: true });
+    const after   = dbAfter.prepare(
+      "SELECT COUNT(*) as count FROM element_assignments"
+    ).get().count;
+    dbAfter.close();
+
+    expect(after).toBe(before);
   });
 });
