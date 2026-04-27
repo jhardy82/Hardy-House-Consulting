@@ -2,6 +2,7 @@ import express from 'express';
 import compression from 'compression';
 import helmet from 'helmet';
 import session from 'express-session';
+import rateLimit from 'express-rate-limit';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import pagesRouter   from './routes/pages.js';
@@ -56,6 +57,7 @@ app.use(session({
   }
 }));
 
+app.use('/api/element', rateLimit({ windowMs: 60_000, max: 10, standardHeaders: true, legacyHeaders: false }));
 app.use('/api/element',    elementRouter);
 app.use('/api/export',     express.json({ limit: '2mb' }), exportRouter);
 app.use('/api/agents',     agentsRouter);
