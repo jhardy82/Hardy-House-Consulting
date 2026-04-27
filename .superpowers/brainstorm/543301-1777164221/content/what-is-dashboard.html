@@ -1,0 +1,61 @@
+<h2>What is the "interactive dashboard and demo"?</h2>
+<p class="subtitle">Two assets already exist in the repo — neither is wired into the live app yet. Pick the direction that matches your intent.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Presentation Deck — embed the 10-slide Three.js deck</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:12px;font-family:monospace;color:#9B7BE0">
+        <div style="color:#C49A1F;margin-bottom:4px">▶ Slide 1/10 — ContextForge Framework</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="width:60px;height:40px;border:1px solid #9B7BE0;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#9B7BE0;font-size:18px">⬡</div>
+          <div style="color:#ccc;font-size:11px">Keyboard nav · Arrow keys · F fullscreen<br>10 slides from demo-presentation.html</div>
+        </div>
+      </div>
+      <p>Migrate the existing 605-line Three.js slide deck into the <code>#presentation</code> SPA section. Keyboard navigation, animated shape reveals, ContextForge branding already built.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Guided Product Tour — narrated walkthrough of the app</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:12px;font-family:monospace;color:#20A8C8">
+        <div style="color:#C49A1F;margin-bottom:4px">Step 2 of 5 — Element Oracle</div>
+        <div style="color:#ccc;font-size:11px">Highlight ring around #oracle section<br>Tooltip: "Answer 5 questions to discover your element"<br>[Skip Tour] [Next →]</div>
+      </div>
+      <p>An overlay tour mode that walks a visitor through the SPA: highlights each section, explains purpose, auto-advances or waits for user. Runs on top of the live app.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>ContextForge Agent Dashboard — live system status view</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:12px;font-family:monospace;color:#2D8050">
+        <div style="color:#C49A1F;margin-bottom:4px">⬡ Agent Status — 5 active</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;color:#ccc">
+          <span>🔥 Fire · Initiator · Online</span>
+          <span>🌍 Earth · Builder · Idle</span>
+          <span>💨 Air · Orchestrator · Active</span>
+          <span>💧 Water · Connector · Online</span>
+          <span style="grid-column:1/-1">✨ Aether · Framework · Monitoring</span>
+        </div>
+      </div>
+      <p>A new dashboard section showing the 5-element agent constellation, PAOAL cycle state, and ContextForge operational status. Data-driven, potentially live-updateable.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="d" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Something else — all three, or a different concept</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:12px;color:#888">
+        <div style="color:#C49A1F;margin-bottom:4px">Describe in terminal ↓</div>
+        <div style="color:#888;font-size:11px">e.g. "A + C combined", "client-facing pitch deck", "demo mode for prospects"</div>
+      </div>
+      <p>Tell me in the terminal what you have in mind. Could be a combination, or something not listed above.</p>
+    </div>
+  </div>
+</div>

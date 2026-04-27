@@ -1,0 +1,135 @@
+<h2>Fleet 4D — Dashboard: layout options</h2>
+<p class="subtitle">New <code>#dashboard</code> SPA section. Shows the 5-element agent constellation (from /api/agents) + task status board (SQLite counts). User's oracle element highlights their agent node.</p>
+
+<div class="split" style="gap:12px;align-items:stretch">
+
+  <!-- Layout A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)" style="cursor:pointer;flex:1">
+    <div class="card-image" style="background:#07040F;padding:12px;min-height:220px">
+      <div style="font-size:10px;color:#C49A1F;font-family:monospace;margin-bottom:8px">Layout A — Side by Side</div>
+      <div style="display:flex;gap:8px;height:180px">
+        <!-- Left: constellation -->
+        <div style="flex:1;background:#1a0d3d;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid #2E1760">
+          <div style="font-size:8px;color:#9B7BE0;font-family:monospace;letter-spacing:.1em">AGENT CONSTELLATION</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0">
+            <div style="width:28px;height:28px;background:#C49A1F22;border:1px solid #C49A1F;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px">🔥</div>
+            <div style="width:28px;height:28px;background:#2D805022;border:1px solid #2D8050;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px">🌍</div>
+            <div style="width:28px;height:28px;background:#3B5FC822;border:1px solid #3B5FC8;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px">💨</div>
+            <div style="width:28px;height:28px;background:#20A8C822;border:1px solid #20A8C8;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px">💧</div>
+          </div>
+          <div style="width:28px;height:28px;background:#9B7BE022;border:2px solid #9B7BE0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px">✨</div>
+          <div style="font-size:7px;color:#555;margin-top:2px">Three.js orbital canvas</div>
+        </div>
+        <!-- Right: task board -->
+        <div style="flex:1;background:#1a0d3d;border-radius:4px;display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid #2E1760">
+          <div style="font-size:8px;color:#C49A1F;font-family:monospace;letter-spacing:.1em">TASK STATUS</div>
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 6px;background:#2D805022;border-radius:3px;border-left:2px solid #2D8050;font-size:9px">
+              <span style="color:#ccc">Open</span><span style="color:#2D8050;font-weight:bold">12</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 6px;background:#3B5FC822;border-radius:3px;border-left:2px solid #3B5FC8;font-size:9px">
+              <span style="color:#ccc">In Progress</span><span style="color:#3B5FC8;font-weight:bold">5</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 6px;background:#C49A1F22;border-radius:3px;border-left:2px solid #C49A1F;font-size:9px">
+              <span style="color:#ccc">Blocked</span><span style="color:#C49A1F;font-weight:bold">2</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 6px;background:#9B7BE022;border-radius:3px;border-left:2px solid #9B7BE0;font-size:9px">
+              <span style="color:#ccc">Done</span><span style="color:#9B7BE0;font-weight:bold">28</span>
+            </div>
+          </div>
+          <div style="font-size:7px;color:#555">Live from SQLite · 30s refresh</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Side by Side</h3>
+      <p>Constellation left, task board right. Both visible simultaneously. Clean 50/50 split. Standard dashboard pattern.</p>
+    </div>
+  </div>
+
+  <!-- Layout B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)" style="cursor:pointer;flex:1">
+    <div class="card-image" style="background:#07040F;padding:12px;min-height:220px">
+      <div style="font-size:10px;color:#C49A1F;font-family:monospace;margin-bottom:8px">Layout B — Command Centre (Recommended)</div>
+      <div style="height:180px;background:#1a0d3d;border-radius:4px;padding:8px;border:1px solid #2E1760;display:flex;flex-direction:column;gap:6px">
+        <!-- Top: constellation hero -->
+        <div style="flex:1.4;display:flex;align-items:center;justify-content:center;gap:8px;border-bottom:1px solid #2E1760;padding-bottom:6px">
+          <div style="width:22px;height:22px;background:#C49A1F22;border:1px solid #C49A1F;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px">🔥</div>
+          <div style="width:22px;height:22px;background:#2D805022;border:1px solid #2D8050;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px">🌍</div>
+          <div style="width:28px;height:28px;background:#9B7BE033;border:2px solid #9B7BE0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 0 8px #9B7BE066">✨</div>
+          <div style="width:22px;height:22px;background:#3B5FC822;border:1px solid #3B5FC8;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px">💨</div>
+          <div style="width:22px;height:22px;background:#20A8C822;border:1px solid #20A8C8;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px">💧</div>
+        </div>
+        <!-- Bottom: 4-metric task bar -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+          <div style="text-align:center;padding:4px;background:#2D805011;border-radius:3px;border:1px solid #2D805044">
+            <div style="font-size:14px;color:#2D8050;font-weight:bold">12</div>
+            <div style="font-size:7px;color:#888">Open</div>
+          </div>
+          <div style="text-align:center;padding:4px;background:#3B5FC811;border-radius:3px;border:1px solid #3B5FC844">
+            <div style="font-size:14px;color:#3B5FC8;font-weight:bold">5</div>
+            <div style="font-size:7px;color:#888">Active</div>
+          </div>
+          <div style="text-align:center;padding:4px;background:#C49A1F11;border-radius:3px;border:1px solid #C49A1F44">
+            <div style="font-size:14px;color:#C49A1F;font-weight:bold">2</div>
+            <div style="font-size:7px;color:#888">Blocked</div>
+          </div>
+          <div style="text-align:center;padding:4px;background:#9B7BE011;border-radius:3px;border:1px solid #9B7BE044">
+            <div style="font-size:14px;color:#9B7BE0;font-weight:bold">28</div>
+            <div style="font-size:7px;color:#888">Done</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Command Centre</h3>
+      <p>Agent constellation dominates top (Three.js hero canvas). Task metrics as a tight 4-number stat bar below. User's element glows. Dramatic, high-impact.</p>
+    </div>
+  </div>
+
+  <!-- Layout C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)" style="cursor:pointer;flex:1">
+    <div class="card-image" style="background:#07040F;padding:12px;min-height:220px">
+      <div style="font-size:10px;color:#C49A1F;font-family:monospace;margin-bottom:8px">Layout C — Full Width Stacked</div>
+      <div style="height:180px;background:#1a0d3d;border-radius:4px;padding:8px;border:1px solid #2E1760;display:flex;flex-direction:column;gap:6px">
+        <!-- Full-width constellation -->
+        <div style="flex:2;display:flex;align-items:center;justify-content:space-around;border-bottom:1px solid #2E1760;padding-bottom:6px">
+          <div style="text-align:center">
+            <div style="width:20px;height:20px;background:#C49A1F22;border:1px solid #C49A1F;border-radius:3px;margin:0 auto 2px;display:flex;align-items:center;justify-content:center;font-size:8px">🔥</div>
+            <div style="font-size:7px;color:#888">Fire</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:20px;height:20px;background:#2D805022;border:1px solid #2D8050;border-radius:3px;margin:0 auto 2px;display:flex;align-items:center;justify-content:center;font-size:8px">🌍</div>
+            <div style="font-size:7px;color:#888">Earth</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:24px;height:24px;background:#9B7BE033;border:2px solid #9B7BE0;border-radius:50%;margin:0 auto 2px;display:flex;align-items:center;justify-content:center;font-size:9px">✨</div>
+            <div style="font-size:7px;color:#9B7BE0">Aether ← you</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:20px;height:20px;background:#3B5FC822;border:1px solid #3B5FC8;border-radius:3px;margin:0 auto 2px;display:flex;align-items:center;justify-content:center;font-size:8px">💨</div>
+            <div style="font-size:7px;color:#888">Air</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:20px;height:20px;background:#20A8C822;border:1px solid #20A8C8;border-radius:3px;margin:0 auto 2px;display:flex;align-items:center;justify-content:center;font-size:8px">💧</div>
+            <div style="font-size:7px;color:#888">Water</div>
+          </div>
+        </div>
+        <!-- Full-width task list -->
+        <div style="flex:1;display:flex;gap:4px;align-items:stretch">
+          <div style="flex:1;padding:4px;background:#07040F;border-radius:3px;border-top:2px solid #2D8050;text-align:center;font-size:8px;color:#2D8050">Open<br><strong style="font-size:12px">12</strong></div>
+          <div style="flex:1;padding:4px;background:#07040F;border-radius:3px;border-top:2px solid #3B5FC8;text-align:center;font-size:8px;color:#3B5FC8">Active<br><strong style="font-size:12px">5</strong></div>
+          <div style="flex:1;padding:4px;background:#07040F;border-radius:3px;border-top:2px solid #C49A1F;text-align:center;font-size:8px;color:#C49A1F">Blocked<br><strong style="font-size:12px">2</strong></div>
+          <div style="flex:1;padding:4px;background:#07040F;border-radius:3px;border-top:2px solid #9B7BE0;text-align:center;font-size:8px;color:#9B7BE0">Done<br><strong style="font-size:12px">28</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Full-Width Stacked</h3>
+      <p>Constellation spans full width (all 5 elements in a row with labels), task metrics as a full-width bar below. Most readable element labels. Horizontal flow.</p>
+    </div>
+  </div>
+
+</div>
+
+<p style="margin-top:12px;font-size:11px;color:#888">All layouts: Three.js canvas for agent visuals · User's oracle element glows/pulses · Task counts from <code>GET /api/tasks/summary</code> (new endpoint) · 30-second auto-refresh</p>

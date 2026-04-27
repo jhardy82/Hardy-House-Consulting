@@ -1,0 +1,168 @@
+<h2>Which 3D representation for Metatron's Cube?</h2>
+<p class="subtitle">All three build on existing code — the difference is geometric depth and wow-factor.</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#07040F;padding:1.5rem;min-height:200px;display:flex;align-items:center;justify-content:center;">
+      <svg width="180" height="180" viewBox="-100 -100 200 200">
+        <!-- Vector Equilibrium: 1 center + 12 outer spheres + all 78 lines -->
+        <defs>
+          <radialGradient id="gA" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#C49A1F" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#C49A1F" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Outer ring of 6 (equator) -->
+        <line x1="0" y1="0" x2="60" y2="0" stroke="#C49A1F" stroke-opacity="0.4" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="30" y2="-52" stroke="#C49A1F" stroke-opacity="0.4" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="-30" y2="-52" stroke="#C49A1F" stroke-opacity="0.4" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="-60" y2="0" stroke="#C49A1F" stroke-opacity="0.4" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="-30" y2="52" stroke="#C49A1F" stroke-opacity="0.4" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="30" y2="52" stroke="#C49A1F" stroke-opacity="0.4" stroke-width="0.7"/>
+        <!-- Top/bottom cap nodes (3D foreshortened) -->
+        <line x1="0" y1="0" x2="0" y2="-75" stroke="#9B7BE0" stroke-opacity="0.5" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="0" y2="75" stroke="#9B7BE0" stroke-opacity="0.5" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="45" y2="-38" stroke="#9B7BE0" stroke-opacity="0.3" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="-45" y2="-38" stroke="#9B7BE0" stroke-opacity="0.3" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="45" y2="38" stroke="#9B7BE0" stroke-opacity="0.3" stroke-width="0.7"/>
+        <line x1="0" y1="0" x2="-45" y2="38" stroke="#9B7BE0" stroke-opacity="0.3" stroke-width="0.7"/>
+        <!-- Interconnecting lines between outer nodes -->
+        <line x1="60" y1="0" x2="30" y2="-52" stroke="#C49A1F" stroke-opacity="0.25" stroke-width="0.5"/>
+        <line x1="30" y1="-52" x2="-30" y2="-52" stroke="#C49A1F" stroke-opacity="0.25" stroke-width="0.5"/>
+        <line x1="-30" y1="-52" x2="-60" y2="0" stroke="#C49A1F" stroke-opacity="0.25" stroke-width="0.5"/>
+        <line x1="-60" y1="0" x2="-30" y2="52" stroke="#C49A1F" stroke-opacity="0.25" stroke-width="0.5"/>
+        <line x1="-30" y1="52" x2="30" y2="52" stroke="#C49A1F" stroke-opacity="0.25" stroke-width="0.5"/>
+        <line x1="30" y1="52" x2="60" y2="0" stroke="#C49A1F" stroke-opacity="0.25" stroke-width="0.5"/>
+        <!-- Cross lines -->
+        <line x1="60" y1="0" x2="-60" y2="0" stroke="#C49A1F" stroke-opacity="0.15" stroke-width="0.5"/>
+        <line x1="30" y1="-52" x2="-30" y2="52" stroke="#C49A1F" stroke-opacity="0.15" stroke-width="0.5"/>
+        <line x1="-30" y1="-52" x2="30" y2="52" stroke="#C49A1F" stroke-opacity="0.15" stroke-width="0.5"/>
+        <line x1="0" y1="-75" x2="0" y2="75" stroke="#9B7BE0" stroke-opacity="0.2" stroke-width="0.5"/>
+        <!-- Nodes -->
+        <circle cx="0" cy="0" r="6" fill="#C49A1F" fill-opacity="0.9"/>
+        <circle cx="60" cy="0" r="4" fill="#C49A1F" fill-opacity="0.7"/>
+        <circle cx="30" cy="-52" r="4" fill="#C49A1F" fill-opacity="0.7"/>
+        <circle cx="-30" cy="-52" r="4" fill="#C49A1F" fill-opacity="0.7"/>
+        <circle cx="-60" cy="0" r="4" fill="#C49A1F" fill-opacity="0.7"/>
+        <circle cx="-30" cy="52" r="4" fill="#C49A1F" fill-opacity="0.7"/>
+        <circle cx="30" cy="52" r="4" fill="#C49A1F" fill-opacity="0.7"/>
+        <circle cx="0" cy="-75" r="4" fill="#9B7BE0" fill-opacity="0.7"/>
+        <circle cx="0" cy="75" r="4" fill="#9B7BE0" fill-opacity="0.7"/>
+        <circle cx="45" cy="-38" r="3.5" fill="#9B7BE0" fill-opacity="0.6"/>
+        <circle cx="-45" cy="-38" r="3.5" fill="#9B7BE0" fill-opacity="0.6"/>
+        <circle cx="45" cy="38" r="3.5" fill="#9B7BE0" fill-opacity="0.6"/>
+        <circle cx="-45" cy="38" r="3.5" fill="#9B7BE0" fill-opacity="0.6"/>
+        <!-- Glow -->
+        <circle cx="0" cy="0" r="20" fill="url(#gA)" fill-opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>A — Vector Equilibrium (Recommended)</h3>
+      <p>13 glowing spheres in 3D space — 1 centre + 12 cuboctahedron vertices — connected by all 78 Metatron lines. Fully orbitable. Uses existing OrbitControl + buildGlowEdge patterns.</p>
+      <p style="color:#C49A1F;font-size:0.8em;margin-top:0.5rem;">★ Most accurate sacred geometry · reuses existing code · cleanest visual</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#07040F;padding:1.5rem;min-height:200px;display:flex;align-items:center;justify-content:center;">
+      <svg width="180" height="180" viewBox="-100 -100 200 200">
+        <!-- 64-tetrahedron grid: simplified preview -->
+        <defs>
+          <radialGradient id="gB" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#9B7BE0" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#9B7BE0" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Grid of tetrahedra, 4x4 arrangement hinted -->
+        <g stroke="#9B7BE0" stroke-opacity="0.5" stroke-width="0.8" fill="none">
+          <!-- row 1 -->
+          <polygon points="-80,-20 -55,-65 -30,-20" fill="#9B7BE0" fill-opacity="0.08"/>
+          <polygon points="-30,-20 -55,-65 -5,-65" fill="#9B7BE0" fill-opacity="0.04"/>
+          <polygon points="-30,-20 -5,-65 20,-20" fill="#9B7BE0" fill-opacity="0.08"/>
+          <polygon points="20,-20 -5,-65 45,-65" fill="#9B7BE0" fill-opacity="0.04"/>
+          <polygon points="20,-20 45,-65 70,-20" fill="#9B7BE0" fill-opacity="0.08"/>
+          <!-- row 2 -->
+          <polygon points="-80,30 -55,-20 -30,30" fill="#C49A1F" fill-opacity="0.06"/>
+          <polygon points="-30,30 -55,-20 -5,-20" fill="#C49A1F" fill-opacity="0.03"/>
+          <polygon points="-30,30 -5,-20 20,30" fill="#C49A1F" fill-opacity="0.06"/>
+          <polygon points="20,30 -5,-20 45,-20" fill="#C49A1F" fill-opacity="0.03"/>
+          <polygon points="20,30 45,-20 70,30" fill="#C49A1F" fill-opacity="0.06"/>
+          <!-- row 3 -->
+          <polygon points="-80,75 -55,30 -30,75" fill="#9B7BE0" fill-opacity="0.05"/>
+          <polygon points="-30,75 -55,30 -5,30" fill="#9B7BE0" fill-opacity="0.02"/>
+          <polygon points="-30,75 -5,30 20,75" fill="#9B7BE0" fill-opacity="0.05"/>
+          <polygon points="20,75 -5,30 45,30" fill="#9B7BE0" fill-opacity="0.02"/>
+          <polygon points="20,75 45,30 70,75" fill="#9B7BE0" fill-opacity="0.05"/>
+        </g>
+        <circle cx="0" cy="0" r="30" fill="url(#gB)" fill-opacity="0.4"/>
+        <text x="0" y="5" text-anchor="middle" fill="#9B7BE0" font-size="10" opacity="0.7">64 tet</text>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>B — 64-Tetrahedron Grid</h3>
+      <p>The "isotropic vector matrix" — 64 tetrahedra tiling 3D space. Spectacular but complex. No direct mapping to existing CLAUDE.md invariants. Requires new geometry module.</p>
+      <p style="color:#888;font-size:0.8em;margin-top:0.5rem;">More impressive at first glance · harder to implement correctly · less sacred-geometry-accurate for Metatron specifically</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#07040F;padding:1.5rem;min-height:200px;display:flex;align-items:center;justify-content:center;">
+      <svg width="180" height="180" viewBox="-100 -100 200 200">
+        <!-- 2D-to-3D morph: flat Metatron lifting into perspective -->
+        <defs>
+          <radialGradient id="gC" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#20A8C8" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#20A8C8" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Flat 2D Metatron (bottom) -->
+        <g transform="translate(0,40) scale(0.85)" stroke="#C49A1F" stroke-opacity="0.4" fill="none" stroke-width="0.6">
+          <line x1="0" y1="0" x2="40" y2="0"/>
+          <line x1="0" y1="0" x2="20" y2="-35"/>
+          <line x1="0" y1="0" x2="-20" y2="-35"/>
+          <line x1="0" y1="0" x2="-40" y2="0"/>
+          <line x1="0" y1="0" x2="-20" y2="35"/>
+          <line x1="0" y1="0" x2="20" y2="35"/>
+          <line x1="40" y1="0" x2="20" y2="-35"/>
+          <line x1="20" y1="-35" x2="-20" y2="-35"/>
+          <line x1="-20" y1="-35" x2="-40" y2="0"/>
+          <line x1="-40" y1="0" x2="-20" y2="35"/>
+          <line x1="-20" y1="35" x2="20" y2="35"/>
+          <line x1="20" y1="35" x2="40" y2="0"/>
+          <line x1="40" y1="0" x2="-40" y2="0"/>
+          <circle cx="0" cy="0" r="3" fill="#C49A1F" fill-opacity="0.7"/>
+        </g>
+        <!-- 3D version (top, emerging) -->
+        <g transform="translate(0,-30) scale(0.6)" stroke="#20A8C8" stroke-opacity="0.7" fill="none" stroke-width="0.9">
+          <line x1="0" y1="0" x2="50" y2="0"/>
+          <line x1="0" y1="0" x2="25" y2="-43"/>
+          <line x1="0" y1="0" x2="-25" y2="-43"/>
+          <line x1="0" y1="0" x2="-50" y2="0"/>
+          <line x1="0" y1="0" x2="-25" y2="43"/>
+          <line x1="0" y1="0" x2="25" y2="43"/>
+          <line x1="0" y1="0" x2="0" y2="-65"/>
+          <line x1="0" y1="0" x2="0" y2="65"/>
+          <circle cx="0" cy="0" r="4" fill="#20A8C8" fill-opacity="0.9"/>
+          <circle cx="0" cy="-65" r="3" fill="#9B7BE0" fill-opacity="0.7"/>
+          <circle cx="0" cy="65" r="3" fill="#9B7BE0" fill-opacity="0.7"/>
+        </g>
+        <!-- Connecting morph arrows -->
+        <line x1="-15" y1="0" x2="-15" y2="-15" stroke="#888" stroke-opacity="0.4" stroke-width="0.8" stroke-dasharray="2,2"/>
+        <line x1="15" y1="0" x2="15" y2="-15" stroke="#888" stroke-opacity="0.4" stroke-width="0.8" stroke-dasharray="2,2"/>
+        <circle cx="0" cy="0" r="40" fill="url(#gC)" fill-opacity="0.15"/>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>C — Animated 2D→3D Morph</h3>
+      <p>Start from the existing flat MetatronScene, then animate the 13 centres rising into 3D space. A unique "construction" reveal. More animation engineering than geometry.</p>
+      <p style="color:#888;font-size:0.8em;margin-top:0.5rem;">Visually dramatic · complex animation state · diverges from existing scene pattern</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top:1.5rem;padding:1rem;border:1px solid rgba(196,154,31,0.2);border-radius:6px;background:rgba(196,154,31,0.03);">
+  <p class="label">Context</p>
+  <p style="font-size:0.85em;color:#aaa;">The existing #geometry section already has: (1) a 2D MetatronScene with 78 flat lines, (2) a Cuboctahedron shape with outer-shell edges only. Option A fills the gap — 13 spheres in true 3D with all 78 internal connecting lines, fully orbitable. It directly extends CLAUDE.md invariants to 3D.</p>
+</div>

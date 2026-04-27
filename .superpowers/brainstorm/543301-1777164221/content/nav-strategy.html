@@ -1,0 +1,49 @@
+<h2>How should the presentation handle navigation?</h2>
+<p class="subtitle">Arrow keys + fullscreen work perfectly standalone — but the SPA's hash router and scroll system compete for the same key events when the deck is embedded.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Fullscreen-on-enter (Recommended)</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:11px;color:#C49A1F">
+        <div>User clicks → enters fullscreen mode</div>
+        <div style="color:#9B7BE0;margin-top:4px">Section shows: [▶ Start Presentation] button</div>
+        <div style="color:#ccc;margin-top:4px">Inside fullscreen: arrow keys, F to exit → no conflicts</div>
+      </div>
+      <p>Clicking "Start Presentation" enters the Browser Fullscreen API. All key events are isolated. Matches how the source file already works. Press Escape or F exits. Section shows a preview/thumbnail before entry.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Click-to-advance (embedded, no fullscreen)</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:11px;color:#20A8C8">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#888">← Prev</span>
+          <span style="color:#ccc">Slide 3 / 10</span>
+          <span style="color:#C49A1F">Next →</span>
+        </div>
+        <div style="margin:8px 0;padding:8px;background:#07040F;border-radius:3px;text-align:center;color:#9B7BE0;font-size:13px">
+          [Three.js shape animation]
+        </div>
+        <div style="color:#888;font-size:10px">Visible prev/next buttons · No keyboard conflicts</div>
+      </div>
+      <p>Render the deck inside the section with explicit prev/next buttons. Disable keyboard navigation to avoid conflicts. The presentation fills the section viewport but stays embedded. Simpler, but less immersive.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Focus-gated keyboard (embedded + keys when focused)</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:11px;color:#1B5E35">
+        <div style="color:#ccc">Click presentation to "focus" it</div>
+        <div style="color:#1B5E35;margin-top:4px">While focused: arrow keys advance slides</div>
+        <div style="color:#888;margin-top:4px">Click outside → keys return to SPA scroll</div>
+      </div>
+      <p>A tabindex container captures key events only when the user has clicked into the presentation area. Focus ring shows active state. Escape releases focus. Most ergonomic if you want to stay embedded with keyboard nav.</p>
+    </div>
+  </div>
+</div>

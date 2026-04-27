@@ -1,0 +1,63 @@
+<h2>Three approaches for dashboard + demo</h2>
+<p class="subtitle">Two independent subsystems: a .pptx client deck and a tasks+agents web dashboard. The question is sequencing and scoping.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Both specs now — execute as separate fleets (Recommended)</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:11px;color:#ccc">
+        <div style="color:#C49A1F;margin-bottom:6px">This session → 2 design specs written</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="padding:6px;background:#07040F;border-radius:3px;border:1px solid #9B7BE0">
+            <div style="color:#9B7BE0;font-size:10px;margin-bottom:3px">Fleet 4C · PPTX</div>
+            <div>12-slide hybrid deck<br>ContextForge + pitch wrapper<br>Hardy House branding</div>
+          </div>
+          <div style="padding:6px;background:#07040F;border-radius:3px;border:1px solid #20A8C8">
+            <div style="color:#20A8C8;font-size:10px;margin-bottom:3px">Fleet 4D · Dashboard</div>
+            <div>#dashboard SPA section<br>Agent graph + task counts<br>Oracle element highlight</div>
+          </div>
+        </div>
+      </div>
+      <p>Write specs for both subsystems now while context is hot. Each becomes its own implementation fleet. No design debt. You decide execution order. Best for complex features with different tech stacks.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Both fully designed before any code</li><li>Specs are independent — execute in any order</li><li>No re-brainstorming later</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Longer brainstorming session</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>PPTX now — skip spec, generate immediately</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:11px;color:#ccc">
+        <div style="color:#C49A1F;margin-bottom:4px">PPTX: generate directly (no spec needed)</div>
+        <div style="color:#888">Dashboard: spec + fleet later</div>
+        <div style="margin-top:6px;font-size:10px;color:#2D8050">⚡ Fastest path to a .pptx file</div>
+      </div>
+      <p>A .pptx deck from a defined content structure doesn't need a full spec — it just needs a slide outline. Invoke the PPTX skill directly, generate the file, then separately brainstorm the dashboard.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Immediate deliverable: a real .pptx file</li><li>PPTX content is already defined (hybrid structure)</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Dashboard design deferred</li><li>Two separate brainstorming sessions needed</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Dashboard spec only — PPTX is out of scope</h3>
+      <div style="margin:10px 0;padding:10px;background:#1a0d3d;border-radius:6px;font-size:11px;color:#ccc">
+        <div style="color:#C49A1F;margin-bottom:4px">Focus: #dashboard SPA section</div>
+        <div style="color:#888">Agent graph + task status board + oracle integration</div>
+        <div style="margin-top:6px;font-size:10px;color:#3B5FC8">Single well-scoped spec → cleaner plan</div>
+      </div>
+      <p>Treat the PPTX as out of scope for now — it's a document artifact, not a web feature. Focus entirely on designing the web dashboard section: agent constellation, task counts, element highlighting, data refresh.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Tight focus, clear deliverable</li><li>Dashboard is the higher-complexity item</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>PPTX still unaddressed</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
