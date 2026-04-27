@@ -29,8 +29,9 @@ NODE_ENV=development
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
 ```
 
-<!-- VERIFY: SESSION_SECRET minimum character length or entropy requirements beyond the 64-char hint in .env.example -->
-<!-- VERIFY: RESEND_API_KEY format constraints (prefix, length) beyond the re_xx… placeholder shown in .env.example -->
+> **Generating `SESSION_SECRET`:** Run `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` to produce a cryptographically random 64-character hex string. Any secret of equivalent entropy (32+ random bytes) is acceptable.
+
+> **`RESEND_API_KEY` format:** Keys begin with the prefix `re_` followed by 48 alphanumeric characters (total ≈ 51 characters). Example shape: `re_AbCdEfGhIjKlMnOpQrStUvWxYz01234567890123456`.
 
 ---
 
@@ -140,4 +141,3 @@ Helmet applies the following CSP directives:
 | `production` | Rate limiting enforced. `cookie.secure` is `true`. Missing `SESSION_SECRET` throws at startup. Missing `RESEND_API_KEY` returns `503` from the contact endpoint. |
 
 For Render.com deployments, set `SESSION_SECRET`, `NODE_ENV=production`, and `RESEND_API_KEY` in the service's **Environment** tab in the Render dashboard.
-<!-- VERIFY: Exact Render.com dashboard path or UI steps for setting environment variables -->
