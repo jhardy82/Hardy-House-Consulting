@@ -393,15 +393,28 @@ test.describe('#contact — contact card', () => {
     await expect(page.locator('#contactRole')).toContainText('Modern Workplace');
   });
 
-  test('"Get in touch" panel is visible', async ({ page }) => {
+  test('contact form is rendered with required fields', async ({ page }) => {
     await goTo(page, '#contact');
-    await expect(page.locator('#contactPanelTitle')).toContainText('Get in touch');
+    await expect(page.locator('#contactForm')).toBeVisible();
+    await expect(page.locator('#contactFormName')).toBeVisible();
+    await expect(page.locator('#contactFormEmail')).toBeVisible();
+    await expect(page.locator('#contactFormMsg')).toBeVisible();
+    await expect(page.locator('#contactFormSubmit')).toBeVisible();
   });
 
-  test('clicking the contact panel triggers a toast notification', async ({ page }) => {
+  test('filling and submitting the form shows success message', async ({ page }) => {
     await goTo(page, '#contact');
-    await page.locator('#contactPanel').click();
-    await expect(page.locator('#toast')).toBeVisible({ timeout: 3000 });
+    await page.fill('#contactFormName', 'Test User');
+    await page.fill('#contactFormEmail', 'test@example.com');
+    await page.fill('#contactFormMsg', 'Hello from Playwright');
+    await page.locator('#contactFormSubmit').click();
+    await expect(page.locator('[data-contact="success"]')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-contact="success"]')).toContainText('Message sent');
+  });
+
+  test('fallback mailto link is present', async ({ page }) => {
+    await goTo(page, '#contact');
+    await expect(page.locator('a[href="mailto:james@hardyhouseconsulting.com"]')).toBeVisible();
   });
 });
 

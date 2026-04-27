@@ -7,95 +7,125 @@ export function init() {
   const section = document.querySelector('[data-section="contact"]');
   if (!section) return;
 
-  // Build the contact card UI using safe DOM methods
   const container = document.createElement('div');
   container.id = 'contactContainer';
 
-  // Logo Area
+  // Logo area
   const logoArea = document.createElement('div');
   logoArea.id = 'contactLogo';
-
   const symbol = document.createElement('div');
   symbol.id = 'contactSymbol';
   symbol.textContent = '◇ ◈ ◇';
-
   const word = document.createElement('div');
   word.id = 'contactWord';
   word.textContent = 'Hardy House Consulting';
-
   const divider = document.createElement('div');
   divider.id = 'contactDivider';
-
   logoArea.append(symbol, word, divider);
 
-  // Centre -- Contact Info
+  // Centre — name and role
   const centre = document.createElement('div');
   centre.id = 'contactCentre';
-
-  const name = document.createElement('div');
-  name.id = 'contactName';
-
+  const nameEl = document.createElement('div');
+  nameEl.id = 'contactName';
   const first = document.createElement('span');
   first.textContent = 'James';
-
   const last = document.createElement('span');
   last.textContent = 'Hardy';
-
-  name.append(first, last);
-
+  nameEl.append(first, last);
   const role = document.createElement('div');
   role.id = 'contactRole';
   role.textContent = 'Modern Workplace · Endpoint Engineering';
+  centre.append(nameEl, role);
 
-  centre.append(name, role);
+  // Contact form — replaces the old panel
+  const formWrap = document.createElement('div');
+  formWrap.id = 'contactFormWrap';
 
-  // Contact Panel
-  const panel = document.createElement('div');
-  panel.id = 'contactPanel';
+  const form = document.createElement('form');
+  form.id = 'contactForm';
 
-  const panelTitle = document.createElement('div');
-  panelTitle.id = 'contactPanelTitle';
-  panelTitle.textContent = 'Get in touch';
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.id = 'contactFormName';
+  nameInput.required = true;
+  nameInput.maxLength = 100;
+  nameInput.placeholder = 'Your name';
 
-  const panelBody = document.createElement('div');
-  panelBody.id = 'contactPanelBody';
+  const emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.id = 'contactFormEmail';
+  emailInput.required = true;
+  emailInput.placeholder = 'your@email.com';
 
-  const locLine = document.createElement('div');
-  locLine.textContent = '📍 Denver, CO · Avanade (Microsoft/Accenture JV)';
+  const msgInput = document.createElement('textarea');
+  msgInput.id = 'contactFormMsg';
+  msgInput.required = true;
+  msgInput.maxLength = 2000;
+  msgInput.rows = 4;
+  msgInput.placeholder = "What's on your mind?";
 
-  const liLine = document.createElement('div');
-  const liLink = document.createElement('a');
-  liLink.href = 'https://www.linkedin.com/in/jameshardy82';
-  liLink.target = '_blank';
-  liLink.rel = 'noopener noreferrer';
-  liLink.textContent = 'linkedin.com/in/jameshardy82';
-  liLink.addEventListener('click', e => e.stopPropagation());
-  liLine.append(document.createTextNode('💼 LinkedIn: '), liLink);
+  const errorDiv = document.createElement('div');
+  errorDiv.id = 'contactFormError';
+  errorDiv.style.display = 'none';
 
-  const emLine = document.createElement('div');
-  emLine.textContent = '✉ Tap to copy email';
+  const submitBtn = document.createElement('button');
+  submitBtn.type = 'submit';
+  submitBtn.id = 'contactFormSubmit';
+  submitBtn.textContent = 'Send message';
 
-  panelBody.append(locLine, liLine, emLine);
+  form.append(nameInput, emailInput, msgInput, errorDiv, submitBtn);
 
-  panel.append(panelTitle, panelBody);
+  // Fallback mailto link
+  const fallback = document.createElement('div');
+  fallback.className = 'contact-mailto-fallback';
+  const fallbackLink = document.createElement('a');
+  fallbackLink.href = 'mailto:james@hardyhouseconsulting.com';
+  fallbackLink.textContent = 'james@hardyhouseconsulting.com';
+  fallback.append(document.createTextNode('Or email me directly: '), fallbackLink);
 
-  container.append(logoArea, centre, panel);
+  formWrap.append(form, fallback);
+  container.append(logoArea, centre, formWrap);
   section.appendChild(container);
 
-  // Attach copy-to-clipboard handler
-  const toast = document.querySelector('#toast');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.textContent = 'Sending…';
+    submitBtn.disabled = true;
+    errorDiv.style.display = 'none';
 
-  if (toast) {
-    panel.addEventListener('click', () => {
-      const email = 'james@hardyhouseconsulting.com';
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(email).catch(() => {
-          // Silently fail if clipboard API unavailable
-        });
+    const body = {
+      name:    nameInput.value.trim(),
+      email:   emailInput.value.trim(),
+      message: msgInput.value.trim(),
+    };
+
+    try {
+      const res  = await fetch('/api/contact', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        const success = document.createElement('div');
+        success.dataset.contact = 'success';
+        success.textContent = "Message sent — I'll be in touch soon.";
+        form.replaceWith(success);
+        return;
       }
-      toast.textContent = 'Email copied';
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1600);
-    });
-  }
+
+      errorDiv.textContent = res.status === 429
+        ? 'Too many requests — please wait a few minutes.'
+        : (data.error || 'Something went wrong — please try again.');
+      errorDiv.style.display = '';
+    } catch {
+      errorDiv.textContent = 'Network error — please try again.';
+      errorDiv.style.display = '';
+    }
+
+    submitBtn.textContent = 'Send message';
+    submitBtn.disabled = false;
+  });
 }
