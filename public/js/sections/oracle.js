@@ -14,6 +14,7 @@ import { createRenderer } from '../utils/createRenderer.js';
 // -- Module-level state -------------------------------------------------------
 
 let _oRevealScene = null; // registered into _scenes; cleared on re-init
+let initialised   = false;
 
 // -- Questions ----------------------------------------------------------------
 
@@ -34,7 +35,7 @@ const ORACLE_QUESTIONS = [
     q:   'Motion or stillness?',
     ctx: 'Where does your best thinking happen.',
     a:   ['In motion -- walking, driving', 'In stillness -- quiet focus'],
-    el:  ['air', 'water'],
+    el:  ['water', 'air'],
   },
   {
     q:   'Detail or vision?',
@@ -307,6 +308,9 @@ function showReveal(revealDiv, winner, progEl, stepsEl) {
 // -- init() -------------------------------------------------------------------
 
 export function init() {
+  if (initialised) return;
+  initialised = true;
+
   if (!window.THREE) {
     console.warn('[oracle] Three.js not loaded');
     return;

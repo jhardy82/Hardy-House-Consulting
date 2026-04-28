@@ -894,7 +894,7 @@ class Metatron3DScene {
     this._nodeMeshes.forEach(m => { m.visible = showNodes; });
   }
 
-  tick(t, boost = 1) {
+  tick(t, _boost = 1) {
     if (!this.running || !this.renderer) return;
     this.orbit.update(!this.orbit.dn);
     this.renderer.render(this.scene, this.camera);

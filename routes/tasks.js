@@ -34,6 +34,11 @@ try {
     element     TEXT    NOT NULL CHECK(element IN ('fire','earth','air','water','aether')),
     assigned_at TEXT    NOT NULL DEFAULT (datetime('now'))
   )`).run();
+  db.prepare(`CREATE TABLE IF NOT EXISTS section_visits (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    section    TEXT NOT NULL,
+    visited_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`).run();
 } catch (err) {
   console.error('tasks: failed to open tasks.db:', err.message);
   process.exit(1);

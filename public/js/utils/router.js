@@ -80,4 +80,9 @@ async function navigate() {
     }
   }
   localStorage.setItem('hh-last-section', id);
+  fetch('/api/analytics/pageview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ section: id }),
+  }).catch(() => {});
 }
