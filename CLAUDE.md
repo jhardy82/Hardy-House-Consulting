@@ -7,7 +7,7 @@
 ## Project Identity
 
 **Name:** Hardy House Consulting App  
-**Owner:** James Hardy — Modern Workplace / Endpoint Engineering Consultant, Avanade  
+**Owner:** James Hardy — Modern Workplace / Endpoint Engineering Consultant, [EMPLOYER_NAME]  
 **Stack:** Node.js + Express · Vanilla JS (ES Modules) · Three.js r128 · GSAP 3 · Jest + Playwright  
 **Deployment:** Local dev (`npm run dev`) + Render.com (Node.js, not static)  
 **Entry point:** `server.js` → serves `views/index.html` → hash router loads sections
